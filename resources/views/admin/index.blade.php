@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     @include('admin.src.headers')
-    <title>Service Electric | Admin Panel</title>
+    <title>Service Electronic | Admin Panel</title>
     <link href="{{ asset('resources/css/admin/main.css') }}?time={{ now() }}" rel="stylesheet">
     <link href="{{ asset('resources/css/admin/dashboard.css') }}?time={{ now() }}" rel="stylesheet">
   </head>
@@ -146,6 +146,20 @@
     </div>
 
     <div id="alerts" class="noties topright"></div>
+
+    <div class="modal fade" id="message-dialog-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content form">
+          <div class="modal-header">
+            <h2 class="modal-title"></h2>
+          </div>
+          <div class="modal-body">
+          </div>
+          <div class="modal-footer">
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script src="{{ asset('/resources/js/admin/main.js') }}?time={{ now() }}"></script>
     <script src="{{ asset('/resources/js/address-input/index.js') }}?time={{ now() }}"></script>

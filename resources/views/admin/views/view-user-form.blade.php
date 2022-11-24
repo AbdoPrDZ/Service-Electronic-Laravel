@@ -31,12 +31,6 @@
               <hr>
 
               <div class="form-group">
-                <h5>Identity Verified</h5>
-                <div class="form-control" name="identity_verifited"></div>
-              </div>
-              <hr>
-
-              <div class="form-group">
                 <h5>Created At</h5>
                 <input type="text" class="form-control" name="created_at">
               </div>

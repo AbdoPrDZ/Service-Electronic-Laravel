@@ -33,7 +33,7 @@ class MultiAuth implements AuthenticatesRequests {
    *
    * @param  \Illuminate\Http\Request  $request
    * @param  \Closure  $next
-   * @param  string[]  ...$guards
+   * @param  string  $guard
    * @return mixed
    *
    * @throws \Illuminate\Auth\AuthenticationException

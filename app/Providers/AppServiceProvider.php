@@ -8,25 +8,25 @@ use Laravel\Sanctum\Sanctum;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        //
-    }
+  /**
+   * Register any application services.
+   *
+   * @return void
+   */
+  public function register()
+  {
+    //
+  }
 
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
-    public function boot() {
-        Sanctum::authenticateAccessTokensUsing(function (PersonalAccessToken $token, $isValid) {
-            if($isValid) return true;
-            return $token->can('remember') && $token->created_at->gt(now()->subMonths(1));
-        });
-    }
+  /**
+   * Bootstrap any application services.
+   *
+   * @return void
+   */
+  public function boot() {
+    Sanctum::authenticateAccessTokensUsing(function (PersonalAccessToken $token, $isValid) {
+      if($isValid) return true;
+      return $token->can('remember') && $token->created_at->gt(now()->subMonths(1));
+    });
+  }
 }

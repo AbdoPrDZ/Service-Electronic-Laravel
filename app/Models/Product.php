@@ -9,20 +9,26 @@ use App\Models\File;
 
 class Product extends Model {
 
-    use HasFactory;
+  use HasFactory;
 
-    protected $fillable = [
-      'name',
-      'user_id',
-      'price',
-      'category_id',
-      'tags',
-      'images_ids',
-      'description',
-    ];
+  protected $fillable = [
+    'name',
+    'purchase_id',
+    'price',
+    'pricing_type',
+    'category_id',
+    'tags',
+    'images_ids',
+    'description',
+  ];
 
-    function linking() {
-        $this->user = User::find($this->user_id);
-        $this->images_ids = json_decode($this->images_ids);
-    }
+  protected $casts = [
+    'images_ids' => 'array',
+    'tags' => 'array',
+  ];
+
+  function linking() {
+    $this->purchase = User::find($this->purchase_id);
+    // $this->images_ids = json_decode($this->images_ids);
+  }
 }

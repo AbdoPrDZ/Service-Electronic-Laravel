@@ -10,13 +10,17 @@ class Currency extends Model {
   use HasFactory;
 
   protected $table = 'currencies';
-  
+
   protected $fillable = [
     'name',
     'char',
     'max_receive',
     'wallet',
     'prices',
+  ];
+
+  protected $casts = [
+    'prices' => 'array',
   ];
 
 }

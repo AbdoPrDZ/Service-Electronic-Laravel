@@ -21,24 +21,24 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+  return $request->user();
 });
 
 
 Route::group([
-    'prefix' => 'auth'
+  'prefix' => 'auth'
 ],
 function($router) {
-    Route::post('/login', [UserController::class, 'login']);
-    Route::post('/signup', [UserController::class, 'signup']);
-    Route::post('/email_verify', [UserController::class, 'emailVerify']);
-    Route::get('/logout', [UserController::class, 'logout']);
-    Route::post('/refresh', [UserController::class, 'refresh']);
-    Route::get('/user', [UserController::class, 'index']);
+  Route::post('/login', [UserController::class, 'login']);
+  Route::post('/signup', [UserController::class, 'signup']);
+  Route::post('/email_verify', [UserController::class, 'emailVerify']);
+  Route::get('/logout', [UserController::class, 'logout']);
+  Route::post('/refresh', [UserController::class, 'refresh']);
+  Route::get('/user', [UserController::class, 'index']);
 
-    Route::post('/password_forgot', [UserController::class, 'passwordForgot']);
-    Route::post('/password_forgot/email_verify', [UserController::class, 'pf_emailVerify']);
-    Route::post('/password_forgot/password_reset', [UserController::class, 'pf_passwordReset']);
+  Route::post('/password_forgot', [UserController::class, 'passwordForgot']);
+  Route::post('/password_forgot/email_verify', [UserController::class, 'pf_emailVerify']);
+  Route::post('/password_forgot/password_reset', [UserController::class, 'pf_passwordReset']);
 });
 
 
@@ -46,14 +46,17 @@ Route::get('/category', [CategoryController::class, 'all']);
 Route::get('/currency', [CurrencyController::class, 'all']);
 
 Route::group(['prefix' => 'transfer'], function ($router) {
-    Route::get('', [TransferController::class, 'all']);
-    Route::post('/create', [TransferController::class, 'create']);
+  Route::get('', [TransferController::class, 'all']);
+  Route::post('/create', [TransferController::class, 'create']);
 });
 
 Route::group(['prefix' => 'product'], function ($router) {
-    Route::get('', [ProductController::class, 'all']);
-    Route::get('/{id}', [ProductController::class, 'find']);
-    Route::post('/{id}/edit', [ProductController::class, 'edit']);
-    Route::post('/create', [ProductController::class, 'create']);
+  Route::get('', [ProductController::class, 'all']);
+  Route::get('/{id}', [ProductController::class, 'find']);
+  Route::post('/{id}/edit', [ProductController::class, 'edit']);
+  Route::post('/create', [ProductController::class, 'create']);
 });
 
+Route::get('/files/{filename}/', function(Request $request, $filename, $fileRow = null) {
+  print_r($request->get('file')->name);
+})->middleware('file.access:public');

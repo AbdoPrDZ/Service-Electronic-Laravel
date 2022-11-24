@@ -34,13 +34,13 @@ function updateTable(values, tableId) {
       // }
       if(tableId == 'all-users') {
       row.push(`<td>${id}</td>`);
+        row.push(`<td><div class="table-img"><img src="./file/${values[id].profile_image_id}"></div></td>`);
         row.push(`<td>${values[id].firstname} ${values[id].lastname}</td>`);
         row.push(`<td>${values[id].email}</td>`);
         row.push(`<td>${values[id].phone}</td>`);
         row.push(`<td>${values[id].balance == 0 ? '<span class="danger">0 SE</span>':`<span class="success">${values[id].balance} SE</span>`}</td>`);
         row.push(`<td>${values[id].email_verified ? '<span class="success">Yes</span>': '<span class="danger">No</span>'}</td>`);
-        row.push(`<td>${values[id].identity_verified ? '<span class="success">Yes</span>': '<span class="danger">No</span>'}</td>`);
-      } else if(tableId == 'all-transfers') {
+       } else if(tableId == 'all-transfers') {
         row.push(`<td>${values[id].id}</td>`);
         row.push(`<td>${values[id].user.firstname} ${values[id].user.lastname}</td>`);
         row.push(`<td>${values[id].sended_balance} ${values[id].sended_currency.char}</td>`);
@@ -74,10 +74,10 @@ function updateTable(values, tableId) {
       row.push(`<td>${values[id].created_at}</td>`);
       var actions = [];
       // if (permissions.user.r) {
-      //   actions.push(`
-      //     <button class="btn btn-icon btn-secondary" action="view">
-      //       <span class="material-symbols-sharp">open_in_new</span>
-      //     </button>`);
+        actions.push(`
+          <button class="btn btn-icon btn-secondary" action="view">
+            <span class="material-symbols-sharp">open_in_new</span>
+          </button>`);
       // }
       // if (permissions.user.u) {
       //   actions.push(`
@@ -86,12 +86,12 @@ function updateTable(values, tableId) {
       //     </button>`);
       // }
       // if (permissions.user.d) {
-      //   actions.push(`
-      //     <button class="btn btn-icon btn-danger" action="delete"">
-      //       <span class="material-symbols-sharp">delete</span>
-      //     </button>`);
+        actions.push(`
+          <button class="btn btn-icon btn-danger" action="delete"">
+            <span class="material-symbols-sharp">delete</span>
+          </button>`);
       // }
-      // if (actions.length > 0) row.push(`<td>${actions.join('')}</td>`);
+      if (actions.length > 0) row.push(`<td>${actions.join('')}</td>`);
       table.row.add(row).node().id = `${tableId}-item-${id}`;
     }
     table.draw();
@@ -122,11 +122,6 @@ function loadUserFormValues(userValues) {
   $(`#view-user .modal-body .form-control[name="email"]`).val(userValues.email);
   $(`#view-user .modal-body .form-control[name="email_verified"]`).html(
     userValues.email_verified ?
-    '<span class="success">Yes</span>':
-    '<span class="danger">No</span>'
-  );
-  $(`#view-user .modal-body .form-control[name="identity_verifited"]`).html(
-    userValues.identity_verifited ?
     '<span class="success">Yes</span>':
     '<span class="danger">No</span>'
   );
@@ -283,7 +278,7 @@ $on('#tab-content .custom-table-header .custom-table-header-actions button[actio
     usersIds.push(inputs[i].id.replace(`${tableId}-chb-`, ''));
   }
   const btnHtml = $(this).html();
-  $(this).html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>يرجى الانتظار...`);
+  $(this).html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Please wait...`);
   $(this).attr('disabled', true);
   messageDialog(
     'delete-user',
@@ -302,16 +297,49 @@ $on('#tab-content .custom-table-header .custom-table-header-actions button[actio
   );
 });
 
-$on('#tab-content #all-users table tr', 'click', function () {
-  const rowId = this.id.replace(`all-users-item-`, '');
+$on('#tab-content #all-users table button[action="view"] ', 'click', function () {
+  const rowId = getElementparent(this, 2).id.replace(`all-users-item-`, '');
   const user = StorageDatabase.collection('users').doc(rowId).get();
   if(user) loadUserFormValues(user);
 });
-// $on('#tab-content #all-users table tr td button[action="view"]', 'click', function () {
-//   const rowId = getElementparent(this, 2).id.replace(`all-users-item-`, '');
-//   const user = StorageDatabase.collection('users').doc(rowId).get();
-//   loadUserFormValues(user);
-// });
+$on('#tab-content #all-users table tr td button[action="delete"]', 'click', function () {
+  const rowId = getElementparent(this, 2).id.replace(`all-users-item-`, '');
+  console.log(rowId);
+  const btnHtml = $(this).html();
+  $(this).html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
+  $(this).attr('disabled', true);
+  messageDialog(
+    'ask-delete-user',
+    'Delete User',
+    '<h4>Are you sure you wanti to delete user?</h4>',
+    async (action) => {
+      if(action == 'Yes') {
+        var data = await $.ajax({
+          url: './admin/user/delete',
+          type: 'POST',
+          headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+          data: {id: rowId},
+          dataType: 'JSON',
+        });
+        alertMessage('delete-user-response',
+          `Delete User ${data['success'] ? 'Success' : 'Error'}`,
+          data['message'] ?? 'Some things bad',
+          data['success'] ? 'success': 'danger'
+        )
+      }
+      $('#message-dialog-modal').modal('hide');
+      $(this).html(btnHtml);
+      $(this).attr('disabled', false);
+    },
+    {Yes:'danger', Cancel: 'primary'},
+    () => {
+      $(this).html(btnHtml);
+      $(this).attr('disabled', false);
+    },
+  );
+  // const user = StorageDatabase.collection('users').doc(rowId).get();
+  // loadUserFormValues(user);
+});
 
 $on('#tab-content #all-transfers table tr', 'click', function () {
   const rowId = this.id.replace(`all-transfers-item-`, '');
@@ -338,7 +366,10 @@ $on(`#view-transfer .modal-body button[name="change-status"]`, 'click', async fu
       $('#view-transfer').modal('hide');
       loadTable();
     },
-    catch: function (err) {console.log(err);}
+    catch: function (err) {console.log(err);},
+    error: async (error) => {
+      console.log(error.responseText)
+    }
   });
 });
 

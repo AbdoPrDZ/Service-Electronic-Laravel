@@ -161,7 +161,7 @@ function initTable(table) {
   });
 }
 
-function messageDialog(dialogId, title, message, onActionClick, buttons = {OK: 'primary'}, cancelBtn = 'Cancel', onHidden = null) {
+function messageDialog(dialogId, title, message, onActionClick, buttons = {OK: 'primary'}, onHidden = null) {
   dialogId = `${dialogId}-${Date.now()}`;
   $('#message-dialog-modal').attr('dialog-id', dialogId);
   $('#message-dialog-modal .modal-title').html(title);
@@ -173,7 +173,7 @@ function messageDialog(dialogId, title, message, onActionClick, buttons = {OK: '
       onActionClick(action.replace(`${dialogId}-`, ''));
     });
   }
-  btnsHtml += `<button type="button" class="btn btn-danger" action="close">${cancelBtn}</button>`
+  // btnsHtml += `<button type="button" class="btn btn-danger" action="close">${cancelBtn}</button>`
   $(`#message-dialog-modal .modal-footer`).html(btnsHtml);
   $('#message-dialog-modal').modal('show');
 

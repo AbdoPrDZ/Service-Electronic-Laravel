@@ -7,24 +7,24 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class Admin extends Authenticatable {
-    use HasFactory, Notifiable;
+  use HasFactory, Notifiable;
 
-    protected $fillable = [
-        'username',
-        'email',
-        'phone',
-        'profile_image_id',
-        'password',
-        'permissions',
-    ];
+  protected $fillable = [
+    'username',
+    'email',
+    'phone',
+    'profile_image_id',
+    'password',
+    'permissions',
+  ];
 
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+  protected $hidden = [
+    'password',
+    'remember_token',
+  ];
 
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+  protected $casts = [
+    'email_verified_at' => 'datetime',
+  ];
 }
 

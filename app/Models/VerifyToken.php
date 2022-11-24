@@ -8,30 +8,30 @@ use App\Models\User;
 
 class VerifyToken extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    protected $table = 'verify_token';
+  protected $table = 'verify_token';
 
-    protected $fillable = [
-        'token',
-        'user_id',
-        'used_at',
-        'code',
-    ];
+  protected $fillable = [
+    'token',
+    'user_id',
+    'used_at',
+    'code',
+  ];
 
-    protected $hidden = [
-        'code',
-    ];
+  protected $hidden = [
+    'code',
+  ];
 
-    protected $casts = [
-        'used_at' => 'datetime',
-    ];
+  protected $casts = [
+    'used_at' => 'datetime',
+  ];
 
-    protected $primaryKey = 'token';
+  protected $primaryKey = 'token';
 
-    function linking() {
-        $this->user = User::find($this->user_id);
-    }
+  function linking() {
+    $this->user = User::find($this->user_id);
+  }
 
 }
 

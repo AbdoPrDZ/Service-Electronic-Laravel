@@ -13,9 +13,10 @@ return new class extends Migration {
   public function up() {
     Schema::create('products', function (Blueprint $table) {
       $table->id();
+      $table->integer('seller_id');
       $table->string('name');
-      $table->unsignedInteger('user_id');
-      $table->float('price');
+      $table->double('price');
+      $table->enum('pricing_type', ['unit', 'kg', 'm', 'l', 'gb'])->default('unit');
       $table->integer('category_id');
       $table->json('tags');
       $table->json('images_ids');

@@ -7,18 +7,18 @@ use App\Models\Currency;
 use Illuminate\Http\Request;
 
 class CurrencyController extends Controller {
-    public function __construct() {
-        $this->middleware('multi.auth:admin');
-    }
+  public function __construct() {
+    $this->middleware('multi.auth:admin');
+  }
 
-    static function all(Request $request) {
-        $items = Currency::all();
-        $currencies = [];
-        foreach ($items as $value) {
-            $currencies[$value->id] = $value;
-        }
-        return Controller::apiSuccessResponse('Success', [
-            'currencies' => $currencies,
-        ]);
+  static function all(Request $request) {
+    $items = Currency::all();
+    $currencies = [];
+    foreach ($items as $value) {
+      $currencies[$value->id] = $value;
     }
+    return Controller::apiSuccessResponse('Success', [
+      'currencies' => $currencies,
+    ]);
+  }
 }

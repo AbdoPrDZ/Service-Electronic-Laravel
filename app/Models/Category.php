@@ -7,18 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    protected $table = 'categories';
+  protected $table = 'categories';
 
-    protected $fillable = [
-      'id',
-      'name',
-      'image_id',
-    ];
+  protected $fillable = [
+    'id',
+    'name',
+    'image_id',
+  ];
 
-    function linking() {
-        $this->name = json_decode($this->name);
-    }
+  protected $casts = [
+    'name' => 'array',
+  ];
+
+  function linking() {
+    // $this->name = json_decode($this->name);
+  }
 
 }
