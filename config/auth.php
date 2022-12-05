@@ -40,6 +40,7 @@ return [
       'driver' => 'session',
       'provider' => 'admins',
       'hash' => true,
+      'home' => 'admin.dashboard'
     ],
     'api' => [
       'driver' => 'session',

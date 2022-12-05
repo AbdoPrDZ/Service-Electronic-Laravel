@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller {
   public function __construct() {
-    $this->middleware('auth:sanctum');
+    $this->middleware('multi.auth:sanctum');
   }
 
   public function all() {
@@ -15,7 +15,6 @@ class CategoryController extends Controller {
     $items = [];
     foreach ($data as $item) {
       $items[$item->id] = $item;
-      $item->linking();
     }
     return [
       'success' => true,

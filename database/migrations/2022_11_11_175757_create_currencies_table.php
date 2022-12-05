@@ -15,10 +15,12 @@ return new class extends Migration
   {
     Schema::create('currencies', function (Blueprint $table) {
       $table->id();
-      $table->string('name');
+      $table->string('name')->unique();
       $table->string('char', 10);
-      $table->float('max_receive');
+      $table->double('max_receive');
+      $table->boolean('proof_is_required')->default(true);
       $table->string('wallet');
+      $table->string('platform_wallet_id');
       $table->json('prices')->default('{}');
       $table->timestamps();
     });

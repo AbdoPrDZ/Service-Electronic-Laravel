@@ -15,12 +15,11 @@ return new class extends Migration {
       $table->id();
       $table->integer('seller_id');
       $table->string('name');
-      $table->double('price');
-      $table->enum('pricing_type', ['unit', 'kg', 'm', 'l', 'gb'])->default('unit');
-      $table->integer('category_id');
-      $table->json('tags');
-      $table->json('images_ids');
       $table->text('description');
+      $table->double('price');
+      $table->integer('count');
+      $table->integer('category_id');
+      $table->json('images_ids');
       $table->timestamps();
     });
   }
@@ -30,8 +29,7 @@ return new class extends Migration {
    *
    * @return void
    */
-  public function down()
-  {
+  public function down() {
     Schema::dropIfExists('products');
   }
 };

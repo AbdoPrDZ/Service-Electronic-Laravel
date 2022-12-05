@@ -196,7 +196,7 @@ return [
     App\Providers\RouteServiceProvider::class,
     App\Http\SocketBridge\SocketProvider::class,
     Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
-
+    Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
   ],
 
   /*
@@ -214,5 +214,9 @@ return [
     // 'ExampleClass' => App\Example\ExampleClass::class,
     'Auth' => Illuminate\Support\Facades\Auth::class,
   ])->toArray(),
+
+  'app_settings' => [
+    'products_commission' => 0.1,
+  ]
 
 ];

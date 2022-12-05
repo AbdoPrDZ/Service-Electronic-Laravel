@@ -239,6 +239,46 @@ function getMultiInputValues(element) {
   return values;
 }
 
+function previewImaes(privewId, images) {
+  var imagesHtml = '';
+  var indicatorsHtml = '';
+  var i = 0;
+  images.forEach(image => {
+    indicatorsHtml += `<li data-target="#images-preivew-carousel" data-slide-to="${i}"${i == 0 ? ' class="active"' : ''}></li>`;
+    imagesHtml +=`
+    <div class="carousel-item ${i == 0 ? ' active' : ''}">
+      <img class="d-block" src="${image}" >
+    </div>
+    `;
+    i++;
+  });
+  console.log(imagesHtml)
+  $('#images-preivew-carousel .carousel-indicators').html(indicatorsHtml);
+  $('#images-preivew-carousel .carousel-inner').html(imagesHtml);
+  $('#images-preview-modal').modal('show');
+}
+/**
+ * Select file(s).
+ * @param {String} contentType The content type of files you wish to select. For instance, use "image/*" to select all types of images.
+ * @param {Boolean} multiple Indicates if the user can select multiple files.
+ * @returns {Promise<File|File[]>} A promise of a file or array of files in case the multiple parameter is true.
+ */
+function selectFile(contentType, multiple = false) {
+  return new Promise(resolve => {
+    let input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = multiple;
+    input.accept = contentType;
+    input.onchange = () => {
+      let files = Array.from(input.files);
+      if (multiple) resolve(files);
+      else resolve(files[0]);
+    };
+
+    input.click();
+  });
+}
+
 $(document).ready(function() {
   $('[data-toggle="tooltip"]').tooltip();
   if ($('body').attr('auto-display') != 'false') {
@@ -404,3 +444,22 @@ $.valHooks.textarea = {
     return el
   }
 };
+
+window.ImagePicker = {};
+$on('.form-group .btn.btn-img-picker', 'click', async function() {
+  var imgFile = await selectFile('image/png, image/jpeg, image/gif');
+  const reader = new FileReader();
+  $(this).html('<img>');
+  // $(this).html(this.innerHTML + '<div class="btn btn-danger"><span class="material-symbols-sharp">delete</span> Delete</div>');
+  var img = getElementChild(this, 'img')
+  reader.addEventListener("load", () => {
+    const uploaded_image = reader.result;
+    $(img).attr('src', uploaded_image);
+  });
+  reader.readAsDataURL(imgFile);
+  window.ImagePicker[$(this).attr('id')] = imgFile;
+});
+
+// $on('.form-group .btn.btn-img-picker btn', 'click', async function() {
+//   console.log(this)
+// });

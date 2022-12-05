@@ -8,7 +8,7 @@ use App\Models\Currency;
 class CurrencyController extends Controller {
 
   public function __construct() {
-    $this->middleware('auth:sanctum');
+    $this->middleware('multi.auth:sanctum');
   }
 
   public function all() {

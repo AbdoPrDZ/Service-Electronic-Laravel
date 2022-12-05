@@ -5,16 +5,20 @@
   "keywords": ["framework", "laravel"],
   "license": "MIT",
   "require": {
-    "php": "^8.0.2",
+    "php": "^8.1.6",
     "guzzlehttp/guzzle": "^7.2",
     "laravel/framework": "^9.19",
     "laravel/sanctum": "^3.0",
     "laravel/tinker": "^2.7",
     "laravel/ui": "^4.1",
     "predis/predis": "^2.0",
-    "rap2hpoutre/laravel-log-viewer": "^2.2"
+    "rap2hpoutre/laravel-log-viewer": "^2.2",
+    "sendgrid/sendgrid": "^8.0",
+    "vlucas/phpdotenv": "^5.5"
   },
   "require-dev": {
+    "barryvdh/laravel-ide-helper": "^2.12",
+    "doctrine/dbal": "^3.5",
     "fakerphp/faker": "^1.9.1",
     "laravel/pint": "^1.0",
     "laravel/sail": "^1.0.1",
@@ -54,7 +58,9 @@
   },
   "extra": {
     "laravel": {
-      "dont-discover": []
+      "dont-discover": [
+        "barryvdh/laravel-ide-helper"
+      ]
     }
   },
   "config": {

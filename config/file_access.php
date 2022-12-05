@@ -7,11 +7,11 @@ return [
     'admin' => [
       'guard' => 'admin',
       'auth' => true,
-      'access_disks' => ['admin', 'public'],
+      'access_disks' => ['admin', 'public', 'api'],
     ],
     'api' => [
-      'guard' => 'api',
-      'auth' => true,
+      'guard' => 'sanctum',
+      // 'auth' => true,
       'access_disks' => ['api', 'public'],
     ],
     'public' => [

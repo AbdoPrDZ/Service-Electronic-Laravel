@@ -32,8 +32,7 @@
                 </div>
                 <div class="dropdown-menu">
                   <div class="short-profile">
-                    {{-- <img src="{{ asset('resources/media/admin/admin.png') }}"> --}}
-                    <img src="./file/admin_profile_default">
+                    <img src="./file/admin/admin_profile_default">
                     <span>
                       <h2><?= $admin->username ?></h2>
                     </span>
@@ -95,70 +94,69 @@
           </div>
       </div>
 
-      <div class="modal fade" id="view-user" tabindex="-1" aria-hidden="true">
+      @include('admin.views.view-user-form')
+
+      @include('admin.views.view-transfer-form')
+
+      @include('admin.views.create-currency')
+
+      <div id="alerts" class="noties topright"></div>
+
+      <div class="modal fade" id="message-dialog-modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content form">
             <div class="modal-header">
-              <h2 class="modal-title">User Details(#<span id="view-user-id"></span>)</h2>
+              <h2 class="modal-title"></h2>
             </div>
             <div class="modal-body">
-              @include('admin.views.view-user-form')
+            </div>
+            <div class="modal-footer">
+            </div>
+          </div>
+        </div>
+      </div>
+      {{--
+      <div class="modal fade" id="images-preview-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content form">
+            <div class="modal-header">
+              <h2 class="modal-title">Preview Images</h2>
+            </div>
+            <div class="modal-body">
+              <div id="images-preivew-carousel" class="carousel slide" data-ride="carousel">
+                <ol class="carousel-indicators">
+                  <li data-target="#images-preivew-carousel" data-slide-to="0" class="active"></li>
+                  <li data-target="#images-preivew-carousel" data-slide-to="1"></li>
+                  <li data-target="#images-preivew-carousel" data-slide-to="2"></li>
+                </ol>
+                <div class="carousel-inner">
+                  <div class="carousel-item active">
+                    <img class="d-block w-100" src="http://localhost/file/admin/u-1-pi" alt="First slide">
+                  </div>
+                  <div class="carousel-item">
+                    <img class="d-block w-100" src="http://localhost/file/admin/u-1-pi" alt="Second slide">
+                  </div>
+                  <div class="carousel-item">
+                    <img class="d-block w-100" src="http://localhost/file/admin/u-1-pi" alt="Third slide">
+                  </div>
+                </div>
+                <a class="carousel-control-prev" href="#images-preivew-carousel" role="button" data-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#images-preivew-carousel" role="button" data-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="sr-only">Next</span>
+                </a>
+              </div>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-danger" action="close">Cancel</button>
             </div>
           </div>
         </div>
-      </div>
+      </div> --}}
 
-      <div class="modal fade" id="view-transfer" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content form">
-            <div class="modal-header">
-              <h2 class="modal-title">Transfer Details(#<span id="view-transfer-id"></span>)</h2>
-            </div>
-            <div class="modal-body">
-              @include('admin.views.view-transfer-form')
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-danger" action="close">Cancel</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal fade" id="view-file" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content form">
-            <div class="modal-header">
-              <h2 class="modal-title">File Details(#<span id="view-file-id"></span>)</h2>
-            </div>
-            <div class="modal-body">
-              @include('admin.views.view-file-form')
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary" action="save">Save</button>
-              <button type="button" class="btn btn-danger" action="close">Cancel</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="alerts" class="noties topright"></div>
-
-    <div class="modal fade" id="message-dialog-modal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content form">
-          <div class="modal-header">
-            <h2 class="modal-title"></h2>
-          </div>
-          <div class="modal-body">
-          </div>
-          <div class="modal-footer">
-          </div>
-        </div>
-      </div>
     </div>
 
     <script src="{{ asset('/resources/js/admin/main.js') }}?time={{ now() }}"></script>

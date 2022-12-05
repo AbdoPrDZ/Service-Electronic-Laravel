@@ -1,0 +1,126 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\File;
+use App\Models\Seller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Validator;
+
+class SellerController extends Controller {
+
+  public function __construct() {
+    $this->middleware('multi.auth:sanctum');
+  }
+
+  public function getNextId() {
+    $id = 0;
+    $last = Seller::orderBy('id','desc')->first();
+    if(!is_null($last)) {
+      $id = $last->id;
+    }
+    return $id + 1;
+  }
+
+  public function register(Request $request) {
+    $validator = Validator::make($request->all(), [
+      'store_name' => 'required|string',
+      'store_address' => 'required|string',
+      'store_image' => 'file|mimes:jpg,png,jpeg',
+    ]);
+    if($validator->fails()){
+      return $this->apiErrorResponse(null, [
+        'errors' => $validator->errors(),
+      ]);
+    }
+
+    if($request->user()->identity_verifited_at == null) {
+      return $this->apiErrorResponse('You identity not verifited');
+    }
+
+    $seller = Seller::where('user_id', '=', $request->user()->id)->first();
+    if(!is_null($seller)) {
+      return $this->apiErrorResponse('You allready a seller');
+    }
+
+    $sellerId = $this->getNextId();
+    $values = [
+      'id' => $sellerId,
+      'user_id' => $request->user()->id,
+      'store_name' => $request->store_name,
+      'store_address' => $request->store_address,
+    ];
+
+    if(!is_null($request->file('store_image'))) {
+      if(!Storage::disk('api')->exists('sellers_data')) {
+        Storage::disk('api')->makeDirectory('sellers_data');
+      }
+      $sellerFilesPath = "sellers_data/$sellerId";
+      if(!Storage::disk('api')->exists($sellerFilesPath)) {
+        Storage::disk('api')->makeDirectory($sellerFilesPath);
+      }
+      $allpath = Storage::disk('api')->path("sellers_data/$sellerId");
+      $shortPath = "$sellerFilesPath/si";
+      $request->file('store_image')->move($allpath, 'si');
+      File::create([
+        'name' => "s-$sellerId-si",
+        'disk' => 'api',
+        'type' => 'image',
+        'path' => $shortPath,
+      ]);
+      $values['store_image_id'] = "s-$sellerId-si";
+    }
+
+    $seller = Seller::create($values);
+
+    return $this->apiSuccessResponse('Successfully creating store, you can start publish your products');
+  }
+
+  public function edit(Request $request) {
+    $validator = Validator::make($request->all(), [
+      'store_name' => 'string',
+      'store_address' => 'string',
+      'store_image' => 'file|mimes:jpg,png,jpeg',
+    ]);
+    if($validator->fails()){
+      return $this->apiErrorResponse(null, [
+        'errors' => $validator->errors(),
+      ]);
+    }
+
+    if($request->user()->identity_verifited_at == null) {
+      return $this->apiErrorResponse('You identity not verifited');
+    }
+
+    $seller = Seller::where('user_id', '=', $request->user()->id)->first();
+    if(is_null($seller)) {
+      return $this->apiErrorResponse('You are not a seller');
+    }
+
+    $seller->store_name = $request->store_name ?? $seller->store_name;
+    $seller->store_address = $request->store_address ?? $seller->store_address;
+    if(!is_null($request->file('store_image'))) {
+      if(!Storage::disk('api')->exists('sellers_data')) {
+        Storage::disk('api')->makeDirectory('sellers_data');
+      }
+      $sellerFilesPath = "sellers_data/$seller->id";
+      if(!Storage::disk('api')->exists($sellerFilesPath)) {
+        Storage::disk('api')->makeDirectory($sellerFilesPath);
+      }
+      $allpath = Storage::disk('api')->path("sellers_data/$seller->id");
+      $shortPath = "$sellerFilesPath/si";
+      $request->file('store_image')->move($allpath, 'si');
+      File::updateOrCreate(['name' => "s-$seller->id-si"], [
+        'disk' => 'api',
+        'type' => 'image',
+        'path' => $shortPath,
+      ]);
+      $seller->store_image_id = "s-$seller->id-si";
+    }
+    $seller->save();
+
+    $this->apiSuccessResponse('Successfully updating settings');
+
+  }
+}

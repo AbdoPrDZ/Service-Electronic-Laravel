@@ -1,6 +1,6 @@
 
             <div id="all-users" class="custom-table tab-view-tab-item" checkbox="true" for="users">
-              <h3 class="table-refresh" table="all-transfers">Refersh <span class="material-symbols-sharp"></span></h3>
+              <h3 class="table-refresh" table="all-users">Refersh <span class="material-symbols-sharp"></span></h3>
               <div class="custom-table-header">
                 <h2 class="custom-table-title">Users</h2>
                 <div class="custom-table-header-actions">

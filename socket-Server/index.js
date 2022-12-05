@@ -45,7 +45,7 @@ async function main() {
     var success = false;
     var message = '';
     if(client) {
-      var res =Environment.clients[request.params.clientId].emitToClient(request.params.routeName, request.body);
+      var res = Environment.clients[request.params.clientId].emitToClient(request.params.routeName, request.body);
       success = res.success
       message = res.message;
     } else {

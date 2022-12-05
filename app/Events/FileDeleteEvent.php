@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\File;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -9,9 +10,9 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 
-class PublicMessage implements ShouldBroadcast
-{
+class FileDeleteEvent {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
   /**
@@ -19,9 +20,8 @@ class PublicMessage implements ShouldBroadcast
    *
    * @return void
    */
-  public function __construct()
-  {
-    //
+  public function __construct(File $file) {
+    Storage::disk($file->disk)->delete($file->path);
   }
 
   /**
@@ -30,18 +30,6 @@ class PublicMessage implements ShouldBroadcast
    * @return \Illuminate\Broadcasting\Channel|array
    */
   public function broadcastOn() {
-    // return new PrivateChannel('channel-name');
-    return new Channel('public-message-channel');
+    return new PrivateChannel('channel-name');
   }
-
-  public function broadcastAs() {
-    return 'MessageEvent';
-  }
-
-  public function broadcastWith() {
-    return [
-      'message' => 'This notification is a public message',
-    ];
-  }
-
 }

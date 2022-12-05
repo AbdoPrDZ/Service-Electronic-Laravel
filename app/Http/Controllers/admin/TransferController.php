@@ -3,8 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
+use App\Models\Notification;
 use App\Models\Transfer;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Validator;
 
 class TransferController extends Controller {
@@ -25,19 +30,21 @@ class TransferController extends Controller {
     ]);
   }
 
-  public function changeStatus(Request $request) {
+  public function changeStatus(Request $request, $id) {
     $validator = Validator::make($request->all(), [
-      'id' => 'required|integer',
       'status' => 'required|string',
+      'description' => 'string',
     ]);
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, ['errors' =>$validator->errors(), 'all' => $request->all()]);
     }
-    $transfer = Transfer::find($request->id);
+    $transfer = Transfer::find($id);
     if(!is_null($transfer)) {
-      if($request->status == 'eccepted' || $request->status == 'refused' || $request->status == 'checking') {
-        $transfer->status = $request->status;
-        $transfer->save();
+      if(in_array($request->status, ['accepted', 'refused'])) {
+        $ansowerRes = $transfer->ansower($request->status, $request->description);
+        if(!$ansowerRes['success']) {
+          return $this->apiErrorResponse($ansowerRes['message']);
+        }
         return $this->apiSuccessResponse('Successfully changing status');
       } else {
         return Controller::apiErrorResponse('Invalid status');

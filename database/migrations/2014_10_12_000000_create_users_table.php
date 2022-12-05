@@ -11,8 +11,7 @@ return new class extends Migration
    *
    * @return void
    */
-  public function up()
-  {
+  public function up() {
     Schema::create('users', function (Blueprint $table) {
       $table->id();
       $table->string('firstname');
@@ -20,9 +19,11 @@ return new class extends Migration
       $table->string('email')->unique();
       $table->timestamp('email_verified_at')->nullable();
       $table->string('phone')->unique();
-      $table->string('profile_image_id')->default('api_profile_default');
-      $table->double('balance')->default(0);
       $table->string('password');
+      $table->string('wallet_id')->nullable()->unique();
+      $table->json('verification_images_ids')->default('[]');
+      $table->timestamp('identity_verifited_at')->nullable();
+      $table->string('profile_image_id')->default('api_profile_default');
       $table->string('messaging_token')->nullable()->unique();
       $table->rememberToken();
       $table->json('settings')->default('[]');
@@ -35,8 +36,7 @@ return new class extends Migration
    *
    * @return void
    */
-  public function down()
-  {
+  public function down() {
     Schema::dropIfExists('users');
   }
 };

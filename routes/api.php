@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SellerController;
 use App\Http\Controllers\TransferController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -35,12 +36,13 @@ function($router) {
   Route::get('/logout', [UserController::class, 'logout']);
   Route::post('/refresh', [UserController::class, 'refresh']);
   Route::get('/user', [UserController::class, 'index']);
+  Route::post('/edit', [UserController::class, 'editProfile']);
+  Route::post('/verify_identity', [UserController::class, 'verifyIdentity']);
 
   Route::post('/password_forgot', [UserController::class, 'passwordForgot']);
   Route::post('/password_forgot/email_verify', [UserController::class, 'pf_emailVerify']);
   Route::post('/password_forgot/password_reset', [UserController::class, 'pf_passwordReset']);
 });
-
 
 Route::get('/category', [CategoryController::class, 'all']);
 Route::get('/currency', [CurrencyController::class, 'all']);
@@ -50,6 +52,12 @@ Route::group(['prefix' => 'transfer'], function ($router) {
   Route::post('/create', [TransferController::class, 'create']);
 });
 
+Route::group(['prefix' => 'seller'], function ($router) {
+  // Route::get('/', [SellerController::class, 'all']);
+  Route::post('/register', [SellerController::class, 'register']);
+  Route::post('/edit', [SellerController::class, 'edit']);
+});
+
 Route::group(['prefix' => 'product'], function ($router) {
   Route::get('', [ProductController::class, 'all']);
   Route::get('/{id}', [ProductController::class, 'find']);
@@ -57,6 +65,6 @@ Route::group(['prefix' => 'product'], function ($router) {
   Route::post('/create', [ProductController::class, 'create']);
 });
 
-Route::get('/files/{filename}/', function(Request $request, $filename, $fileRow = null) {
-  print_r($request->get('file')->name);
-})->middleware('file.access:public');
+// Route::get('/files/{filename}/', function(Request $request, $filename, $fileRow = null) {
+//   print_r($request->get('file')->name);
+// })->middleware('file.access:public');

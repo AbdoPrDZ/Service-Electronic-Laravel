@@ -20,14 +20,14 @@ class AdminSeeder extends Seeder {
       'email' => 'admin@admin.com',
       'phone' => '0778185797',
       'profile_image_id'=> 'admin-logo',
-      'password'=> \Hash::make('123456'),
-      'permissions'=> json_encode([
+      'password' => Hash::make('123456'),
+      'permissions'=> [
         'users' => ['read', 'update', 'delete'],
         'currencies' => ['create', 'read', 'update', 'delete'],
         'files' => ['create', 'read', 'update', 'delete'],
         'products' => ['read', 'delete'],
         'transfers' => ['read', 'update', 'delete'],
-      ]),
+      ],
     ]);
   }
 }

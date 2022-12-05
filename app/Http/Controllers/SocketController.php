@@ -15,7 +15,7 @@ class SocketController extends Controller {
    * @param \App\Http\SocketBridge\SocketClient $client
    */
   public function startListen($client, ...$args) {
-    $client->emit('hi', 'successfully bride', ...$args);
+    $client->emit('hi', 'success message', 'successfully bride', ...$args);
   }
 
 }
