@@ -17,9 +17,11 @@ return new class extends Migration {
       $table->string('store_name');
       $table->string('store_address');
       $table->string('store_image_id')->nullable();
-      $table->enum('status', ['checking', 'accepted', 'banned'])->default('checking');
+      $table->json('delivery_prices');
+      $table->enum('status', ['checking', 'accepted', 'refused', 'banned'])->default('checking');
       $table->string('anower_description')->nullable();
-      $table->timestamp('anower_at')->nullable();
+      $table->timestamp('answered_at')->nullable();
+      $table->json('unreades')->default('[]');
       $table->timestamps();
     });
   }
@@ -30,6 +32,6 @@ return new class extends Migration {
    * @return void
    */
   public function down() {
-    Schema::dropIfExists('sallers');
+    Schema::dropIfExists('sellers');
   }
 };

@@ -35,6 +35,7 @@ class VerifyToken extends Model
   protected $fillable = [
     'token',
     'user_id',
+    'model',
     'used_at',
     'code',
   ];
@@ -50,7 +51,7 @@ class VerifyToken extends Model
   protected $primaryKey = 'token';
 
   public function linking() {
-    $this->user = User::find($this->user_id);
+    $this->user = (app($this->model))::find($this->user_id);
   }
 
 }

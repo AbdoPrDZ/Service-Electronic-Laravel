@@ -16,10 +16,15 @@ return new class extends Migration {
       $table->integer('seller_id');
       $table->string('name');
       $table->text('description');
+      $table->boolean('inside_country')->default(true);
       $table->double('price');
+      $table->double('commission');
       $table->integer('count');
+      $table->json('rates')->default('[]');
+      $table->json('likes')->default('[]');
       $table->integer('category_id');
       $table->json('images_ids');
+      $table->json('unreades')->default('[]');
       $table->timestamps();
     });
   }

@@ -43,18 +43,72 @@ class Product extends Model {
     'seller_id',
     'name',
     'description',
+    'inside_country',
     'price',
+    'commission',
     'count',
+    'rates',
+    'likes',
     'category_id',
     'images_ids',
+    'unreades',
   ];
 
   protected $casts = [
+    'inside_country' => 'boolean',
     'images_ids' => 'array',
+    'rates' => 'array',
+    'likes' => 'array',
+    'unreades' => 'array',
+    'created_at' => 'datetime:Y-m-d H:m:s',
   ];
 
-  public function linking() {
-    $this->seller = Seller::find($this->seller_id);
-    $this->seller->linking();
+  static function news($admin_id) {
+    $products = Product::where('unreades', '!=', '[]')->get();
+    $newsProducts = [];
+    foreach ($products as $product) {
+      if(in_array($admin_id, $product->unreades))
+        $newsProducts[$product->id] = $product;
+    }
+    return $newsProducts;
   }
+
+  static function readNews($admin_id) {
+    $items = Product::news($admin_id);
+    foreach ($items as $item) {
+      $item->unreades = array_diff($item->unreades, [$admin_id]);
+      $item->save();
+    }
+  }
+
+  public function linking(User $user = null) {
+    $this->display_price = $this->price + ($this->price * $this->commission);
+    $this->seller = Seller::find($this->seller_id );
+    $this->seller->linking();
+    $this->category = Category::find($this->category_id);
+    $totalRate = 0;
+    foreach ($this->rates as $rate) {
+      $totalRate += $rate;
+    }
+    $this->is_liked = $user ? in_array($user->id, $this->likes) : false;
+    $this->is_rated = $user ? key_exists($user->id, $this->rates) : false;
+    $this->rate = count($this->rates) != 0 ? ($totalRate / count($this->rates)) : 0;
+    $this->like_count = count($this->likes);
+  }
+
+  public function unlinking() {
+    unset($this->display_price);
+    unset($this->seller);
+    unset($this->category);
+    unset($this->is_liked);
+    unset($this->is_rated);
+    unset($this->rate);
+    unset($this->like_count);
+  }
+
+  public function unlinkingAndSave() {
+    $this->unlinking();
+    $this->save();
+  }
+
 }

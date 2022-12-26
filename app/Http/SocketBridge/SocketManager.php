@@ -12,11 +12,11 @@ class SocketManager {
   protected $router;
 
   public function __construct($boot = false) {
-    if(!Cache::has(config('socket_bridge.manager.cache.routes')) || $boot) {
-      Cache::forever(config('socket_bridge.manager.cache.routes'), []);
+    if(!Cache::store('file')->has(config('socket_bridge.manager.cache.routes')) || $boot) {
+      Cache::store('file')->set(config('socket_bridge.manager.cache.routes'), []);
       $this->setupBridgeRoutes();
     }
-    $this->router =new SocketRouter($this);
+    $this->router = new SocketRouter($this);
     $this->router->setupRoutes();
   }
 

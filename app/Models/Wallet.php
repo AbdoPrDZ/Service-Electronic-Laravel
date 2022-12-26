@@ -12,12 +12,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $user_id
  * @property string $user_model
  * @property float $balance
- * @property float $checking_balance
- * @property float $total_received_balance
- * @property float $total_withdrawn_balance
+ * @property float $checking_recharge_balance
+ * @property float $checking_withdraw_balance
  * @property string $status
  * @property string|null $answored_at
- * @property string|null $ansower_description
+ * @property string|null $answer_description
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Wallet newModelQuery()
@@ -40,17 +39,18 @@ use Illuminate\Database\Eloquent\Model;
 class Wallet extends Model {
   use HasFactory;
 
+  public $incrementing = false;
+
   protected $fillable = [
     'id',
     'user_id',
     'user_model',
     'balance',
-    'checking_balance',
-    'total_received_balance',
-    'total_withdrawn_balance',
+    'checking_recharge_balance',
+    'checking_withdraw_balance',
     'status',
     'answored_at',
-    'ansower_description',
+    'answer_description',
   ];
 
   protected $casts = [

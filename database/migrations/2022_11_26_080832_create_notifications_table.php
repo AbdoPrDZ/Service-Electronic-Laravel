@@ -14,8 +14,8 @@ return new class extends Migration {
   public function up() {
     Schema::create('notifications', function (Blueprint $table) {
       $table->id();
-      $table->string('from_id');
-      $table->string('from_model')->default(User::class);
+      $table->string('from_id')->nullable();
+      $table->string('from_model')->nullable();
       $table->string('to_id');
       $table->string('to_model')->default(User::class);
       $table->string('name');

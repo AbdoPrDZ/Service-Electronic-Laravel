@@ -41,11 +41,15 @@ async function main() {
 
   // emit to client route
   Environment.app.post(`${Environment.configures.bridge.path}${Environment.configures.bridge.from_manager}`, (request, response) => {
-    var client = Environment.clients[request.params.clientId];
+    var clientId = `${request.params.clientId}`;
+    console.log(clientId);
+    console.log(Environment.clients)
+    var client = Environment.clients[clientId];
+    console.log(client)
     var success = false;
     var message = '';
     if(client) {
-      var res = Environment.clients[request.params.clientId].emitToClient(request.params.routeName, request.body);
+      var res = Environment.clients[clientId].emitToClient(request.params.routeName, request.body);
       success = res.success
       message = res.message;
     } else {
@@ -63,28 +67,6 @@ async function main() {
     const data = request.body;
     var message = JSON.parse(data[0]);
     console.log(message);
-    // {
-    //   message: {
-    //     token: client.handshake.headers.messagingtoken,
-    //     notification: {
-    //       title: "Notification Title",
-    //       body: "Notification Body ",
-    //     },
-    //     android: {
-    //       notification: {
-    //         priority: "high",
-    //         icon: 'stock_ticker_update',
-    //         sound: "default",
-    //         color: '#7e55c3',
-    //         imageUrl: 'http://abdopr.ddns.net/file/currency-12',
-    //       }
-    //     },
-    //     data: {
-    //       Nick: "Mario",
-    //       Room: "PortugalVSDenmark",
-    //     },
-    //   },
-    // };
 
     if(message) {
       admin.messaging().send(message).then(messagingResponse => {
@@ -126,7 +108,7 @@ async function main() {
         },
         allowEIO3: true,
       });
-      Environment.socket.use(SocketClient.auth);
+      // Environment.socket.use(SocketClient.auth);
 
       Environment.socket.on('connection', (client) => {
         new SocketClient(client);

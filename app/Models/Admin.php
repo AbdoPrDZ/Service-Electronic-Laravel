@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 /**
  * App\Models\Admin
@@ -36,8 +38,8 @@ use Illuminate\Notifications\Notifiable;
  * @method static \Illuminate\Database\Eloquent\Builder|Admin whereUsername($value)
  * @mixin \Eloquent
  */
-class Admin extends Authenticatable {
-  use HasFactory, Notifiable;
+class Admin extends Authenticatable{
+  use HasApiTokens, HasFactory, Notifiable;
 
   protected $fillable = [
     'username',
@@ -54,11 +56,21 @@ class Admin extends Authenticatable {
   ];
 
   protected $casts = [
-    'email_verified_at' => 'datetime',
+    'email_verified_at' => 'datetime:Y-m-d H:m:s',
     'permissions' => 'array',
+    'created_at' => 'datetime:Y-m-d H:m:s',
   ];
 
   public function linking() {
+  }
+
+  static function unreades($admin_id = null) {
+    $admins = is_null($admin_id) ? Admin::all() :Admin::where('id', '!=', $admin_id)->get();
+    $ids = [];
+    foreach ($admins as $admin) {
+      $ids[] = $admin->id;
+    }
+    return $ids;
   }
 
 }

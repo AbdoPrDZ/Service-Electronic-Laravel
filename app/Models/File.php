@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Events\FileDeleteEvent;
+use App\Events\FileDeletedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -31,6 +31,7 @@ class File extends Model
   use HasFactory;
 
   protected $table = 'files';
+  public $incrementing = false;
   protected $primaryKey = 'name';
 
   protected $fillable = [
@@ -45,7 +46,7 @@ class File extends Model
   ];
 
   protected $dispatchesEvents = [
-    'deleted' => FileDeleteEvent::class,
+    'deleted' => FileDeletedEvent::class,
   ];
 
 }

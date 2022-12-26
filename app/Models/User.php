@@ -67,6 +67,9 @@ class User extends Authenticatable {
     'profile_image_id',
     'verification_images_ids',
     'identity_verifited_at',
+    'identity_status',
+    'identity_answer_description',
+    'messaging_token',
     'settings',
   ];
 
@@ -76,41 +79,68 @@ class User extends Authenticatable {
   ];
 
   protected $casts = [
-    'email_verified_at' => 'datetime',
+    'email_verified_at' => 'datetime:Y-m-d H:m:s',
     'verification_images_ids' => 'array',
-    'identity_verifited_at' => 'datetime',
+    'identity_verifited_at' => 'datetime:Y-m-d H:m:s',
     'settings' => 'array',
+    'created_at' => 'datetime:Y-m-d H:m:s',
   ];
 
-  public function linking() {
+  static function news($admin_id) {
+    $users = User::where('unreades', '!=', '[]')->get();
+    $newUsers = [];
+    foreach ($users as $user) {
+      if(in_array($admin_id, $user->unreades))
+        $newUsers[$user->id] = $user;
+    }
+    return $newUsers;
+  }
+
+  static function readNews($admin_id) {
+    $items = User::news($admin_id);
+    foreach ($items as $item) {
+      $item->unreades = array_diff($item->unreades, [$admin_id]);
+      $item->save();
+    }
+  }
+
+  public function linking($linkSeller = true) {
+    $this->fullname = $this->firstname . ' ' . $this->lastname;
     $this->email_verified = !is_null($this->email_verified_at);
     $this->profile_image = File::find($this->profile_image_id)->name;
-    $this->identity_verifited = !is_null($this->identity_verifited_at);
-    $this->identity_status = $this->identity_verifited ? 'verifted' :
-      (count($this->verification_images_ids) > 0 ?
-        'checking' :
-        'not_verifited');
-    $this->seller = Seller::where('user_id', '=', $this->id)->first();
-    if(!is_null($this->sellet)) $this->sellet->linking();
+    // $this->identity_verifited = !is_null($this->identity_verifited_at);
+    // $this->identity_status = $this->identity_verifited ? 'verifted' :
+    //   (count($this->verification_images_ids) > 0 ?
+    //     'checking' :
+    //     'not_verifited');
+    if($linkSeller) {
+      $seller = Seller::where('user_id', '=', $this->id)->first();
+      if(!is_null($seller)) {
+        $this->seller_id = $seller->id;
+        $this->seller_status = $seller->status;
+      }
+      // $this->seller = Seller::where('user_id', '=', $this->id)->first();
+      // if(!is_null($this->sellet)) $this->sellet->linking();
+    }
     $this->wallet = Wallet::find($this->wallet_id);
     $balance = 0;
     $checking_balance = 0;
     if(!is_null($this->wallet)) {
       $this->wallet->linking();
       $balance = $this->wallet->balance;
-      $checking_balance = $this->wallet->checking_balance;
+      $checking_balance = $this->wallet->checking_recharge_balance + $this->wallet->checking_withdraw_balance;
     }
     $this->balance = $balance;
     $this->checking_balance = $checking_balance;
 
-    $recherge_currencies = [];
-    $recherge_currencies_ids = Setting::find('recherge_currencies')->value;
-    foreach ($recherge_currencies_ids as $id) {
-      $recherge_currencies[$id] = Currency::find($id);
-    }
+    $platform_currency = Currency::find(Setting::find('platform_currency_id')?->value[0]);
+    $display_currency = Currency::find(Setting::find('display_currency_id')?->value[0]);
+    $platform_currency->linking();
+    $display_currency->linking();
     $this->platform_settings = [
-      'platform_currency' => Currency::find(Setting::find('platform_currency_id')->value[0]),
-      'recherge_currencies' => $recherge_currencies,
+      'platform_currency' => $platform_currency,
+      'display_currency' => $display_currency,
+      'commission' => Setting::find('commission')?->value[0],
     ];
   }
 

@@ -14,14 +14,29 @@ class AdminSeeder extends Seeder {
    * @return void
    */
   public function run() {
+    // Admin::create([
+    //   'id' => 1,
+    //   'username' => 'admin',
+    //   'email' => 'admin@admin.com',
+    //   'phone' => '0778185797',
+    //   'profile_image_id'=> 'admin_profile_default',
+    //   'password' => Hash::make('123456'),
+    //   'permissions' => [
+    //     'users' => ['read', 'update', 'delete'],
+    //     'currencies' => ['create', 'read', 'update', 'delete'],
+    //     'files' => ['create', 'read', 'update', 'delete'],
+    //     'products' => ['read', 'delete'],
+    //     'transfers' => ['read', 'update', 'delete'],
+    //   ],
+    // ]);
     Admin::create([
-      'id' => 1,
-      'username' => 'admin',
-      'email' => 'admin@admin.com',
-      'phone' => '0778185797',
-      'profile_image_id'=> 'admin-logo',
+      'id' => 2,
+      'username' => 'admin1',
+      'email' => 'admin1@admin.com',
+      'phone' => '0778185794',
+      'profile_image_id'=> 'admin_profile_default',
       'password' => Hash::make('123456'),
-      'permissions'=> [
+      'permissions' => [
         'users' => ['read', 'update', 'delete'],
         'currencies' => ['create', 'read', 'update', 'delete'],
         'files' => ['create', 'read', 'update', 'delete'],

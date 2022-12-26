@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Auth\User;
+use Storage;
 
 /**
  * App\Models\Seller
@@ -16,7 +16,7 @@ use Illuminate\Foundation\Auth\User;
  * @property string|null $store_image_id
  * @property string $status
  * @property string|null $anower_description
- * @property string|null $anower_at
+ * @property string|null $answered_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Seller newModelQuery()
@@ -45,15 +45,45 @@ class Seller extends Model
     'user_id',
     'store_name',
     'store_address',
-    'store_phone',
     'store_image_id',
-    'balance',
-    'total_commission',
+    'delivery_prices',
     'status',
+    'answer_description',
+    'answered_at',
+    'unreades',
   ];
 
+  protected $casts = [
+    'delivery_prices' => 'array',
+    'answered_at' => 'datetime:Y-m-d H:m:s',
+    'unreades' => 'array',
+    'created_at' => 'datetime:Y-m-d H:m:s',
+  ];
+
+  static function news($admin_id) {
+    $sellers = Seller::where('unreades', '!=', '[]')->get();
+    $newsSellers = [];
+    foreach ($sellers as $seller) {
+      if(in_array($admin_id, $seller->unreades))
+        $newsSellers[$seller->id] = $seller;
+    }
+    return $newsSellers;
+  }
+
+  static function readNews($admin_id) {
+    $items = Seller::news($admin_id);
+    foreach ($items as $item) {
+      $item->unreades = array_diff($item->unreades, [$admin_id]);
+      $item->save();
+    }
+  }
+
   public function linking() {
+    // $countries = json_decode(Storage::disk('public')->get('countries.json'));
+    // list($country, $state, $address) = explode('->', $this->store_address);
+    // $this->strAddress = $countries[intVal($country)]->country . "-" .$countries[intVal($country)]->states[intVal($state)] . "-" .$address;
     $this->user = User::find($this->user_id);
+    $this->user->linking(false);
   }
 
 }

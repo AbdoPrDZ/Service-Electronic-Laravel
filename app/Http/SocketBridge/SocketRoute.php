@@ -49,10 +49,10 @@ class SocketRoute {
     if(!is_string($funcName) || !method_exists($class, $funcName)) {
       throw new Error('Invalid function ' . $callback);
     }
-    $routes = Cache::get(config('socket_bridge.manager.cache.routes'));
+    $routes = Cache::store('file')->get(config('socket_bridge.manager.cache.routes'));
     // $routes[] = new SocketRoute($class, $funcName, $defualtArgs);
     $routes[$routeName] = new SocketRoute($routeName, $class, $funcName, $targets);
-    Cache::forever(config('socket_bridge.manager.cache.routes'), $routes);
+    Cache::store('file')->put(config('socket_bridge.manager.cache.routes'), $routes);
   }
 
   public function middleware($middlware) {

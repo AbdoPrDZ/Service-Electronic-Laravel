@@ -21,9 +21,11 @@ return new class extends Migration {
       $table->string('proof_id')->nullable();
       $table->string('wallet')->nullable();
       $table->integer('exchange_id')->nullable();
+      $table->enum('for_what', ['transfer', 'withdraw', 'recharge'])->default('transfer');
       $table->enum('status', ['accepted', 'refused', 'checking'])->default('checking');
-      $table->timestamp('ansowerd_at')->nullable();
-      $table->string('ansower_description')->nullable();
+      $table->timestamp('answered_at')->nullable();
+      $table->string('answer_description')->nullable();
+      $table->json('unreades')->default('[]');
       $table->timestamps();
     });
   }

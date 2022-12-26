@@ -3,4 +3,5 @@
 !categories/*
 !currencies/
 !currencies/*
+!countries.json
 !.gitignore

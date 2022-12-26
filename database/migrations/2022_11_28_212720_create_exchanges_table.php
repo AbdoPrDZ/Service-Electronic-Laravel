@@ -14,16 +14,15 @@ return new class extends Migration {
   public function up() {
     Schema::create('exchanges', function (Blueprint $table) {
       $table->id();
-      $table->integer('from_id');
-      $table->string('from_model')->default(User::class);
-      $table->integer('to_id');
-      $table->string('to_model')->default(User::class);
-      $table->string('from_wallet_id');
+      $table->string('name');
+      $table->string('from_wallet_id')->nullable();
       $table->string('to_wallet_id');
-      $table->double('balance');
+      $table->double('sended_balance');
+      $table->double('received_balance');
       $table->enum('status', ['waiting', 'received', 'blocked'])->default('waiting');
       $table->string('anower_description')->nullable();
-      $table->timestamp('anower_at')->nullable();
+      $table->timestamp('answered_at')->nullable();
+      $table->json('unreades')->default('[]');
       $table->timestamps();
     });
   }

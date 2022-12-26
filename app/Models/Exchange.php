@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\Exchange\ExchangeCreatedEvent;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,7 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property float $balance
  * @property string $status
  * @property string|null $anower_description
- * @property string|null $anower_at
+ * @property string|null $answered_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Exchange newModelQuery()
@@ -44,36 +45,52 @@ class Exchange extends Model {
   use HasFactory;
 
   protected $fillable = [
-    'from_id',
-    'from_model',
-    'to_id',
-    'to_model',
+    'name',
     'from_wallet_id',
     'to_wallet_id',
-    'balance',
+    'sended_balance',
+    'received_balance',
     'status',
     'anower_description',
-    'anower_at',
+    'answered_at',
+    'unreades',
   ];
 
+  protected $casts = [
+    'answered_at' => 'datetime:Y-m-d H:m:s',
+    'unreades' => 'array',
+    'created_at' => 'datetime:Y-m-d H:m:s',
+  ];
+
+  static function news($admin_id) {
+    $exchanges = Exchange::where('unreades', '!=', '[]')->get();
+    $newsExchanges = [];
+    foreach ($exchanges as $exchange) {
+      if(in_array($admin_id, $exchange->unreades))
+        $newsExchanges[$exchange->id] = $exchange;
+    }
+    return $newsExchanges;
+  }
+
+  static function readNews($admin_id) {
+    $items = Exchange::news($admin_id);
+    foreach ($items as $item) {
+      $item->unreades = array_diff($item->unreades, [$admin_id]);
+      $item->save();
+    }
+  }
+
   public function linking() {
-    $this->from = app($this->from_model)::find($this->from_id);
-    $this->from->linking();
-    $this->to = app($this->to_model)::find($this->to_id);
-    $this->to->linking();
     $this->from_wallet = Wallet::find($this->from_wallet_id);
-    $this->from_wallet->linking();
+    if($this->from_wallet) $this->from_wallet->linking();
     $this->to_wallet = Wallet::find($this->to_wallet_id);
     $this->to_wallet->linking();
   }
 
   public function unlinking() {
-    unset($this->from);
-    unset($this->to);
     unset($this->from_wallet);
     unset($this->to_wallet);
   }
-
 
   public function unlinkingAndSave() {
     $this->unlinking();
@@ -81,16 +98,18 @@ class Exchange extends Model {
   }
 
   public function accept() {
-    if($this->from_wallet->balance < $this->balance) return [
+    if($this->from_wallet && $this->from_wallet->balance < $this->sended_balance) return [
       'success' => false,
       'message' => 'The sender balance is insufficient',
     ];
-    $this->from_wallet->balance -= $this->balance;
-    $this->to_wallet->balance += $this->balance;
-    $this->to_wallet->checking_balance -= $this->balance;
-    $this->from_wallet->unlinkingAndSave();
+    $this->to_wallet->balance += $this->received_balance;
+    $this->to_wallet->checking_recharge_balance -= $this->received_balance;
     $this->to_wallet->unlinkingAndSave();
-    $this->anower_at = Carbon::now();
+    if(!is_null($this->from_wallet)) {
+      $this->from_wallet->checking_withdraw_balance -= $this->sended_balance;
+      $this->from_wallet->unlinkingAndSave();
+    }
+    $this->answered_at = Carbon::now();
     $this->status = 'received';
     $this->unlinkingAndSave();
     return [
@@ -100,12 +119,22 @@ class Exchange extends Model {
 
   public function refuse($message) {
     $this->anower_description = $message;
-    $this->anower_at = Carbon::now();
+    $this->answered_at = Carbon::now();
     $this->status = 'blocked';
+    if($this->from_wallet) {
+      $this->from_wallet->checking_withdraw_balance -= $this->sended_balance;
+      $this->from_wallet->balance += $this->sended_balance;
+      $this->from_wallet->unlinkingAndSave();
+    }
+    $this->to_wallet->checking_recharge_balance -= $this->received_balance;
+    $this->to_wallet->unlinkingAndSave();
     $this->unlinkingAndSave();
     return [
       'success' => true,
     ];
   }
 
+  protected $dispatchesEvents = [
+    'created' => ExchangeCreatedEvent::class,
+  ];
 }

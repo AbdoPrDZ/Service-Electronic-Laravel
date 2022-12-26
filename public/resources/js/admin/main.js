@@ -95,12 +95,14 @@ async function displayBodyContent() {
   $('#body-content').attr('class', 'show');
 }
 
-function initTable(table) {
+function initTable(table, order = []) {
   if ($.fn.dataTable.isDataTable(table)) {
     return $(table).DataTable();
   }
   return $(table).DataTable({
     bLengthChange: false,
+    order: order,
+    columnDefs: [ { orderable: false, targets: [0] }],
     language: {
       emptyTable: 'لا توجد بيانات',
       info: "تم عرض من _START_ إلى _END_ من أصل _TOTAL_ عنصر",
@@ -131,32 +133,32 @@ function initTable(table) {
     },
     drawCallback: function name() {
       this.api()
-          .columns()
-          .every(function () {
-              var that = this;
-              var header = $(this.header());
-              var columnHtml = header.html();
-              if (columnHtml.indexOf('<div') > -1) columnHtml = columnHtml.split('<div')[0].replaceAll('\n', '');
-              if (header.attr('class').indexOf('sorting_asc') != -1 && header.attr('class').indexOf('no-sort') == -1) {
-                header.html(`${columnHtml}\
-                  <div class="sorting-header">
-                    <span class="material-symbols-sharp">
-                    keyboard_arrow_down
-                    </span>
-                  </div>
-                `);
-              } else if (header.attr('class').indexOf('sorting_desc') != -1 && header.attr('class').indexOf('no-sort') == -1) {
-                header.html(`${columnHtml}\
-                  <div class="sorting-header">
-                    <span class="material-symbols-sharp">
-                    keyboard_arrow_up
-                    </span>
-                  </div>
-                `);
-              } else if (header.attr('class').indexOf('no-sort') == -1) {
-                header.html(columnHtml);
-              }
-          });
+        .columns()
+        .every(function () {
+          var that = this;
+          var header = $(this.header());
+          var columnHtml = header.html();
+          if (columnHtml.indexOf('<div') > -1) columnHtml = columnHtml.split('<div')[0].replaceAll('\n', '');
+          if (header.attr('class').indexOf('sorting_asc') != -1 && header.attr('class').indexOf('no-sort') == -1) {
+            header.html(`${columnHtml}\
+              <div class="sorting-header">
+                <span class="material-symbols-sharp">
+                keyboard_arrow_down
+                </span>
+              </div>
+            `);
+          } else if (header.attr('class').indexOf('sorting_desc') != -1 && header.attr('class').indexOf('no-sort') == -1) {
+            header.html(`${columnHtml}\
+              <div class="sorting-header">
+                <span class="material-symbols-sharp">
+                keyboard_arrow_up
+                </span>
+              </div>
+            `);
+          } else if (header.attr('class').indexOf('no-sort') == -1) {
+            header.html(columnHtml);
+          }
+      });
     }
   });
 }
@@ -213,7 +215,7 @@ function addMultiInputItem(element, itemValues) {
   for (const name in itemValues) {
     const value = itemValues[name];
     if (value == '') return;
-    itemValueHtml += `<span class="multi-input-row-item" name="${name}">${value}</span>`;
+    itemValueHtml += `<span class="multi-input-row-item" name="${name}" value="${value}">${name}: ${value}</span>`;
   }
   itemValueHtml += `<button class="btn btn-icon" action="remove"><span class="material-symbols-sharp">close</span></button>`;
   $(element).find('.multi-input-body').append(`<div class="multi-input-row">${itemValueHtml}</div>`);
@@ -231,7 +233,7 @@ function getMultiInputValues(element) {
       var items = $(row).find('.multi-input-row-item');
       for (let j = 0; j < items.length; j++) {
         const item = items[j];
-        rowValues[$(item).attr('name')] = $(item).text();
+        rowValues[$(item).attr('name')] = $(item).attr('value');
       }
       values.push(rowValues);
     }
@@ -239,7 +241,11 @@ function getMultiInputValues(element) {
   return values;
 }
 
-function previewImaes(privewId, images) {
+function clearMultiInputValues(element) {
+  $(element).find('.multi-input-body').html('');
+}
+
+function previewImages(images) {
   var imagesHtml = '';
   var indicatorsHtml = '';
   var i = 0;
@@ -252,11 +258,11 @@ function previewImaes(privewId, images) {
     `;
     i++;
   });
-  console.log(imagesHtml)
   $('#images-preivew-carousel .carousel-indicators').html(indicatorsHtml);
   $('#images-preivew-carousel .carousel-inner').html(imagesHtml);
   $('#images-preview-modal').modal('show');
 }
+
 /**
  * Select file(s).
  * @param {String} contentType The content type of files you wish to select. For instance, use "image/*" to select all types of images.

@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Events\Purchase\PurchaseCreatedEvent;
+use App\Events\Purchase\PurchaseUpdatedEvent;
+use App\Events\PurchaseEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,12 +19,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $address
  * @property string $delivery_type
  * @property float $delivery_price
- * @property \Illuminate\Support\Carbon|null $charging_date
- * @property \Illuminate\Support\Carbon|null $delivery_date
- * @property \Illuminate\Support\Carbon|null $received_date
  * @property float $total_price
- * @property string|null $pay_exchange_id
- * @property string $status
+ * @property string|null $exchange_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Purchase newModelQuery()
@@ -53,26 +52,68 @@ class Purchase extends Model {
   protected $fillable = [
     'product_id',
     'count',
+    'user_id',
     'fullname',
     'phone',
     'address',
     'delivery_type',
-    'delivery_price',
-    'charging_date',
-    'delivery_date',
-    'received_date',
     'total_price',
+    'delivery_steps',
+    'delivery_cost_exchange_id',
+    'product_price_exchange_id',
+    'status',
+    'unreades',
   ];
 
   protected $casts = [
-    'charging_date' => 'datetime',
-    'received_date' => 'datetime',
-    'delivery_date' => 'datetime',
+    'delivery_steps' => 'array',
+    'unreades' => 'array',
+    'created_at' => 'datetime:Y-m-d H:m:s',
   ];
 
-  public function linking() {
-    $this->product= Product::find($this->product_id);
-    $this->product->linking();
+  protected $dispatchesEvents = [
+    'created' => PurchaseCreatedEvent::class,
+    'updated' => PurchaseUpdatedEvent::class,
+  ];
+
+  static function news($admin_id) {
+    $purchases = Purchase::where('unreades', '!=', '[]')->get();
+    $newsPurchases = [];
+    foreach ($purchases as $purchase) {
+      if(in_array($admin_id, $purchase->unreades))
+        $newsPurchases[$purchase->id] = $purchase;
+    }
+    return $newsPurchases;
   }
 
+  static function readNews($admin_id) {
+    $items = Purchase::news($admin_id);
+    foreach ($items as $item) {
+      $item->unreades = array_diff($item->unreades, [$admin_id]);
+      $item->save();
+    }
+  }
+
+  public function linking() {
+    $this->user = User::find($this->user_id);
+    $this->user->linking();
+    $this->product= Product::find($this->product_id);
+    $this->product->linking();
+    $this->delivery_cost_exchange = Exchange::find($this->delivery_cost_exchange_id);
+    $this->delivery_cost_exchange->linking();
+    $this->product_price_exchange = Exchange::find($this->product_price_exchange_id);
+    $this->product_price_exchange->linking();
+  }
+
+  public function unlinking() {
+    unset($this->user);
+    unset($this->product);
+    unset($this->delivery_cost_exchange);
+    unset($this->product_price_exchange);
+  }
+
+  public function unlinkingAndSave() {
+    $this->unlinking();
+    $this->save();
+  }
 }

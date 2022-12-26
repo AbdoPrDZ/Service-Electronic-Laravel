@@ -1,3 +1,3 @@
 <p class="text-muted footer" style="margin-top: 20px; margin-bottom: 3px; text-align: center;">
-    &copy; 2022 آت بالفع<br>Powered By Abderrahmane Guerguer
+    &copy; Service-Electronic 2022 <br>Powered By Abderrahmane Guerguer
 </p>

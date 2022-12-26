@@ -15,6 +15,7 @@ return new class extends Migration {
       $table->id();
       $table->json('name');
       $table->string('image_id');
+      $table->json('unreades')->default('[]');
       $table->timestamps();
     });
   }

@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\SocketBridge\SocketClient;
+use App\Models\Admin;
+use App\Models\Notification;
+use App\Models\Transfer;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -24,8 +27,26 @@ class UserController extends Controller {
       $users[$value->id] = $value;
     }
     return Controller::apiSuccessResponse('Success', [
-      'users' => $users,
+      'data' => [
+        'users' => $users,
+        'recharges' => Transfer::recharges(),
+        'withdrawes' => Transfer::withdrawes(),
+      ]
     ]);
+  }
+
+  static function news(Request $request) {
+    $admin_id = $request->user()->id;
+    return [
+      'count' => count(User::news($admin_id)) + count(Transfer::news($admin_id, 'recharge')) + count(Transfer::news($admin_id, 'withdraw')),
+    ];
+  }
+
+  static function readNews(Request $request) {
+    User::readNews($request->user()->id);
+    Transfer::readNews($request->user()->id, 'recharge');
+    Transfer::readNews($request->user()->id, 'withdraw');
+    return Controller::apiSuccessResponse('successfully reading news');
   }
 
   public function delete(Request $request, $id) {
@@ -35,10 +56,10 @@ class UserController extends Controller {
     return $this->apiSuccessResponse('Successflully deleting user');
   }
 
-  public function answoerIdentityVerify(Request $request, $userId) {
+  public function changeIdentityStatus(Request $request, $userId) {
     $validator = Validator::make($request->all(), [
-      'status' => 'required|string',
-      'refuse_description' => 'required|string',
+      'status' => 'required|in:verifited,refused',
+      'answer_description' => 'string',
     ]);
 
     if ($validator->fails()) {
@@ -47,43 +68,37 @@ class UserController extends Controller {
 
     $user = User::find($userId);
     if(!is_null($user)){
-      $success = false;
+      if($user->identity_verifited_at != null) {
+        return $this->apiErrorResponse('This User already ansowered');
+      }
       $message = '';
-      if($request->status == 'accepeted') {
-        $success = true;
-        $message = 'Congratulations your identity verify eccepted';
+      if($request->status == 'verifited') {
+        $message = 'Congratulations your identity verify accepted';
         $user->identity_verifited_at = Carbon::now();
-        $user->save();
       } else {
-        $message = $request->refuse_description ?? 'Sorry your identity verify refused';
+        $message = $request->answer_description ?? 'Sorry your identity verify refused';
       }
-      $client = new SocketClient($user->id);
-      $response = $client->emit('identity-verify-ansowred', $success, $message);
-      if(!$response['success']) {
-        $notificatino = [
-          'token' => $user->messaging_token,
-          'notification' => [
-            'title' => "Identity Verify Result",
-            'body' => $message,
-          ],
-          'android' => [
-            'notification' => [
-              'priority' => "high",
-              'icon' => 'stock_ticker_update',
-              'sound' => "default",
-              'color' => '#7e55c3',
-              'imageUrl' => env('APP_URL').'/file/currency-12',
-            ]
-          ],
-          'data' => [
-            'topic' => 'identity-verify-Result',
-            'success' => $success,
-            'message' => $message,
-          ],
-        ];
-        $res = $client->pushNotification($notificatino);
-        Log::info('send transfer update notification', [$res]);
-      }
+      $user->identity_status = $request->status;
+      $user->save();
+
+      Notification::create([
+        'name' => 'notifications',
+        'title' => 'Identity Verify Result',
+        'message' => $message,
+        'from_id' => $user->id,
+        'from_model' => Admin::class,
+        'to_id' => $userId,
+        'to_model' => User::class,
+        'data' => [
+          'event_name' => 'identity-status-change',
+          'data' => json_encode([
+            'status' => $request->status,
+          ])
+        ],
+        'image_id' => 'currency-4',
+        'type' => 'emitOrNotify',
+      ]);
+      return $this->apiSuccessResponse('Successfully changing status');
     }
   }
 

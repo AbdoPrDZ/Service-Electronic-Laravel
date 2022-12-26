@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Events\NotificationEvent;
+use App\Events\NotificationCreatedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
@@ -62,26 +62,31 @@ class Notification extends Model {
 
   protected $casts =  [
     'data' => 'array',
+    'created_at' => 'datetime:Y-m-d H:m:s',
   ];
+
+  static function allUnreaded($user_id) {
+    return Notification::where([['to_id', '=', $user_id], ['is_readed', '=', 0]])->get();
+  }
 
   public function linking() {
     try {
       $this->sender = app($this->from_model)::find($this->from_id);
       $this->sender->linking();
     } catch (\Throwable $th) {
-      Log::error('notification linking', [$th]);
+      // Log::error('notification linking', [$th]);
       $this->sender = null;
     }
     try {
       $this->client = app($this->to_model)::find($this->to_id);
       $this->client->linking();
     } catch (\Throwable $th) {
-      Log::error('notification linking', [$th]);
+      // Log::error('notification linking', [$th]);
       $this->client = null;
     }
   }
 
   protected $dispatchesEvents = [
-    'created' => NotificationEvent::class,
+    'created' => NotificationCreatedEvent::class,
   ];
 }

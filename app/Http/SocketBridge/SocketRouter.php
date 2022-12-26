@@ -38,7 +38,7 @@ class SocketRouter {
   }
 
   public function all() {
-    return Cache::get(config('socket_bridge.manager.cache.routes'));
+    return Cache::store('file')->get(config('socket_bridge.manager.cache.routes'));
   }
 
   public function routeExists($routeName) {

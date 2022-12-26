@@ -23,10 +23,13 @@ return new class extends Migration
       $table->string('wallet_id')->nullable()->unique();
       $table->json('verification_images_ids')->default('[]');
       $table->timestamp('identity_verifited_at')->nullable();
+      $table->enum('identity_status', ['checking', 'refused', 'verifited', 'not_verifited'])->default('not_verifited');
+      $table->string('identity_answer_description')->nullable();
       $table->string('profile_image_id')->default('api_profile_default');
-      $table->string('messaging_token')->nullable()->unique();
+      $table->string('messaging_token')->nullable();
       $table->rememberToken();
       $table->json('settings')->default('[]');
+      $table->json('unreades')->default('[]');
       $table->timestamps();
     });
   }

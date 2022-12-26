@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Seller;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
@@ -26,18 +27,16 @@ class ProductController extends Controller {
     return $id + 1;
   }
 
-  public function all() {
+  public function all(Request $request) {
     $data = Product::all();
     $items = [];
     foreach ($data as $item) {
-      $item->linking();
+      $item->linking($request->user());
       $items[$item->id] = $item;
     }
-    return [
-      'success' => true,
-      'message' => 'Successfully getting products',
+    return $this->apiSuccessResponse('Successfully getting products', [
       'currencies' => $items,
-    ];
+    ]);
   }
 
   public function find($id) {
@@ -45,10 +44,7 @@ class ProductController extends Controller {
     if(!is_null($product)) {
       return $product;
     } else {
-      return response()->json([
-        'success' => false,
-        'message' => 'Invalid id'
-      ], 404);
+      return $this->apiErrorResponse('Invalid id',[], 404);
     }
   }
 
@@ -56,7 +52,7 @@ class ProductController extends Controller {
     $validator = Validator::make($request->all(), [
       'name' => 'required|string',
       'description' => 'required|string',
-      'price' => 'required|regex:/^[0-9]+(\.[0-9][0-9]?)?$/',
+      'price' => 'required|regex:/^[0-9]+(\.[0-9]?[0-9]?[0-9]?)?$/',
       'count' => 'required|integer',
       'category_id' => 'required|integer',
     ]);
@@ -66,16 +62,20 @@ class ProductController extends Controller {
       ]);
     }
 
-    $seller = Seller::where('user_id', '=', $request->user()->id)->first();
+    $user = $request->user();
+
+    $seller = Seller::where('user_id', '=', $user->id)->first();
     if(is_null($seller)) {
       return $this->apiErrorResponse('You are not seller');
     }
-    if($request->user()->identity_verifited_at == null) {
+    if($user->identity_verifited_at == null) {
       return $this->apiErrorResponse('You identity not verifited');
     }
     if(is_null(Category::where('id', '=', $request->category_id)->first())) {
       return $this->apiErrorResponse('Invalid category');
     }
+
+    $commission = Setting::find('commission')?->value[0];
 
     $productId = $this->getNextId();
     $values = [
@@ -84,6 +84,8 @@ class ProductController extends Controller {
       'name' => $request->name,
       'description' => $request->description,
       'price' => $request->price,
+      'commission' => $commission,
+      'count' => $request->count,
       'category_id' => $request->category_id,
       'images_ids' => [],
     ];
@@ -91,7 +93,7 @@ class ProductController extends Controller {
     if(!Storage::disk('api')->exists('users_data')) {
       Storage::disk('api')->makeDirectory('users_data');
     }
-    $userFilesPath = "users_data/".$request->user()->id;
+    $userFilesPath = "users_data/".$user->id;
     if(!Storage::disk('api')->exists($userFilesPath)) {
       Storage::disk('api')->makeDirectory($userFilesPath);
       Storage::disk('api')->makeDirectory("$userFilesPath/products");
@@ -104,7 +106,7 @@ class ProductController extends Controller {
     $i = 1;
     foreach ($request->files as $file) {
       $file->move(Storage::disk('api')->path($userProductPath), "i-$i");
-      $name = "u-" . $request->user()->id . "-p-$productId-i-$i";
+      $name = "u-" . $user->id . "-p-$productId-i-$i";
       File::create([
         'name' => $name,
         'disk' => 'api',
@@ -129,7 +131,7 @@ class ProductController extends Controller {
     $validator = Validator::make($request->all(), [
       'name' => 'string',
       'description' => 'string',
-      'price' => 'regex:/^[0-9]+(\.[0-9][0-9]?)?$/',
+      'price' => 'regex:/^[0-9]+(\.[0-9]?[0-9]?[0-9]?)?$/',
       'pricing_type' => 'string',
       'category_id' => 'integer',
     ]);
@@ -171,4 +173,64 @@ class ProductController extends Controller {
       ]);
     }
   }
+
+  public function like(Request $request, $id) {
+    $user = $request->user();
+    $product = Product::find($id);
+    if($product) {
+      $product->linking($user);
+      if($product->is_liked) {
+        return $this->apiErrorResponse('You already liked this product');
+      }
+      $product->likes = [...$product->likes, $user->id];
+      $product->unlinkingAndSave();
+      return $this->apiSuccessResponse('Successfully liking product');
+    } else {
+      return $this->apiErrorResponse('Invalid product id');
+    }
+  }
+
+  public function unLike(Request $request, $id) {
+    $user = $request->user();
+    $product = Product::find($id);
+    if($product) {
+      $product->linking($user);
+      if(!$product->is_liked) {
+        return $this->apiErrorResponse('You are not liked this product');
+      }
+      $product->likes = array_diff($product->likes, [$user->id]);
+      $product->unlinkingAndSave();
+      return $this->apiSuccessResponse('Successfully unliking product');
+    } else {
+      return $this->apiErrorResponse('Invalid product id');
+    }
+  }
+
+  public function rate(Request $request, $id) {
+    $validator = Validator::make($request->all(), [
+      'value' => 'required|regex:/^[0-9]+(\.[0-9]?[0-9]?[0-9]?)?$/',
+    ]);
+    if ($validator->fails()) {
+      return $this->apiErrorResponse(null, [
+        'errors' => $validator->errors(),
+      ]);
+    }
+
+    $user = $request->user();
+    $product = Product::find($id);
+    if($product) {
+      $product->linking($user);
+      if($product->is_rated) {
+        return $this->apiErrorResponse('You already rated this product');
+      }
+      $rates = $product->rates;
+      $rates[$user->id] = $request->value;
+      $product->rates = $rates;
+      $product->unlinkingAndSave();
+      return $this->apiSuccessResponse('Successfully rating product');
+    } else {
+      return $this->apiErrorResponse('Invalid product id');
+    }
+  }
+
 }

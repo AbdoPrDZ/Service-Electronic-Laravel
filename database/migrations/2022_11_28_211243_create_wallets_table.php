@@ -14,15 +14,14 @@ return new class extends Migration {
   public function up() {
     Schema::create('wallets', function (Blueprint $table) {
       $table->string('id')->primary();
-      $table->integer('user_id')->unique();
+      $table->integer('user_id');
       $table->string('user_model')->default(User::class);
       $table->double('balance')->default(0);
-      $table->double('checking_balance')->default(0);
-      $table->double('total_received_balance');
-      $table->double('total_withdrawn_balance');
+      $table->double('checking_recharge_balance')->default(0);
+      $table->double('checking_withdraw_balance')->default(0);
       $table->enum('status', ['active', 'banned', 'blocked', 'checking', 'stopped'])->default('checking');
       $table->timestamp('answored_at')->nullable();
-      $table->string('ansower_description')->nullable();
+      $table->string('answer_description')->nullable();
       $table->timestamps();
     });
   }

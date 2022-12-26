@@ -4,8 +4,7 @@ namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
-class Kernel extends HttpKernel
-{
+class Kernel extends HttpKernel {
   /**
    * The application's global HTTP middleware stack.
    *
@@ -66,7 +65,9 @@ class Kernel extends HttpKernel
     'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
     'ability' => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
     'multi.auth' => \App\Http\Middleware\MultiAuth::class,
+    'socket.auth' => \App\Http\Middleware\SocketVerifyToken::class,
     'file.access' => \App\Http\Middleware\FileAccess::class,
     'host.access' => \App\Http\Middleware\HostAccess::class,
+    'seller.access' => \App\Http\Middleware\SellerMiddleware::class,
   ];
 }

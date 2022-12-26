@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use App\Events\CurrencyDeleteEvent;
+use App\Events\Currency\CurrencyCreatedEvent;
+use App\Events\Currency\CurrencyDeletedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Transfer;
@@ -46,21 +47,52 @@ class Currency extends Model {
     'char',
     'max_receive',
     'proof_is_required',
+    'image_pick_type',
     'wallet',
     'platform_wallet_id',
     'prices',
+    'unreades',
   ];
 
   protected $casts = [
     'prices' => 'array',
+    'unreades' => 'array',
+    'created_at' => 'datetime:Y-m-d H:m:s',
   ];
+
+  static function news($admin_id) {
+    $currencies = Currency::where('unreades', '!=', '[]')->get();
+    $newsCurrencies = [];
+    foreach ($currencies as $currency) {
+      if(in_array($admin_id, $currency->unreades))
+        $newsCurrencies[$currency->id] = $currency;
+    }
+    return $newsCurrencies;
+  }
+
+  static function readNews($admin_id) {
+    $items = Currency::news($admin_id);
+    foreach ($items as $item) {
+      $item->unreades = array_diff($item->unreades, [$admin_id]);
+      $item->save();
+    }
+  }
 
   public function linking() {
     $this->platform_wallet = Wallet::find($this->platform_wallet_id);
     // $this->platform_wallet->linking();
+    $rendred_prices = [];
+    foreach ($this->prices as $currencyId => $price) {
+      $rendred_prices[$currencyId] = [
+        'currency' => Currency::find($currencyId),
+        'price' => $price
+      ];
+    }
+    $this->rendred_prices = $rendred_prices;
   }
 
   protected $dispatchesEvents = [
-    'deleted' => CurrencyDeleteEvent::class,
+    'created' => CurrencyCreatedEvent::class,
+    'deleted' => CurrencyDeletedEvent::class,
   ];
 }

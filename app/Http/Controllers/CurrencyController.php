@@ -16,6 +16,7 @@ class CurrencyController extends Controller {
     $items = [];
     foreach ($data as $item) {
       $items[$item->id] = $item;
+      $items[$item->id]->linking();
     }
     return [
       'success' => true,

@@ -141,6 +141,30 @@ body>div {
   color: var(--color-primary);
 }
 
+
+.sidebar .sidebar-item .news-badge {
+  font-size: 10px;
+  color: #fff;
+  top: 18px;
+  left: 20px;
+  width: 8px !important;
+  height: 8px !important;
+}
+.sidebar .sidebar-item.active .news-badge {
+  left: 42px;
+  transition: all 300ms ease;
+}
+
+.badge:empty {
+  display: block;
+}
+.sidebar .sidebar-item .badge.show {
+  display: block;
+}
+.sidebar .sidebar-item .badge.hide {
+  display: none;
+}
+
 #tab-content {
   padding: 20px 25px;
   overflow: auto;
@@ -231,12 +255,16 @@ body>div {
 }
 
 .modal#images-preview-modal {
-  display: grid;
+
   padding: 10px 15px;
   background-color: transparent;
   margin: auto;
   justify-items: center;
   align-items: center;
+}
+
+.modal#images-preview-modal.show {
+  display: grid;
 }
 
 .modal#images-preview-modal .modal-dialog {
@@ -268,4 +296,60 @@ body>div {
 #images-preivew-carousel a.carousel-control-next {
   background: linear-gradient(to left, #222A, #cccD);
   border-radius: 0 10px 10px 0;
+}
+
+#notifications-dropdown button span.badge.show {
+  display: block;
+}
+#notifications-dropdown button span.badge.hide {
+  display: none;
+}
+#notifications-dropdown .dropdown-menu {
+  width: 25rem;
+  padding: 5px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 80vh;
+}
+#notifications-dropdown .notification-item {
+  display: grid;
+  gap: 2px;
+  grid-template-columns: min-content auto 20%;
+  justify-items: center;
+  align-items: center;
+  margin: 5px;
+  background-color: #efefef;
+  border-radius: 5px;
+  padding: 5px 5px;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+#notifications-dropdown .notification-item:hover {
+  cursor: pointer;
+  background-color: #d7d7d7;
+}
+#notifications-dropdown .notification-item .image {
+  width: 60px;
+  padding: 0 5px;
+}
+#notifications-dropdown .notification-item .content {
+  width: 100%;
+}
+#notifications-dropdown .notification-item .content .title {
+  margin-bottom: 2px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #444;
+}
+#notifications-dropdown .notification-item .content .message {
+  margin: 0px;
+  font-size: 11px;
+}
+#notifications-dropdown .notification-item .date {
+  font-size: 10px;
+  text-align: center;
+}
+
+.tox-tinymce {
+
+  height: 90vh;
 }

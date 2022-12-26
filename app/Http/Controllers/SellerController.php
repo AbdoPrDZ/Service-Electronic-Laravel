@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Admin;
 use App\Models\File;
 use App\Models\Seller;
 use Illuminate\Http\Request;
@@ -28,11 +29,17 @@ class SellerController extends Controller {
       'store_name' => 'required|string',
       'store_address' => 'required|string',
       'store_image' => 'file|mimes:jpg,png,jpeg',
+      'delivery_prices' => 'required'
     ]);
     if($validator->fails()){
       return $this->apiErrorResponse(null, [
         'errors' => $validator->errors(),
       ]);
+    }
+    try {
+      $delivery_prices = json_decode($request->delivery_prices);
+    } catch (\Throwable $th) {
+      $this->apiErrorResponse('invalid delivery prices');
     }
 
     if($request->user()->identity_verifited_at == null) {
@@ -40,16 +47,18 @@ class SellerController extends Controller {
     }
 
     $seller = Seller::where('user_id', '=', $request->user()->id)->first();
-    if(!is_null($seller)) {
+    if(!is_null($seller) && $seller->status != 'refused') {
       return $this->apiErrorResponse('You allready a seller');
     }
 
-    $sellerId = $this->getNextId();
+    $sellerId = $seller?->id ??$this->getNextId();
     $values = [
       'id' => $sellerId,
       'user_id' => $request->user()->id,
       'store_name' => $request->store_name,
       'store_address' => $request->store_address,
+      'delivery_prices' => $delivery_prices,
+      'unreades' => Admin::unreades(),
     ];
 
     if(!is_null($request->file('store_image'))) {
@@ -72,7 +81,16 @@ class SellerController extends Controller {
       $values['store_image_id'] = "s-$sellerId-si";
     }
 
-    $seller = Seller::create($values);
+    if (!is_null($seller)){
+      $seller->answered_at = null;
+      $seller->status = 'checking';
+      $seller->store_name = $request->store_name;
+      $seller->store_address = $request->store_address;
+      $seller->delivery_prices = $delivery_prices;
+      $seller->save();
+    } else {
+      $seller = Seller::create($values);
+    }
 
     return $this->apiSuccessResponse('Successfully creating store, you can start publish your products');
   }

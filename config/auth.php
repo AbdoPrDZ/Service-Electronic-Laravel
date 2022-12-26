@@ -42,11 +42,21 @@ return [
       'hash' => true,
       'home' => 'admin.dashboard'
     ],
+    // 'admin-socket' => [
+    //   'driver' => 'jwt',
+    //   'provider' => 'admins',
+    //   'hash' => true,
+    // ],
     'api' => [
       'driver' => 'session',
       'provider' => 'users',
       'hash' => true,
     ],
+    // 'api-socket' => [
+    //   'driver' => 'jwt',
+    //   'provider' => 'users',
+    //   'hash' => true,
+    // ],
   ],
 
   /*
@@ -75,11 +85,6 @@ return [
       'driver' => 'eloquent',
       'model' => App\Models\User::class,
     ],
-
-    // 'users' => [
-    //   'driver' => 'database',
-    //   'table' => 'users',
-    // ],
   ],
 
   /*

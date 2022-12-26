@@ -196,6 +196,12 @@ b {
   font-size: 20px;
 }
 
+.btn.btn-icon .badge {
+  font-size: 10px;
+  right: -10px;
+  top: -6px;
+}
+
 .form-group .btn.btn-img-picker {
   background-color: var(--gray-dark);
   width: 100%;

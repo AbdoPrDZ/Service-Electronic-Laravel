@@ -41,19 +41,11 @@ class MultiAuth implements AuthenticatesRequests {
   public function handle(Request $request, Closure $next, $guard) {
     if ($this->auth->guard($guard)->check()) {
       $this->auth->shouldUse($guard);
-      // if($guard == 'admin' && $request->route()->named('admin.login')) {
-      //   return redirect()->route('admin.dashboard');
-      // }
       return $next($request);
     } else {
-      if ($guard == 'admin') {
-        // throw new AuthenticationException(
-        //   'Unauthenticated.',
-        //   [$guard],
-        //   route('admin.login'),
-        // );
+      if($guard == 'admin' && !$request->wantsJson()) {
         return redirect()->route('admin.login');
-      } else if ($guard == 'sanctum') {
+      } else {
         return Controller::apiErrorResponse('Unauthenticated');
       }
     }

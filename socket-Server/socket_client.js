@@ -9,13 +9,13 @@ class SocketClient {
   routes = [];
 
   constructor(client) {
+
     this.client = client;
     this.clientId = client.clientId;
     this.client.on('event', (routeName, ...args) => {
       return this.emitToServer(routeName, ...args);
     });
-    if(Environment.clients[this.clientId]) delete(Environment.clients[this.clientId])
-    Environment.clients[this.clientId] = this;
+    this.client.on('auth', (token) => {this.auth(token)});
   }
 
   emitToClient(eventName, ...args) {
@@ -48,29 +48,55 @@ class SocketClient {
     }
   }
 
-  static async auth(client, next) {
-    var headers = client.handshake.headers;
+  // static async auth(client, next) {
+  //   var headers = client.handshake.headers;
+  //   Object.assign(headers, Environment.requestHeaders)
+  //   // headers['host'] = 'localhost';
+  //   // headers['Content-Type'] = 'application/json; charset=UTF-8';
+  //   // headers['Accept'] = 'application/json';
+  //   try {
+  //     var {data} =  await axios.get(
+  //       `${Environment.configures.manager.app_url}${Environment.configures.manager.path}${Environment.configures.manager.onConnect}`
+  //         .replace('{clientId}', client.id),
+  //       {headers: headers}
+  //     );
+  //     console.log(data, headers);
+  //     if(data['success']) {
+  //       client.routes = data['routes'];
+  //       client.clientId = data['clientId'];
+  //       return next();
+  //     }
+  //   } catch (error) {
+  //     console.error(error)
+  //     return next(Error(error))
+  //   }
+  //   return next(new Error('Unauthenticated'));
+  // }
+
+  async auth(token) {
+    // var headers = this.client.handshake.headers;
+    var headers = {}
     Object.assign(headers, Environment.requestHeaders)
-    // headers['host'] = 'localhost';
-    // headers['Content-Type'] = 'application/json; charset=UTF-8';
-    // headers['Accept'] = 'application/json';
+    headers['Authorization'] = `Bearer ${token}`;
     try {
       var {data} =  await axios.get(
         `${Environment.configures.manager.app_url}${Environment.configures.manager.path}${Environment.configures.manager.onConnect}`
-          .replace('{clientId}', client.id),
+          .replace('{clientId}', this.client.id),
         {headers: headers}
       );
       console.log(data);
       if(data['success']) {
-        client.routes = data['routes'];
-        client.clientId = data['clientId'];
-        return next();
+        this.client.routes = data['routes'];
+        this.client.clientId = data['clientId'];
+        if(Environment.clients[data['clientId']]) delete(Environment.clients[data['clientId']])
+        Environment.clients[data['clientId']] = this;
+        return this.client.emit('auth-resualt', {success: true, message: 'successfully connecting'})
       }
     } catch (error) {
       console.error(error)
-      return next(Error(error))
+      return this.client.emit('auth-resualt', {success: false, message: error})
     }
-    return next(new Error('Unauthenticated'));
+    this.client.emit('auth-resualt', {success: false, message: 'Unauthenticated'})
   }
 }
 

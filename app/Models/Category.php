@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Events\Category\CategoryCreatedEvent;
+use App\Events\Category\CategoryDeletedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -33,9 +35,36 @@ class Category extends Model
     'id',
     'name',
     'image_id',
+    'unreades',
   ];
 
   protected $casts = [
     'name' => 'array',
+    'unreades' => 'array',
+    'created_at' => 'datetime:Y-m-d H:m:s',
   ];
+
+  protected $dispatchesEvents = [
+    'created' => CategoryCreatedEvent::class,
+    'deleted' => CategoryDeletedEvent::class,
+  ];
+
+  static function news($admin_id) {
+    $categories = Category::where('unreades', '!=', '[]')->get();
+    $newsCategories = [];
+    foreach ($categories as $category) {
+      if(in_array($admin_id, $category->unreades))
+        $newsCategories[$category->id] = $category;
+    }
+    return $newsCategories;
+  }
+
+  static function readNews($admin_id) {
+    $items = Category::news($admin_id);
+    foreach ($items as $item) {
+      $item->unreades = array_diff($item->unreades, [$admin_id]);
+      $item->save();
+    }
+  }
+
 }

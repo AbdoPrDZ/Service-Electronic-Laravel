@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\EmailVerify;
+use App\Models\Admin;
 use App\Models\File;
 use App\Models\User;
 use App\Models\VerifyToken;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Str;
@@ -19,7 +21,6 @@ use Validator;
 class UserController extends Controller {
 
   public function __construct() {
-    // $this->middleware('auth:sanctum', ['except' => [
     $this->middleware('multi.auth:sanctum', ['except' => [
       'login',
       'signup',
@@ -50,8 +51,16 @@ class UserController extends Controller {
       $authed = Auth::attempt($validator->validated());
       if($authed) {
         $token = $request->user()->createToken('access.token', ['remember'])->plainTextToken;
+        $socketToken = $request->user()->createToken('socket.access.token', ['socket_token'])->plainTextToken;
+        VerifyToken::create([
+          'token' => $socketToken,
+          'user_id' => $request->user()->id,
+          'model' => User::class,
+          'code' => '',
+        ]);
         return $this->apiSuccessResponse('Successfully login', [
           'token' => $token,
+          'socket.token' => $socketToken,
         ]);
       } else {
         return $this->apiErrorResponse('Invalid password');
@@ -93,6 +102,7 @@ class UserController extends Controller {
         'theme' => 'Light',
         'languange' => 'En',
       ],
+      'unreades' => Admin::unreades(),
     ]);
 
     $verifyCode = random_int(100000, 999999);
@@ -126,23 +136,34 @@ class UserController extends Controller {
     $token = VerifyToken::where('token', '=', $request->token)->first();
     $user = User::where('id', '=', $request->user_id)->first();
     if(!is_null($token) && !is_null($user) && $token->used_at == null && $token->code == $request->code) {
+      if($user->email_verified_at != null) {
+        return $this->apiErrorResponse('This email already verifited');
+      }
       $user->update([
         'email_verified_at' => Carbon::now(),
       ]);
       $token->update([
         'used_at' => Carbon::now(),
       ]);
-      $wallet = Wallet::create([
-        'id' => bin2hex('w-' . date_format(Carbon::now(), 'yyyy-MM-dd') . "-u-$user->id"),
-        'user_id' => $user->id,
-        'user_model' => User::class,
-        'balance' => 0,
-        'total_received_balance' => 0,
-        'total_withdrawn_balance' => 0,
-        'status' => 'active',
-        'answored_at' => Carbon::now(),
-      ]);
-      $user->wallet_id = $wallet->id;
+
+      if($user->wallet_id == null){
+        $walletId = bin2hex('w-' . date_format(Carbon::now(), 'yyyy-MM-dd HH:mm:ss') . "-u-$user->id");
+        $wallet = Wallet::create([
+          'id' => $walletId,
+          'user_id' => $user->id,
+          'user_model' => User::class,
+          'balance' => 0,
+          'total_received_balance' => 0,
+          'total_withdrawn_balance' => 0,
+          'status' => 'active',
+          'answored_at' => Carbon::now(),
+        ]);
+        $user->wallet_id = $wallet->id;
+      } else {
+        $wallet = Wallet::find($user->wallet_id);
+        $wallet->status = 'active';
+        $wallet->save();
+      }
       $user->save();
       return $this->apiSuccessResponse('User successfully verifing email');
     } else {
@@ -234,7 +255,7 @@ class UserController extends Controller {
       'used_at' => Carbon::now(),
       ]);
       $user->update([
-      'password' => bcrypt($request->new_password)
+        'password' => bcrypt($request->new_password)
       ]);
       return $this->apiSuccessResponse('Successfully reset password');
     } else {
@@ -264,7 +285,7 @@ class UserController extends Controller {
     $dirPath = "$userFilesPath/identity_verifications/";
 
     $images = [];
-    $request->file('identity_image')->move(Storage::disk('api')->path($dirPath), 'identity_image');
+    $request->file('identity_image')->move(Storage::disk('api')->path($dirPath), 'vi');
     $name = "u-" . $request->user()->id . '-vi';
     File::updateOrCreate(['name' => $name], [
       'disk' => 'api',
@@ -272,7 +293,7 @@ class UserController extends Controller {
       'path' => "$dirPath/vi",
     ]);
     $images[] = $name;
-    $request->file('address_image')->move(Storage::disk('api')->path($dirPath), 'address_image');
+    $request->file('address_image')->move(Storage::disk('api')->path($dirPath), 'va');
     $name = "u-" . $request->user()->id . '-va';
     File::updateOrCreate(['name' => $name], [
       'disk' => 'api',
@@ -282,6 +303,7 @@ class UserController extends Controller {
     $images[] = $name;
 
     $request->user()->verification_images_ids = $images;
+    $request->user()->identity_status = 'checking';
     $request->user()->save();
 
     return $this->apiSuccessResponse('Your Verify identity in progress.');
@@ -333,6 +355,75 @@ class UserController extends Controller {
     return $this->apiSuccessResponse('Successfully editing profile data');
   }
 
+  public function changeEmail(Request $request) {
+    $validator = Validator::make($request->all(), [
+      'new_email' => 'required|email',
+    ]);
+    if ($validator->fails()) {
+      return $this->apiErrorResponse(null, [
+        'messages' => $validator->errors(),
+      ]);
+    }
+
+    $user = User::whereEmail($request->new_email)->first();
+    if(!is_null($user) && $user->email_verified_at != null) {
+      return $this->apiErrorResponse('Invalid email');
+    }
+
+    $user = $request->user();
+    $user->email = $request->new_email;
+    $user->email_verified_at = null;
+    $user->save();
+    $user->linking();
+    $user->wallet->status = 'blocked';
+    $user->wallet->unlinkingAndSave();
+
+    $verifyCode = random_int(100000, 999999);
+    $token = Str::random(64);
+    VerifyToken::create([
+      'token' => $token,
+      'user_id' => $user->id,
+      'code' => $verifyCode,
+    ]);
+    Mail::to($request->new_email)->send(new EmailVerify($verifyCode));
+    $user->tokens()->delete();
+    return $this->apiSuccessResponse("Successfully changing email", [
+      'token' => $token,
+      'user_id' => $user->id,
+    ]);
+  }
+
+  public function rp_check_password(Request $request) {
+    $validator = Validator::make($request->all(), [
+      'password' => 'required',
+    ]);
+    if ($validator->fails()) {
+      return $this->apiErrorResponse(null, [
+        'messages' => $validator->errors(),
+      ]);
+    }
+
+    $user = $request->user();
+    if(!Hash::check($request->password, $user->password)) {
+      return $this->apiErrorResponse('Invalid password');
+    }
+    $user->linking();
+    $user->wallet->status = 'blocked';
+    $user->wallet->unlinkingAndSave();
+
+    $token = Str::random(64);
+    VerifyToken::create([
+      'token' => $token,
+      'user_id' => $user->id,
+      'code' => '',
+    ]);
+    $user->tokens()->delete();
+    return $this->apiSuccessResponse('Successfully verifing email', [
+      'token' => $token,
+      'user_id' => $user->id,
+    ]);
+  }
+
   public function index(Request $request) {
     $user = auth()->user();
     $user->linking();
@@ -341,8 +432,9 @@ class UserController extends Controller {
     ]);
   }
 
-  public function logout() {
-    auth()->logout();
+  public function logout(Request $request) {
+    $user = request()->user();
+    $user->tokens()->delete();
     return $this->apiSuccessResponse('User successfully signed out');
   }
 
