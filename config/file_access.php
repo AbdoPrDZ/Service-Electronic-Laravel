@@ -11,7 +11,7 @@ return [
     ],
     'api' => [
       'guard' => 'sanctum',
-      // 'auth' => true,
+      'auth' => true,
       'access_disks' => ['api', 'public'],
     ],
     'public' => [

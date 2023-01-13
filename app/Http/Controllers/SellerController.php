@@ -11,19 +11,6 @@ use Validator;
 
 class SellerController extends Controller {
 
-  public function __construct() {
-    $this->middleware('multi.auth:sanctum');
-  }
-
-  public function getNextId() {
-    $id = 0;
-    $last = Seller::orderBy('id','desc')->first();
-    if(!is_null($last)) {
-      $id = $last->id;
-    }
-    return $id + 1;
-  }
-
   public function register(Request $request) {
     $validator = Validator::make($request->all(), [
       'store_name' => 'required|string',
@@ -39,7 +26,9 @@ class SellerController extends Controller {
     try {
       $delivery_prices = json_decode($request->delivery_prices);
     } catch (\Throwable $th) {
-      $this->apiErrorResponse('invalid delivery prices');
+      $this->apiErrorResponse('invalid delivery prices', [
+        'errors' => ['prices' => 'Invalid delivery prices']
+      ]);
     }
 
     if($request->user()->identity_verifited_at == null) {
@@ -51,7 +40,7 @@ class SellerController extends Controller {
       return $this->apiErrorResponse('You allready a seller');
     }
 
-    $sellerId = $seller?->id ??$this->getNextId();
+    $sellerId = $seller?->id ?? Seller::GetNextSequenceValue();
     $values = [
       'id' => $sellerId,
       'user_id' => $request->user()->id,

@@ -14,13 +14,13 @@ class ProductController extends Controller {
   }
 
   static function all(Request $request) {
-    $items = Product::all();
+    $items = Product::where('is_deleted', '=', 0)->get();
     $products = [];
     foreach ($items as $value) {
       $value->linking();
       $products[$value->id] = $value;
     }
-    $items = Category::all();
+    $items = Category::where('is_deleted', '=', 0)->get();
     $categories = [];
     foreach ($items as $value) {
       $categories[$value->id] = $value;
@@ -33,16 +33,13 @@ class ProductController extends Controller {
     ]);
   }
 
-  static function news(Request $request) {
-    $admin_id = $request->user()->id;
-    return [
-      'count' => count(Product::news($admin_id)) + count(Category::news($admin_id)),
-    ];
+  static function news($admin_id) {
+    return count(Product::news($admin_id)) + count(Category::news($admin_id));
   }
 
-  static function readNews(Request $request) {
-    Product::readNews($request->user()->id);
-    Category::readNews($request->user()->id);
+  static function readNews($admin_id) {
+    Product::readNews($admin_id);
+    Category::readNews($admin_id);
     return Controller::apiSuccessResponse('successfully reading news');
   }
 }

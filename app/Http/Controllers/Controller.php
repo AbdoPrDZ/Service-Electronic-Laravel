@@ -26,4 +26,12 @@ class Controller extends BaseController {
     return Controller::apiResponse(false, $message, $values, $code);
   }
 
+  public function tryDecodeArray(string|null $text) {
+    try {
+      return json_decode($text);
+    } catch (\Throwable $th) {
+      echo $th;
+      return $text;
+    }
+  }
 }

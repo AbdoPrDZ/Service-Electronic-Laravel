@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\ProductCreatedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
@@ -37,7 +38,7 @@ use App\Models\File;
  */
 class Product extends Model {
 
-  use HasFactory;
+  use HasFactory, GetNextSequenceValue;
 
   protected $fillable = [
     'seller_id',
@@ -52,6 +53,7 @@ class Product extends Model {
     'category_id',
     'images_ids',
     'unreades',
+    'is_deleted',
   ];
 
   protected $casts = [
@@ -60,7 +62,12 @@ class Product extends Model {
     'rates' => 'array',
     'likes' => 'array',
     'unreades' => 'array',
+    'is_deleted' => 'boolean',
     'created_at' => 'datetime:Y-m-d H:m:s',
+  ];
+
+  protected $dispatchesEvents = [
+    'created' => ProductCreatedEvent::class,
   ];
 
   static function news($admin_id) {
@@ -81,10 +88,10 @@ class Product extends Model {
     }
   }
 
-  public function linking(User $user = null) {
+  public function linking(User $user = null, $linkingSeller = true) {
     $this->display_price = $this->price + ($this->price * $this->commission);
-    $this->seller = Seller::find($this->seller_id );
-    $this->seller->linking();
+    $this->seller = Seller::find($this->seller_id);
+    if($linkingSeller) $this->seller->linking();
     $this->category = Category::find($this->category_id);
     $totalRate = 0;
     foreach ($this->rates as $rate) {
@@ -109,6 +116,11 @@ class Product extends Model {
   public function unlinkingAndSave() {
     $this->unlinking();
     $this->save();
+  }
+
+  public function preDelete() {
+    $this->is_deleted = true;
+    $this->unlinkingAndSave();
   }
 
 }

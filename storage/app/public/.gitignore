@@ -1,7 +1,3 @@
 *
-!categories/
-!categories/*
-!currencies/
-!currencies/*
-!countries.json
+!defaults/
 !.gitignore

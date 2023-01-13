@@ -69,5 +69,6 @@ class Kernel extends HttpKernel {
     'file.access' => \App\Http\Middleware\FileAccess::class,
     'host.access' => \App\Http\Middleware\HostAccess::class,
     'seller.access' => \App\Http\Middleware\SellerMiddleware::class,
+    'valid_id' => \App\Http\Middleware\ValidIdMiddleware::class,
   ];
 }

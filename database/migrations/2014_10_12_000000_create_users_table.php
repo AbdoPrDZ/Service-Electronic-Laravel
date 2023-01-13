@@ -30,6 +30,7 @@ return new class extends Migration
       $table->rememberToken();
       $table->json('settings')->default('[]');
       $table->json('unreades')->default('[]');
+      $table->boolean('is_deleted')->default(false);
       $table->timestamps();
     });
   }

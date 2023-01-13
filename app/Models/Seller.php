@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\SellerCreatedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Storage;
@@ -34,9 +35,8 @@ use Storage;
  * @method static \Illuminate\Database\Eloquent\Builder|Seller whereUserId($value)
  * @mixin \Eloquent
  */
-class Seller extends Model
-{
-  use HasFactory;
+class Seller extends Model {
+  use HasFactory, GetNextSequenceValue;
 
   protected $table = 'sellers';
 
@@ -60,6 +60,10 @@ class Seller extends Model
     'created_at' => 'datetime:Y-m-d H:m:s',
   ];
 
+  protected $dispatchesEvents = [
+    'created' => SellerCreatedEvent::class,
+  ];
+
   static function news($admin_id) {
     $sellers = Seller::where('unreades', '!=', '[]')->get();
     $newsSellers = [];
@@ -78,12 +82,49 @@ class Seller extends Model
     }
   }
 
-  public function linking() {
-    // $countries = json_decode(Storage::disk('public')->get('countries.json'));
-    // list($country, $state, $address) = explode('->', $this->store_address);
-    // $this->strAddress = $countries[intVal($country)]->country . "-" .$countries[intVal($country)]->states[intVal($state)] . "-" .$address;
+  public function linking($linkingUser = true) {
     $this->user = User::find($this->user_id);
-    $this->user->linking(false);
+    if($linkingUser) $this->user->linking(false);
   }
 
+  public function unlinking() {
+    unset($this->user);
+  }
+
+  public function unlinkingAndSave() {
+    $this->unlinking();
+    $this->save();
+  }
+
+  public function preDelete() {
+    $this->is_deleted = true;
+    $this->unlinkingAndSave();
+  }
+
+  /**
+   * all seller products
+   * @return array<Product>
+   */
+  public function products() {
+    $items = Product::where('seller_id', '=', $this->id)->get();
+    $products = [];
+    foreach ($items as $product) {
+      $product->linking(linkingSeller: false);
+      $products[$product->id] = $product;
+    }
+    return $products;
+  }
+
+  public function purchases() {
+    $purchases = [];
+    $sellerProducts = $this->products();
+    foreach ($sellerProducts as $product) {
+      $items = Purchase::where('product_id', '=', $product->id)->get();
+      foreach ($items as $purchase) {
+        $purchase->linking();
+        $purchases[$purchase->id] = $purchase;
+      }
+    }
+    return $purchases;
+  }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Events\UserCreatedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -70,6 +71,7 @@ class User extends Authenticatable {
     'identity_status',
     'identity_answer_description',
     'messaging_token',
+    'is_deleted',
     'settings',
   ];
 
@@ -83,7 +85,12 @@ class User extends Authenticatable {
     'verification_images_ids' => 'array',
     'identity_verifited_at' => 'datetime:Y-m-d H:m:s',
     'settings' => 'array',
+    'is_deleted' => 'boolean',
     'created_at' => 'datetime:Y-m-d H:m:s',
+  ];
+
+  protected $dispatchesEvents = [
+    'created' => UserCreatedEvent::class,
   ];
 
   static function news($admin_id) {
@@ -108,19 +115,10 @@ class User extends Authenticatable {
     $this->fullname = $this->firstname . ' ' . $this->lastname;
     $this->email_verified = !is_null($this->email_verified_at);
     $this->profile_image = File::find($this->profile_image_id)->name;
-    // $this->identity_verifited = !is_null($this->identity_verifited_at);
-    // $this->identity_status = $this->identity_verifited ? 'verifted' :
-    //   (count($this->verification_images_ids) > 0 ?
-    //     'checking' :
-    //     'not_verifited');
-    if($linkSeller) {
-      $seller = Seller::where('user_id', '=', $this->id)->first();
-      if(!is_null($seller)) {
-        $this->seller_id = $seller->id;
-        $this->seller_status = $seller->status;
-      }
-      // $this->seller = Seller::where('user_id', '=', $this->id)->first();
-      // if(!is_null($this->sellet)) $this->sellet->linking();
+    $seller = Seller::where('user_id', '=', $this->id)->first();
+    if(!is_null($seller)) {
+      $this->seller = $seller;
+      if($linkSeller) $this->seller->linking(false);
     }
     $this->wallet = Wallet::find($this->wallet_id);
     $balance = 0;
@@ -143,5 +141,33 @@ class User extends Authenticatable {
       'commission' => Setting::find('commission')?->value[0],
     ];
   }
+  public function unlinking($linkSeller = true) {
+    unset($this->fullname);
+    unset($this->email_verified);
+    unset($this->profile_image);
+    unset($this->wallet);
+    unset($this->balance);
+    unset($this->checking_balance);
+    unset($this->platform_settings);
+  }
 
+  public function unlinkingAndSave() {
+    $this->unlinking();
+    $this->save();
+  }
+
+  public function preDelete() {
+    $this->is_deleted = true;
+    $this->unlinkingAndSave();
+  }
+
+  public function purchases() {
+    $items = Purchase::where('user_id', '=', $this->id);
+    $purchases = [];
+    foreach ($purchases as $purchase) {
+      $purchase->linking();
+      $purchases[$purchase->id] = $purchase;
+    }
+    return $purchases;
+  }
 }

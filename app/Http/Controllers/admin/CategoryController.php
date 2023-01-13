@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Category;
 use App\Models\File;
 use Carbon\Carbon;
@@ -16,31 +17,9 @@ class CategoryController extends Controller {
     $this->middleware('multi.auth:admin');
   }
 
-  public function getNextId() {
-    $id = 0;
-    $last = Category::orderBy('id','desc')->first();
-    if(!is_null($last)) {
-      $id = $last->id;
-    }
-    return $id + 1;
-  }
-
-  static function all(Request $request) {
-    $items = Category::all();
-    $categories = [];
-    foreach ($items as $value) {
-      $categories[$value->id] = $value;
-    }
-    return Controller::apiSuccessResponse('Success', [
-      'data' => $categories,
-    ]);
-  }
-
   static function news(Request $request) {
     $admin_id = $request->user()->id;
-    return [
-      'count' => count(Category::news($admin_id)),
-    ];
+    return count(Category::news($admin_id));
   }
 
   static function readNews(Request $request) {
@@ -69,7 +48,7 @@ class CategoryController extends Controller {
       return $this->apiErrorResponse('Invalid Names');
     }
 
-    $categoryId = $this->getNextId();
+    $categoryId = Category::getNextSequenceValue();
 
     if(!Storage::disk('public')->exists("categories")) {
       Storage::disk('public')->makeDirectory("categories");
@@ -86,11 +65,12 @@ class CategoryController extends Controller {
       'id' => $categoryId,
       'name' => $names,
       'image_id' => $imageFile->name,
+      'unreades' => Admin::unreades($request->user()->id),
     ]);
     return $this->apiSuccessResponse('Succesfully creating category');
   }
 
-  public function edit(Request $request, $id) {
+  public function edit(Request $request, Category $category) {
     $validator = Validator::make($request->all(), [
       'names' => 'string',
       'image' => 'file|mimes:jpg,png,jpeg',
@@ -101,7 +81,6 @@ class CategoryController extends Controller {
       ]);
     }
 
-    $category = Category::find($id);
     $names = [];
     if(!is_null($request->names)) {
       try {
@@ -115,22 +94,22 @@ class CategoryController extends Controller {
         return $this->apiErrorResponse('Invalid Names');
       }
     }
+    $category->unreades = Admin::unreades($request->user()->id);
     $category->save();
 
     if($request->file('image')) {
       if(!Storage::disk('public')->exists("categories")) {
         Storage::disk('public')->makeDirectory("categories");
       }
-      $request->file('image')->move(Storage::disk('public')->path("categories"), "$id.png");
+      $request->file('image')->move(Storage::disk('public')->path("categories"), "$category->id.png");
     }
 
     return $this->apiSuccessResponse('Succesfully editing category');
   }
 
-  public function delete(Request $request, $id) {
-    $category = Category::find($id);
+  public function delete(Request $request, $category) {
     if(is_null($category)) return $this->apiErrorResponse('Invlid category id');
-    $category->delete();
+    $category->preDelete();
     return $this->apiSuccessResponse('Successflully deleting category');
   }
 

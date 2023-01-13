@@ -34,7 +34,7 @@ function textfilter(value) {
       value = value.replaceAll(char, '');
     }
   });
-  return value.replace( /\r?\n/g, "\r\n" );
+  return value.replace(/\r?\n/g, "\r\n");
 }
 
 function padTo2Digits(num) {
@@ -95,7 +95,7 @@ async function displayBodyContent() {
   $('#body-content').attr('class', 'show');
 }
 
-function initTable(table, order = []) {
+window.initTable= function (table, order = []) {
   if ($.fn.dataTable.isDataTable(table)) {
     return $(table).DataTable();
   }
@@ -179,7 +179,29 @@ function messageDialog(dialogId, title, message, onActionClick, buttons = {OK: '
   $(`#message-dialog-modal .modal-footer`).html(btnsHtml);
   $('#message-dialog-modal').modal('show');
 
-  $on(`#message-dialog-modal[dialog-id="${dialogId}"]`, 'onModalHidden', () => {
+  $on(`#message-dialog-modal[dialog-id="${dialogId}"]`, 'onHidden', () => {
+    if (onHidden) onHidden();
+  });
+}
+/**
+ * Alert Loading Dialog
+ * @param {string} dialogId
+ * @param {string} title
+ * @param {string} message
+ * @param {Promise} callback
+ * @param {callback?} onHidden
+ */
+async function loadingDialog(dialogId, title, message, callback = async () => {}, onHidden = null) {
+  dialogId = `${dialogId}-${Date.now()}`;
+  $('#loading-dialog-modal').attr('dialog-id', dialogId);
+  $('#loading-dialog-modal .modal-title').html(title);
+  $('#loading-dialog-modal .modal-body .dialog-message').html(message);
+
+  $('#loading-dialog-modal').modal('show');
+  await callback();
+  $('#loading-dialog-modal').modal('hide');
+
+  $on(`#loading-dialog-modal[dialog-id="${dialogId}"]`, 'onModalHidden', () => {
     if (onHidden) onHidden();
   });
 }
@@ -204,7 +226,14 @@ function initMultiInputWidget(element) {
   var inputs = JSON.parse($(element).attr('inputs'));
   var inputsHtml = '';
   inputs.forEach((input) => {
-    inputsHtml += `<input type="${input.type}" name="${input.name}" class="form-control" placeholder="${input.text}">`;
+    if(input.type == 'select') {
+      inputsHtml += `<select class="form-control" name="${input.name}">`;
+      input.options.forEach(option => {
+        inputsHtml += `<option value="${option[0]}">${option[1]}</option>`
+      });
+    } else {
+      inputsHtml += `<input type="${input.type}" name="${input.name}" class="form-control" placeholder="${input.text}">`;
+    }
   });
   inputsHtml += `<button class="btn btn-primary" action="add">${$(element).attr('add-btn-text') || 'إضافة'}</button>`;
   $(element).find('.multi-input-header').html(inputsHtml);
@@ -298,7 +327,7 @@ $(document).ready(function() {
 
 $on('.multi-input-header button[action="add"]', 'click', function() {
   const element = getElementparent(this, 2);
-  var inputs = $(element).find('.multi-input-header input');
+  var inputs = $(element).find('.multi-input-header .form-control');
   var itemValue = {};
   for (let i = 0; i < inputs.length; i++) {
     const input = inputs[i];
@@ -394,7 +423,7 @@ $on('.modal .modal-content .modal-footer button.btn', 'click', function() {
 
 $on('.modal', 'hidden.bs.modal', function (e) {
   const modalId = $(this).attr('id');
-  $(`#${modalId}`).trigger('onModalHidden');
+  $(`#${modalId}`).trigger('onHidden');
   $(`.modal`).trigger(`onModalHidden[id="${modalId}"]`);
 });
 
@@ -424,39 +453,69 @@ $on('.select-group-tabs-select', 'change', function() {
   $(`#${selectGroupId} .select-group-tabs-item[for="${this.value}"]`).addClass('selected');
 });
 
-$on('input', 'change, keyup', function() {
-  this.value = textfilter(this.value);
-});
-$on('textarea', 'change, keyup', function() {
-  this.value = textfilter(this.value);
-});
+// $on('input', 'change, keyup', function() {
+//   this.value = textfilter(this.value);
+// });
+// $on('textarea', 'change, keyup', function() {
+//   this.value = textfilter(this.value);
+// });
 
-$.valHooks.input = {
-  get: function(element) {
-    return textfilter(element.value);
-  },
-  set: function(el, val) {
-    el.value = textfilter(val);
-    return el
-  }
-};
-$.valHooks.textarea = {
-  get: function(element) {
-    return textfilter(element.value);
-  },
-  set: function(el, val) {
-    console.log(el.value)
-    el.value = textfilter(val);
-    return el
-  }
+// $.valHooks.input = {
+//   get: function(element) {
+//     return textfilter(element.value);
+//   },
+//   set: function(el, val) {
+//     el.value = textfilter(val);
+//     return el
+//   }
+// };
+// $.valHooks.textarea = {
+//   get: function(element) {
+//     return textfilter(element.value);
+//   },
+//   set: function(el, val) {
+//     el.value = textfilter(val);
+//     return el
+//   }
+// };
+
+async function compressImage(file, {quality = 1, type = file.type}) {
+  // Get as image data
+  const imageBitmap = await createImageBitmap(file);
+
+  // Draw to canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = imageBitmap.width;
+  canvas.height = imageBitmap.height;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(imageBitmap, 0, 0);
+
+  // Turn into Blob
+  const blob = await new Promise((resolve) =>
+    canvas.toBlob(resolve, type, quality)
+  );
+
+  // Turn Blob into File
+  return new File([blob], file.name, {
+    type: blob.type,
+  });
 };
 
 window.ImagePicker = {};
 $on('.form-group .btn.btn-img-picker', 'click', async function() {
   var imgFile = await selectFile('image/png, image/jpeg, image/gif');
+  console.log(imgFile.size / 1024)
+  if(imgFile.size > 102400) {
+    quality = 0.1;
+    imgFile = await compressImage(imgFile, {
+      quality: quality,
+      type: imgFile.type,
+    });
+    console.log('q:', quality, 'ns:', imgFile.size / 1024)
+  }
+
   const reader = new FileReader();
   $(this).html('<img>');
-  // $(this).html(this.innerHTML + '<div class="btn btn-danger"><span class="material-symbols-sharp">delete</span> Delete</div>');
   var img = getElementChild(this, 'img')
   reader.addEventListener("load", () => {
     const uploaded_image = reader.result;
@@ -466,6 +525,3 @@ $on('.form-group .btn.btn-img-picker', 'click', async function() {
   window.ImagePicker[$(this).attr('id')] = imgFile;
 });
 
-// $on('.form-group .btn.btn-img-picker btn', 'click', async function() {
-//   console.log(this)
-// });

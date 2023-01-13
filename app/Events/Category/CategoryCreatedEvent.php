@@ -2,7 +2,9 @@
 
 namespace App\Events\Category;
 
+use App\Models\Admin;
 use App\Models\Category;
+use App\Models\Notification;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -20,7 +22,20 @@ class CategoryCreatedEvent {
    * @return void
    */
   public function __construct(Category $category) {
-
+    foreach ($category->unreades ?? [] as $admin_id) {
+      Notification::create([
+        'to_id' => $admin_id,
+        'to_model' => Admin::class,
+        'name' => 'new-category-created',
+        'title' => 'A new category created',
+        'message' => 'Category (' . $category->name['en'] . ')',
+        'data' => [
+          'category_id' => $category->id,
+        ],
+        'image_id' => $category->image_id,
+        'type' => 'emit',
+      ]);
+    }
   }
 
   /**

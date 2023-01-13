@@ -44,7 +44,7 @@ use Illuminate\Support\Facades\Log;
  * @mixin \Eloquent
  */
 class Notification extends Model {
-  use HasFactory;
+  use HasFactory, GetNextSequenceValue;
 
   protected $fillable = [
     'from_id',
@@ -62,11 +62,16 @@ class Notification extends Model {
 
   protected $casts =  [
     'data' => 'array',
+    'is_readed' => 'boolean',
     'created_at' => 'datetime:Y-m-d H:m:s',
   ];
 
-  static function allUnreaded($user_id) {
-    return Notification::where([['to_id', '=', $user_id], ['is_readed', '=', 0]])->get();
+  protected $dispatchesEvents = [
+    'created' => NotificationCreatedEvent::class,
+  ];
+
+  static function allUnreaded($user_id, $model = User::class) {
+    return Notification::where([['to_id', '=', $user_id], ['to_model', '=', $model], ['is_readed', '=', 0]])->get();
   }
 
   public function linking() {
@@ -86,7 +91,14 @@ class Notification extends Model {
     }
   }
 
-  protected $dispatchesEvents = [
-    'created' => NotificationCreatedEvent::class,
-  ];
+  public function unlinking() {
+    unset($this->sender);
+    unset($this->client);
+  }
+
+  public function unlinkingAndSave() {
+    $this->unlinking();
+    $this->save();
+  }
+
 }

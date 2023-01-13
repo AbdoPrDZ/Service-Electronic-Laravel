@@ -17,9 +17,24 @@ class ExchangeController extends Controller {
     $this->middleware('multi.auth:sanctum');
   }
 
+  public function all(Request $request) {
+    $items = Exchange::where([
+      ['name', '=', 'users-transfer'],
+      ['from_wallet_id', '=', $request->user()->wallet_id],
+    ])->get();
+    $exhcnages = [];
+    foreach ($items as $item) {
+      $item->linking(true);
+      $exhcnages[$item->id] = $item;
+    }
+    return $this->apiSuccessResponse('successfully gettin exchanges', [
+      'exchanges' => $exhcnages,
+    ]);
+  }
+
   public function create(Request $request) {
     $validator = Validator::make($request->all(), [
-      'balance' => 'required|regex:/^[0-9]+(\.[0-9][0-9]?)?$/',
+      'balance' => 'required|numeric',
       'email' => 'required|email',
     ]);
     if ($validator->fails()) {
@@ -32,10 +47,14 @@ class ExchangeController extends Controller {
     $user->linking();
 
     $target_user = User::whereEmail($request->email)->first();
-    if(is_null($target_user) || $request->email == $user->email) return $this->apiErrorResponse('Invalid email');
+    if(is_null($target_user) || $request->email == $user->email) return $this->apiErrorResponse('Invalid email', [
+      'errors' => ['email' => 'Invalid email']
+    ]);
     $target_user->linking();
     if($user->wallet->status != 'active') return $this->apiErrorResponse('Your wallet is not activeted');
-    if($target_user->wallet->status != 'active') return $this->apiErrorResponse('The target user wallet is not activeted');
+    if($target_user->wallet->status != 'active') return $this->apiErrorResponse('The target user wallet is not activeted', [
+      'errors' => ['email' => 'The target user wallet is not activeted']
+    ]);
     if($user->wallet->balance < $request->balance) return $this->apiErrorResponse('You don\'t have required balance');
 
     $exchange = Exchange::create([
@@ -44,17 +63,12 @@ class ExchangeController extends Controller {
       'to_wallet_id' => $target_user->wallet_id,
       'sended_balance' => $request->balance,
       'received_balance' => $request->balance,
-      'status' => 'received',
-      'answered_at' => Carbon::now(),
     ]);
     $exchange->linking();
-    $exchange->eccept();
-
-    // $user->wallet->balance -= $request->balance;
-    // $user->wallet->unlinkingAndSave();
-    // $target_user->wallet->balance += $request->balance;
-    // $target_user->wallet->unlinkingAndSave();
-
+    $res = $exchange->accept();
+    if(!$res['success']) {
+      return $this->apiErrorResponse($res['message']);
+    }
 
     $platformCurrency = Currency::find(Setting::find('platform_currency_id')->value[0]);
 
@@ -73,7 +87,7 @@ class ExchangeController extends Controller {
           'balance' => $request->balance,
         ])
       ],
-      'image_id' => 'currency-4',
+      'image_id' => 'logo',
       'type' => 'emitOrNotify',
     ]);
 

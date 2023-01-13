@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Admin;
 use App\Models\Category;
 use App\Models\File;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -21,11 +22,7 @@ class CategorySeeder extends Seeder {
         'ar' => 'الهواتف النقالة'
       ],
       'image_id' => 'category-1',
-    ]);
-    File::create([
-      'name' => 'category-1',
-      'disk' => 'public',
-      'path' => 'categories/1.png',
+      'unreades' => Admin::unreades(),
     ]);
     Category::create([
       'id' => 2,
@@ -34,6 +31,12 @@ class CategorySeeder extends Seeder {
         'ar' => 'أجهزة الكمبيوتر'
       ],
       'image_id' => 'category-2',
+      'unreades' => Admin::unreades(),
+    ]);
+    File::create([
+      'name' => 'category-1',
+      'disk' => 'public',
+      'path' => 'categories/1.png',
     ]);
     File::create([
       'name' => 'category-2',

@@ -7,10 +7,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <meta name="socket-token" content="{{ $socketToken }}" />
     @include('admin.src.headers')
-    <title>Service Electronic | Admin Panel</title>
     <link href="{{ asset('resources/css/admin/main.css') }}?time={{ now() }}" rel="stylesheet">
     <link href="{{ asset('resources/css/admin/dashboard.css') }}?time={{ now() }}" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.3.1/tinymce.min.js" integrity="sha512-eV68QXP3t5Jbsf18jfqT8xclEJSGvSK5uClUuqayUbF5IRK8e2/VSXIFHzEoBnNcvLBkHngnnd3CY7AFpUhF7w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <title>Service Electronic | Admin Panel</title>
   </head>
   <body auto-display="false">
     <div id="body-loading" class="loading show">
@@ -28,6 +27,11 @@
               <h3><span class="danger">Service|</span><span class="success">Electronic</span> </h3>
             </div>
             <div class="topbar-actions">
+              @if (!is_null($admin->balance))
+                <h2 class=" {{ $admin->balance != 0 ? 'success' : 'danger' }}" style="font-size: 14px;font-weight: bold;">
+                  {{ $admin->balance ?? 0 }} SE
+                </h2>
+              @endif
               <div class="dropdown dropdown-selecetion" id="person-dropdown">
                 <div class="btn btn-primary btn-icon dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <span class="material-symbols-sharp">person</span>
@@ -42,7 +46,15 @@
                   <!-- <div class="dropdown-divider"></div> -->
                   <!-- <div class="dropdown-item" value="account"></div> -->
                   <div class="dropdown-divider"></div>
-                  <a href="./admin/logout" class="dropdown-item">تسجيل الخروج</a>
+                  <a href="./admin/setting" class="dropdown-item" style="display: flex;">
+                    <span class="material-symbols-sharp" style="margin-right: 10px">settings</span>
+                    الإعدادات
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <a href="./admin/logout" class="dropdown-item" style="display: flex;">
+                    <span class="material-symbols-sharp" style="margin-right: 10px">logout</span>
+                    تسجيل الخروج
+                  </a>
                 </div>
               </div>
               <div class="dropdown" id="notifications-dropdown">
@@ -94,17 +106,17 @@
                 </span>
                 <h3>مبيعات المنتجات</h3>
               </div>
+              <div id="offers" class="sidebar-item">
+                <span class="material-symbols-sharp">price_change
+                  <span class="news-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger hide"></span>
+                </span>
+                <h3>العروض</h3>
+              </div>
               <div id="mails" class="sidebar-item">
                 <span class="material-symbols-sharp">mail
                   <span class="news-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger hide"></span>
                 </span>
                 <h3>الإيمايلات</h3>
-              </div>
-              <div id="settings" class="sidebar-item">
-                <span class="material-symbols-sharp">settings
-                  <span class="news-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger hide"></span>
-                </span>
-                <h3>الإعدادات</h3>
               </div>
             </div>
 
@@ -115,8 +127,8 @@
               @include('admin.tabs.currencies')
               @include('admin.tabs.products')
               @include('admin.tabs.purchases')
+              @include('admin.tabs.offers')
               @include('admin.tabs.mails')
-              @include('admin.tabs.settings')
             </div>
 
             <div id="tab-loading" class="loading show">
@@ -129,11 +141,17 @@
       </div>
 
       @include('admin.views.view-user-form')
+      @include('admin.views.send-notification-form')
       @include('admin.views.view-transfer-form')
       @include('admin.views.view-seller-form')
+      @include('admin.views.view-purchase-form')
+
       @include('admin.views.create-edit-currency-form')
       @include('admin.views.create-edit-category-form')
-      @include('admin.views.create-edit-mail-template-form')
+      @include('admin.views.create-edit-offer-form')
+      @include('admin.views.view-offer-request-form')
+      @include('admin.views.create-edit-template-form')
+      @include('admin.views.create-mail-form')
 
       <div id="alerts" class="noties topright"></div>
 
@@ -146,6 +164,20 @@
             <div class="modal-body">
             </div>
             <div class="modal-footer">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="loading-dialog-modal" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content form">
+            <div class="modal-header">
+              <h2 class="modal-title"></h2>
+            </div>
+            <div class="modal-body">
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              <span class="dialog-message">يرجى الإنتظار...</span>
             </div>
           </div>
         </div>
@@ -185,18 +217,6 @@
     <script src="{{ asset('/resources/js/admin/main.js') }}?time={{ now() }}"></script>
     <script src="{{ asset('/resources/js/address-input/index.js') }}?time={{ now() }}"></script>
     <script type="module" src="{{ asset('/resources/js/admin/dashboard.js') }}?time={{ now() }}"></script>
-    <script>
-      window.news = {
-        'users': 0,
-        'sellers': 0,
-        'transfers': 0,
-        'currencies': 0,
-        'products': 0,
-        'purchases': 0,
-        'mails': 0,
-        'settings': 0,
-      };
-    </script>
 
   </body>
 </html>

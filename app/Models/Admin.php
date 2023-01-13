@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 
 /**
  * App\Models\Admin
@@ -62,6 +61,7 @@ class Admin extends Authenticatable{
   ];
 
   public function linking() {
+    $this->balance = $this->id == 1? Setting::platformCurrency()->platform_wallet->balance : null;
   }
 
   static function unreades($admin_id = null) {

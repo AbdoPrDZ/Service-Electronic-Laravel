@@ -25,9 +25,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Category whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class Category extends Model
-{
-  use HasFactory;
+class Category extends Model {
+  use HasFactory, GetNextSequenceValue;
 
   protected $table = 'categories';
 
@@ -36,11 +35,13 @@ class Category extends Model
     'name',
     'image_id',
     'unreades',
+    'is_deleted',
   ];
 
   protected $casts = [
     'name' => 'array',
     'unreades' => 'array',
+    'is_deleted' => 'boolean',
     'created_at' => 'datetime:Y-m-d H:m:s',
   ];
 
@@ -65,6 +66,11 @@ class Category extends Model
       $item->unreades = array_diff($item->unreades, [$admin_id]);
       $item->save();
     }
+  }
+
+  public function preDelete() {
+    $this->is_deleted = true;
+    $this->save();
   }
 
 }

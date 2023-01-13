@@ -14,7 +14,6 @@ use App\Models\Transfer;
  * @property int $id
  * @property string $name
  * @property string $char
- * @property float $max_receive
  * @property bool $proof_is_required
  * @property string $wallet
  * @property string $platform_wallet_id
@@ -38,26 +37,33 @@ use App\Models\Transfer;
  * @mixin \Eloquent
  */
 class Currency extends Model {
-  use HasFactory;
+  use HasFactory, GetNextSequenceValue;
 
   protected $table = 'currencies';
 
   protected $fillable = [
     'name',
     'char',
-    'max_receive',
     'proof_is_required',
     'image_pick_type',
     'wallet',
     'platform_wallet_id',
     'prices',
     'unreades',
+    'is_deleted',
   ];
 
   protected $casts = [
     'prices' => 'array',
     'unreades' => 'array',
+    'proof_is_required' => 'boolean',
+    'is_deleted' => 'boolean',
     'created_at' => 'datetime:Y-m-d H:m:s',
+  ];
+
+  protected $dispatchesEvents = [
+    'created' => CurrencyCreatedEvent::class,
+    'deleted' => CurrencyDeletedEvent::class,
   ];
 
   static function news($admin_id) {
@@ -91,8 +97,18 @@ class Currency extends Model {
     $this->rendred_prices = $rendred_prices;
   }
 
-  protected $dispatchesEvents = [
-    'created' => CurrencyCreatedEvent::class,
-    'deleted' => CurrencyDeletedEvent::class,
-  ];
+  public function unlinking() {
+    unset($this->platform_wallet);
+    unset($this->rendred_prices);
+  }
+
+  public function unlinkingAndSave() {
+    $this->unlinking();
+    $this->save();
+  }
+
+  public function preDelete() {
+    $this->is_deleted = true;
+    $this->unlinkingAndSave();
+  }
 }

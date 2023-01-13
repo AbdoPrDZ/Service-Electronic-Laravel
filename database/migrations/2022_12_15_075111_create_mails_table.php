@@ -17,7 +17,6 @@ return new class extends Migration {
       $table->string('manager');
       $table->json('data')->default('{}');
       $table->json('targets');
-      $table->json('attachments')->default('[]');
       $table->json('unreades')->default('[]');
       $table->timestamps();
     });

@@ -55,7 +55,7 @@ body {
   overflow-x: hidden;
   background-image: url(../../media/admin/bg.png);
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: contain;
   background-position: center;
 }
 
@@ -205,6 +205,7 @@ b {
 .form-group .btn.btn-img-picker {
   background-color: var(--gray-dark);
   width: 100%;
+  max-width: 50vw;
   height: 300px;
 }
 
@@ -263,7 +264,6 @@ b {
 #body-content.hide {
   display: none;
 }
-
 
 .form {
   width: 500px;
@@ -352,7 +352,7 @@ b {
 }
 
 .modal .form .modal-title {
-  font-size: 16px;
+  font-size: 22px;
   text-align: center;
 }
 
@@ -360,7 +360,6 @@ b {
   margin: 10px auto;
   width: 100%;
 }
-
 
 .custom-table thead th:not(.no-sort) {
   cursor: pointer;
@@ -379,6 +378,22 @@ b {
 .custom-table table tr {
   /* font-weight: 500; */
   font-size: 13px;
+}
+
+.custom-table .table-img {
+  margin: auto;
+  width: fit-content;
+  height: auto;
+  border-radius: 0.5rem;
+  padding: 4px;
+  background-color: white;
+  border: 0.02px solid #ccc;
+}
+
+.custom-table .table-img img {
+  width: 100px;
+  min-width: 100px;
+  height: 100px;
 }
 
 .custom-table .custom-table-header {
@@ -422,6 +437,7 @@ b {
 .custom-table table .btn-icon {
   width: 1.5rem;
   height: 1.5rem;
+  margin: 2px 0;
 }
 
 .custom-table table .btn-icon span {
@@ -503,6 +519,7 @@ b {
 }
 
 .custom-table .dataTables_paginate .page-item .page-link {
+  z-index: 1;
   border: 1px solid #ccc;
   font-size: 13px;
   min-width: 30px;
@@ -814,4 +831,8 @@ ul.pagination li.page-item.disabled {
 @keyframes fadeEffect {
   from {opacity: 0;}
   to {opacity: 1;}
+}
+
+.bold {
+  font-weight: bold;
 }

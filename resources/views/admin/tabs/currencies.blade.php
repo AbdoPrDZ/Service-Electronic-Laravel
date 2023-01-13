@@ -34,20 +34,20 @@
                   <th style="min-width: 120px; max-width: 120px;"></th>
                 </thead>
                 <tbody>
-                  <tfoot>
-                    <tr>
-                      <th></th>
-                      <th search="true">#</th>
-                      <th></th>
-                      <th search="true">الاسم</th>
-                      <th search="true">الرمز</th>
-                      <th search="true">الرصيد</th>
-                      <th></th>
-                      <th search="true">المحفظة</th>
-                      <th search="true">أنشئ في</th>
-                      <th></th>
-                    </tr>
-                  </tfoot>
                 </tbody>
+                <tfoot>
+                  <tr>
+                    <th></th>
+                    <th search="true">#</th>
+                    <th></th>
+                    <th search="true">الاسم</th>
+                    <th search="true">الرمز</th>
+                    <th search="true">الرصيد</th>
+                    <th></th>
+                    <th search="true">المحفظة</th>
+                    <th search="true">أنشئ في</th>
+                    <th></th>
+                  </tr>
+                </tfoot>
               </table>
             </div>

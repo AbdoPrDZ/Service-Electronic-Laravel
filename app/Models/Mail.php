@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\MailCreateEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -9,20 +10,22 @@ class Mail extends Model {
   use HasFactory;
 
   protected $fillable = [
+    'title',
     'template_id',
-    'manager',
     'data',
     'targets',
-    'attachments',
     'unreades',
   ];
 
   protected $casts = [
     'data' => 'array',
     'targets' => 'array',
-    'attachments' => 'array',
     'unreades' => 'array',
     'created_at' => 'datetime:Y-m-d H:m:s',
+  ];
+
+  protected $dispatchesEvents = [
+    'created' => MailCreateEvent::class,
   ];
 
   static function news($admin_id) {
@@ -45,11 +48,23 @@ class Mail extends Model {
 
   public function linking() {
     $this->template = Template::find($this->template_id);
-    $this->managerClass = app($this->manager);
+    if(is_string($this->data)) $this->data = json_decode($this->data);
+    $this->rendredContent = str_replace(
+      array_keys($this->data),
+      array_values($this->data),
+      $this->template->content
+    );
   }
 
-  protected $dispatchesEvents = [
-    'created' => FileDeleteEvent::class,
-  ];
+  public function unlinking() {
+    unset($this->template);
+    unset($this->data);
+    unset($this->rendredContent);
+  }
+
+  public function unlinkingAndSave() {
+    $this->unlinking();
+    $this->save();
+  }
 
 }

@@ -2,13 +2,13 @@
 
 namespace App\Events;
 
+use App\Models\Admin;
 use App\Models\Mail;
-use Illuminate\Broadcasting\Channel;
+use App\Models\Notification;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Mail\Message;
 use Illuminate\Queue\SerializesModels;
 
 class MailCreateEvent {
@@ -20,7 +20,28 @@ class MailCreateEvent {
    * @return void
    */
   public function __construct(Mail $mail) {
-
+    $mail->linking();
+    \Illuminate\Support\Facades\Mail::raw($mail->title, function (Message $message) use($mail) {
+      foreach ($mail->targets as $email) {
+       $message->to($email)
+               ->subject($mail->title)
+               ->html($mail->rendredContent);
+      }
+    });
+    foreach ($mail->unreades ?? [] as $admin_id) {
+      Notification::create([
+        'to_id' => $admin_id,
+        'to_model' => Admin::class,
+        'name' => 'new-mail-created',
+        'title' => 'A new mail created',
+        'message' => 'Mail sended to (' . join(', ', $mail->targets) . ')',
+        'data' => [
+          'mail_id' => $mail->id,
+        ],
+        'image_id' => 'logo',
+        'type' => 'emit',
+      ]);
+    }
   }
 
   /**

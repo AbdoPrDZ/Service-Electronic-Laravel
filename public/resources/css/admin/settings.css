@@ -1,0 +1,83 @@
+body {
+  overflow: hidden;
+  display: grid;
+}
+
+.body {
+  overflow: auto;
+  padding: 40px 0;
+  height: 100%;
+}
+.topbar {
+  height: 10vh;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: auto auto;
+  padding: 10px 20px;
+  align-content: center;
+  box-shadow: #0000003d 0 4px 2px -2px;
+}
+
+.topbar .topbar-logo {
+  /* width: 14rem; */
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.topbar .topbar-logo img {
+  width: 65px;
+}
+
+.topbar .topbar-logo h3 {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.topbar .topbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  gap: 0.6rem;
+}
+
+.topbar .topbar-actions .dropdown .dropdown-menu {
+  left: -20rem;
+  width: 20rem;
+}
+
+.topbar .topbar-actions .dropdown .dropdown-menu .dropdown-item {
+  cursor: pointer;
+}
+
+.topbar .topbar-actions .short-profile {
+  display: grid;
+  justify-content: center;
+  text-align: center;
+  gap: 0.8rem;
+  margin: 1rem auto;
+}
+
+.topbar .topbar-actions .short-profile img {
+  width: 8rem;
+  height: 8rem;
+  margin: auto;
+  padding: 1px;
+  border-radius: 50%;
+  border: 1px solid #efefef;
+  object-fit: cover;
+  background-color: #efefef;
+  box-shadow: #32325d40 0px 6px 12px -2px, #0000004d 0px 3px 7px -3px;
+}
+
+.content {
+  justify-items: center;
+  background-color: #ffffffd6;
+  border-radius: 10px;
+  width: 65%;
+  min-width: max-content;
+  margin: auto;
+  padding: 20px 40px;
+  border: solid 1m #ccc;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}

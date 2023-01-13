@@ -6,10 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Notification;
 use App\Models\Transfer;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 use Validator;
 
 class TransferController extends Controller {
@@ -30,18 +27,16 @@ class TransferController extends Controller {
     ]);
   }
 
-  static function news(Request $request) {
-    return [
-      'count' => count(Transfer::news($request->user()->id, 'transfer')),
-    ];
+  static function news($admin_id) {
+    return count(Transfer::news($admin_id, 'transfer'));
   }
 
-  static function readNews(Request $request) {
-    Transfer::readNews($request->user()->id, 'transfer');
+  static function readNews($admin_id) {
+    Transfer::readNews($admin_id, 'transfer');
     return Controller::apiSuccessResponse('successfully reading news');
   }
 
-  public function changeStatus(Request $request, $id) {
+  public function changeStatus(Request $request, $transfer) {
     $validator = Validator::make($request->all(), [
       'status' => 'required|string',
       'description' => '',
@@ -49,25 +44,18 @@ class TransferController extends Controller {
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, ['errors' =>$validator->errors(), 'all' => $request->all()]);
     }
-    $transfer = Transfer::find($id);
-    if(!is_null($transfer)) {
-      if(in_array($request->status, ['accepted', 'refused'])) {
-        $ansowerRes = $transfer->ansower($request->status, $request->description, $request->user()->id);
-        if(!$ansowerRes['success']) {
-          return $this->apiErrorResponse($ansowerRes['message']);
-        }
-        return $this->apiSuccessResponse('Successfully changing status');
-      } else {
-        return $this->apiErrorResponse('Invalid status');
+    if(in_array($request->status, ['accepted', 'refused'])) {
+      $ansowerRes = $transfer->ansower($request->status, $request->description, $request->user()->id);
+      if(!$ansowerRes['success']) {
+        return $this->apiErrorResponse($ansowerRes['message']);
       }
+      return $this->apiSuccessResponse('Successfully changing status');
     } else {
-      return $this->apiErrorResponse('Invalid id');
+      return $this->apiErrorResponse('Invalid status');
     }
   }
 
-  public function delete(Request $request, $id) {
-    $transfer = Transfer::find($id);
-    if(is_null($transfer)) return $this->apiErrorResponse('Invlid transfer id');
+  public function delete(Request $request, $transfer) {
     $transfer->linking();
     $transfer->user->linking();
     if($transfer->status == 'checking') {

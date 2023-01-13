@@ -2,8 +2,7 @@
 
 namespace App\Models;
 
-use App\Events\Purchase\PurchaseCreatedEvent;
-use App\Events\Purchase\PurchaseUpdatedEvent;
+use App\Events\PurchaseCreatedEvent;
 use App\Events\PurchaseEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -45,7 +44,7 @@ use Illuminate\Database\Eloquent\Model;
  * @mixin \Eloquent
  */
 class Purchase extends Model {
-  use HasFactory;
+  use HasFactory, GetNextSequenceValue;
 
   protected $table = 'purchases';
 
@@ -61,6 +60,7 @@ class Purchase extends Model {
     'delivery_steps',
     'delivery_cost_exchange_id',
     'product_price_exchange_id',
+    'commission_exchange_id',
     'status',
     'unreades',
   ];
@@ -73,7 +73,6 @@ class Purchase extends Model {
 
   protected $dispatchesEvents = [
     'created' => PurchaseCreatedEvent::class,
-    'updated' => PurchaseUpdatedEvent::class,
   ];
 
   static function news($admin_id) {
@@ -103,6 +102,8 @@ class Purchase extends Model {
     $this->delivery_cost_exchange->linking();
     $this->product_price_exchange = Exchange::find($this->product_price_exchange_id);
     $this->product_price_exchange->linking();
+    $this->commission_exchange = Exchange::find($this->commission_exchange_id);
+    $this->commission_exchange->linking();
   }
 
   public function unlinking() {
@@ -110,6 +111,7 @@ class Purchase extends Model {
     unset($this->product);
     unset($this->delivery_cost_exchange);
     unset($this->product_price_exchange);
+    unset($this->commission_exchange);
   }
 
   public function unlinkingAndSave() {

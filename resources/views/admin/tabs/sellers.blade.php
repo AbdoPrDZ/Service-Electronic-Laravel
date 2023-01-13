@@ -31,24 +31,24 @@
                   <th style="min-width: 80px; max-width: 80px;"></th>
                 </thead>
                 <tbody>
-                  <tfoot>
-                    <tr>
-                      <th></th>
-                      <th search="true">#</th>
-                      <th></th>
-                      <th search="true">الاسم الكامل</th>
-                      <th search="true">الاسم المتحر</th>
-                      <th search="true">البريد الالكتروني</th>
-                      <th search="true">رقم الهاتف</th>
-                      <th search="true">العنوان</th>
-                      <th search="true">الرصيد</th>
-                      <th search="true">رصيد قيد التحقق</th>
-                      <th search="true">الوضعية</th>
-                      <th search="true">أنشئ في</th>
-                      <th></th>
-                    </tr>
-                  </tfoot>
                 </tbody>
+                <tfoot>
+                  <tr>
+                    <th></th>
+                    <th search="true">#</th>
+                    <th></th>
+                    <th search="true">الاسم الكامل</th>
+                    <th search="true">الاسم المتحر</th>
+                    <th search="true">البريد الالكتروني</th>
+                    <th search="true">رقم الهاتف</th>
+                    <th search="true">العنوان</th>
+                    <th search="true">الرصيد</th>
+                    <th search="true">رصيد قيد التحقق</th>
+                    <th search="true">الوضعية</th>
+                    <th search="true">أنشئ في</th>
+                    <th></th>
+                  </tr>
+                </tfoot>
               </table>
             </div>
 
@@ -84,23 +84,23 @@
                   <th style="min-width: 80px; max-width: 80px;"></th>
                 </thead>
                 <tbody>
-                  <tfoot>
-                    <tr>
-                      <th></th>
-                      <th search="true">#</th>
-                      <th></th>
-                      <th search="true">الاسم الكامل</th>
-                      <th search="true">الاسم المتحر</th>
-                      <th search="true">البريد الالكتروني</th>
-                      <th search="true">رقم الهاتف</th>
-                      <th search="true">العنوان</th>
-                      <th search="true">الرصيد</th>
-                      <th search="true">رصيد قيد التحقق</th>
-                      <th search="true">الوضعية</th>
-                      <th search="true">أنشئ في</th>
-                      <th></th>
-                    </tr>
-                  </tfoot>
                 </tbody>
+                <tfoot>
+                  <tr>
+                    <th></th>
+                    <th search="true">#</th>
+                    <th></th>
+                    <th search="true">الاسم الكامل</th>
+                    <th search="true">الاسم المتحر</th>
+                    <th search="true">البريد الالكتروني</th>
+                    <th search="true">رقم الهاتف</th>
+                    <th search="true">العنوان</th>
+                    <th search="true">الرصيد</th>
+                    <th search="true">رصيد قيد التحقق</th>
+                    <th search="true">الوضعية</th>
+                    <th search="true">أنشئ في</th>
+                    <th></th>
+                  </tr>
+                </tfoot>
               </table>
             </div>

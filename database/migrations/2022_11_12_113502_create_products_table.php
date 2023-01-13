@@ -25,6 +25,7 @@ return new class extends Migration {
       $table->integer('category_id');
       $table->json('images_ids');
       $table->json('unreades')->default('[]');
+      $table->boolean('is_deleted')->default(false);
       $table->timestamps();
     });
   }

@@ -22,10 +22,11 @@ use Illuminate\Database\Eloquent\Model;
  * @mixin \Eloquent
  */
 class Setting extends Model {
+
   use HasFactory;
 
   public $incrementing = false;
-  
+
   protected $primaryKey = 'name';
 
   protected $fillable = [
@@ -37,4 +38,53 @@ class Setting extends Model {
     'value' => 'array',
   ];
 
+  /**
+   * Getting platformCurrency
+   * @return Currency
+   */
+  static function platformCurrency() {
+    $currency = Currency::find(Setting::find('platform_currency_id')->value[0]);
+    $currency->linking();
+    return $currency;
+  }
+
+  /**
+   * Getting emailVerificationTemplateId
+   * @return string
+   */
+  static function emailVerificationTemplateId() {
+    return Setting::find('email_verification_template_id')->value[0];
+  }
+
+  /**
+   * Getting userRechargeEmailTemplateId
+   * @return string
+   */
+  static function userRechargeEmailTemplateId() {
+    return Setting::find('user_recharge_email_template_id')->value[0];
+  }
+
+  /**
+   * Getting userWithdrawEmailTemplateId
+   * @return string
+   */
+  static function userWithdrawEmailTemplateId() {
+    return Setting::find('user_withdraw_email_template_id')->value[0];
+  }
+
+  /**
+   * Getting userCreditReceiveEmailTemplateId
+   * @return string
+   */
+  static function userCreditReceiveEmailTemplateId() {
+    return Setting::find('user_credit_receive_template_id')->value[0];
+  }
+
+  /**
+   * Getting userIdentityConfirmEmailTemplateId
+   * @return string
+   */
+  static function userIdentityConfirmEmailTemplateId() {
+    return Setting::find('user_identity_confirm_template_id')->value[0];
+  }
 }

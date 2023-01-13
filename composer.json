@@ -14,8 +14,8 @@
     "predis/predis": "^2.0",
     "rap2hpoutre/laravel-log-viewer": "^2.2",
     "sendgrid/sendgrid": "^8.0",
-    "tymon/jwt-auth": "1.0.*",
-    "vlucas/phpdotenv": "^5.5"
+    "vlucas/phpdotenv": "^5.5",
+    "vxm/laravel-async": "^2.2"
   },
   "require-dev": {
     "barryvdh/laravel-ide-helper": "^2.12",

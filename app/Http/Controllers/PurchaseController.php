@@ -9,30 +9,33 @@ use App\Models\Notification;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Seller;
+use App\Models\Setting;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Validator;
 
 class PurchaseController extends Controller {
   public function __construct() {
     $this->middleware('seller.access', [
-      'except' => ['create', 'userAll'],
+      'except' => ['create', 'userAll', 'clientAnsower'],
     ]);
   }
 
   public function sellerAll(Request $request) {
     $user = $request->user();
     $user->linking();
-    $purchases = [];
-    $sellerProducts = Product::where('seller_id', '=', $user->seller_id)->get();
-    foreach ($sellerProducts as $product) {
-      $purchase = Purchase::where('product_id', '=', $product->id)->first();
-      if($purchase) {
-        $purchase->linking();
-        $purchases[$purchase->id] = $purchase;
-      }
-    }
+    $purchases = $user->seller->purchases();
+    // $purchases = [];
+    // $sellerProducts = Product::where('seller_id', '=', $user->seller->id)->get();
+    // foreach ($sellerProducts as $product) {
+    //   $items = Purchase::where('product_id', '=', $product->id)->get();
+    //   foreach ($items as $purchase) {
+    //     $purchase->linking();
+    //     $purchases[$purchase->id] = $purchase;
+    //   }
+    // }
     return $this->apiSuccessResponse('Successfully getting data', [
       'purchases' => $purchases,
     ]);
@@ -50,15 +53,6 @@ class PurchaseController extends Controller {
     ]);
   }
 
-  public function getNextId() {
-    $id = 0;
-    $last = Purchase::orderBy('id','desc')->first();
-    if(!is_null($last)) {
-      $id = $last->id;
-    }
-    return $id + 1;
-  }
-
   static function encodeAddress(string $country, string $state, $address) {
     return "$country->$state".(!is_null($address) ? "->$address" : '');
   }
@@ -68,7 +62,7 @@ class PurchaseController extends Controller {
     return [$country, $state, $address];
   }
 
-  public function create(Request $request, $product_id) {
+  public function create(Request $request, $product) {
     $validator = Validator::make($request->all(), [
       'fullname' => 'required|string',
       'count' => 'required|integer',
@@ -83,10 +77,6 @@ class PurchaseController extends Controller {
       ]);
     }
 
-    $product = Product::find($product_id);
-    if(is_null($product)) {
-      return $this->apiErrorResponse('Invalid product Id');
-    }
     $product->linking();
     $user = $request->user();
     $user->linking();
@@ -96,34 +86,43 @@ class PurchaseController extends Controller {
     }
 
     if(!key_exists($request->state, $product->seller->delivery_prices)) {
-      return $this->apiErrorResponse('Your state is not supported', [$request->state, $product->seller->delivery_prices]);
+      return $this->apiErrorResponse('Your state is not supported', [
+        'errors' => ['state' => 'Your state is not supported']
+      ]);
     }
 
     $deliveryPrice = $product->seller->delivery_prices
       [$request->state]
       [$request->delivery_type];
-    $totalPrice = ($product->price * $request->count) + ($product->price * $request->count * $product->commission);
+    $totalPrice = $product->price * $request->count;
+    $cmmissionPrice = ($product->price * $request->count * $product->commission);
 
-    if ($totalPrice > $user->wallet->balance) {
+    if (($totalPrice + $cmmissionPrice) > $user->wallet->balance) {
       return $this->apiErrorResponse('You don\'t have required balance to buy this product');
     }
 
-    $purchaseId = $this->getNextId();
+    $purchaseId = Purchase::getNextSequenceValue();
 
-    $deliveryCostExchane = Exchange::create([
+    $deliveryCostExchange = Exchange::create([
       'name' => 'new-purchase-delivery-cost',
       'from_wallet_id' => $user->wallet_id,
       'to_wallet_id' => $product->seller->user->wallet_id,
       'sended_balance' => $deliveryPrice,
       'received_balance' => $deliveryPrice,
     ]);
-
-    $exchange = Exchange::create([
-      'name' => 'new-purchase',
+    $productPriceExchange = Exchange::create([
+      'name' => 'new-purchase-product-price',
       'from_wallet_id' => $user->wallet_id,
       'to_wallet_id' => $product->seller->user->wallet_id,
       'sended_balance' => $totalPrice,
       'received_balance' => $totalPrice,
+    ]);
+    $commissionExchange = Exchange::create([
+      'name' => 'new-purchase-commission',
+      'from_wallet_id' => $user->wallet_id,
+      'to_wallet_id' => Setting::platformCurrency()->wallet_id,
+      'sended_balance' => $cmmissionPrice,
+      'received_balance' => $cmmissionPrice,
     ]);
     Purchase::create([
       'id' => $purchaseId,
@@ -135,55 +134,16 @@ class PurchaseController extends Controller {
       'address' => $this->encodeAddress('Algeria', $request->state, $request->address),
       'delivery_type' => $request->delivery_type,
       'total_price' => $totalPrice + $deliveryPrice,
-      'delivery_cost_exchange_id' => $deliveryCostExchane->id,
-      'product_price_exchange_id' => $exchange->id,
+      'delivery_cost_exchange_id' => $deliveryCostExchange->id,
+      'product_price_exchange_id' => $productPriceExchange->id,
+      'commission_exchange_id' => $commissionExchange->id,
       'unreades' => Admin::unreades(),
-      // 'delivery_steps' => [
-        // 'seller_accept' => [
-        //   'readed_at' => '2022-12-24 10:28',
-        //   'ansower' => ['accept', 'discription', '2022-12-24 11:28'],
-        // ],
-        // 'location_steps' => [
-        //   'charging' => '2022-12-24 13:20',
-        //   'out_from_state' => '2022-12-24 14:10',
-        //   'in_to_state' => '2022-12-24 20:15',
-        //   'discharging_on_office' => '2022-12-24 20:30',
-        //   'delivering_to_client' => '2022-12-25 08:07',
-        // ],
-        // 'receive' => [
-        //   'received' => ['received', 'discription', '2022-12-25 08:10'],
-          // 'received' => ['refused', 'discription', '2022-12-25 08:10'],
-          // 'received' => ['absent', 'discription', '2022-12-25 08:10'],
-        // ],
-      // ]
-    ]);
-
-    Notification::create([
-      'to_id' => $product->seller->user_id,
-      'to_model' => User::class,
-      'name' => 'notifications',
-      'title' => 'A new product has been sold',
-      'message' => 'New Product solded by User(' . $user->fullname . ')',
-      'data' => [
-        'event_name' => 'new-product-solded',
-        'data' => json_encode([
-          'product_id' => $product->id,
-          'count' => $request->count,
-          'purchase_id' => $purchaseId,
-        ]),
-      ],
-      'image_id' => 'currency-4',
-      'type' => 'emitAndNotify',
     ]);
 
     return $this->apiSuccessResponse('Successfully buing product');
   }
 
-  public function read(Request $request, $id) {
-    $purchase = Purchase::find($id);
-    if(is_null($purchase)) {
-      return $this->apiErrorResponse('Invalid id', [], 404);
-    }
+  public function read(Request $request, $purchase) {
     $purchase->linking();
 
     $user = $request->user();
@@ -200,11 +160,7 @@ class PurchaseController extends Controller {
     return $this->apiSuccessResponse('Successfully reading purchase');
   }
 
-  public function ansower(Request $request, $id) {
-    $purchase = Purchase::find($id);
-    if (is_null($purchase)) {
-      return $this->apiErrorResponse('Invalid id', [], 404);
-    }
+  public function sellerAnsower(Request $request, $purchase) {
     $purchase->linking();
 
     $user = $request->user();
@@ -215,7 +171,7 @@ class PurchaseController extends Controller {
 
     $validator = Validator::make($request->all(), [
       'ansower' => 'required|in:accept,refuse',
-      'discription' => $request->ansower == 'refuse' ? 'required|string' : '',
+      'description' => $request->ansower == 'refuse' ? 'required|string' : '',
     ]);
 
     if($validator->fails()) {
@@ -230,12 +186,22 @@ class PurchaseController extends Controller {
       return $this->apiErrorResponse('You are already ansowerd');
     }
 
-    if ($request->ansower == 'refuse'){
-      $purchase->delivery_cost_exchange->refuse($request->discription);
-      $purchase->product_price_exchange->refuse($request->discription);
+    if ($request->ansower == 'refuse') {
+      $res = $purchase->delivery_cost_exchange->refuse($request->description);
+      if(!$res['success']) {
+        return $this->apiErrorResponse($res['message']);
+      }
+      $res = $purchase->product_price_exchange->refuse($request->description);
+      if(!$res['success']) {
+        return $this->apiErrorResponse($res['message']);
+      }
+      $res = $purchase->commission_exchange->refuse($request->description);
+      if(!$res['success']) {
+        return $this->apiErrorResponse($res['message']);
+      }
     }
 
-    $steps['seller_accept']['ansower'] = [$request->ansower, $request->discription, Carbon::now()];
+    $steps['seller_accept']['ansower'] = [$request->ansower, $request->description, Carbon::now()];
     $purchase->delivery_steps = $steps;
     $purchase->status = ['accept' => 'seller_accept', 'refuse' => 'seller_refuse'][$request->ansower];
     $purchase->unreades = Admin::unreades($user->id);
@@ -252,29 +218,25 @@ class PurchaseController extends Controller {
         'refuse' => 'Purchase request refused',
       ][$request->ansower],
       'message' => [
-        'accept' => $request->discription ?? 'Your request to purchase the product has been approved. You can track the product',
-        'refuse' => $request->discription,
+        'accept' => $request->description ?? 'Your request to purchase the product has been approved. You can track the product',
+        'refuse' => $request->description,
       ][$request->ansower],
       'data' => [
         'event_name' => 'purchase-seller-ansower',
         'data' => json_encode([
           'purchase_id' => $purchase->id,
           'ansower' => $request->ansower,
-          'discription' => $request->discription,
+          'description' => $request->description,
         ]),
       ],
-      'image_id' => 'currency-4',
+      'image_id' => 'logo',
       'type' => 'emitAndNotify',
     ]);
 
     return $this->apiSuccessResponse('Successfully ansower a purchase');
   }
 
-  public function nextStep(Request $request, $id) {
-    $purchase = Purchase::find($id);
-    if (is_null($purchase)) {
-      return $this->apiErrorResponse('Invalid id', [], 404);
-    }
+  public function nextStep(Request $request, $purchase) {
     $purchase->linking();
 
     $user = $request->user();
@@ -297,17 +259,16 @@ class PurchaseController extends Controller {
 
     $steps['location_steps'][$nextStep] = Carbon::now();
     $purchase->delivery_steps = $steps;
+    if ($nextStep == 'delivering_to_client') {
+      $purchase->status = 'waiting_client_ansower';
+    }
     $purchase->unreades = Admin::unreades();
     $purchase->unlinkingAndSave();
 
     return $this->apiSuccessResponse('Successfully changing step');
   }
 
-  public function clientAnsower(Request $request, $id) {
-    $purchase = Purchase::find($id);
-    if (is_null($purchase)) {
-      return $this->apiErrorResponse('Invalid id', [], 404);
-    }
+  public function clientAnsower(Request $request, $purchase) {
     $purchase->linking();
 
     $user = $request->user();
@@ -318,7 +279,7 @@ class PurchaseController extends Controller {
 
     $validator = Validator::make($request->all(), [
       'ansower' => 'required|in:accept,refuse',
-      'discription' => $request->ansower == 'refuse' ? 'required|string' : '',
+      'description' => $request->ansower == 'refuse' ? 'required|string' : '',
     ]);
 
     if($validator->fails()) {
@@ -334,14 +295,21 @@ class PurchaseController extends Controller {
     }
 
     if($request->ansower == 'accept') {
-      $purchase->product_price_exchange->accept();
-      $purchase->delivery_cost_exchange->accept();
-    } else {
-      $purchase->product_price_exchange->refuse($request->discription);
-      $purchase->delivery_cost_exchange->refuse($request->discription);
+      $res = $purchase->product_price_exchange->accept();
+      if(!$res['success']) {
+        return $this->apiErrorResponse($res['message']);
+      }
+      $res = $purchase->delivery_cost_exchange->accept();
+      if(!$res['success']) {
+        return $this->apiErrorResponse($res['message']);
+      }
+      $res = $purchase->commission_exchange->accept();
+      if(!$res['success']) {
+        return $this->apiErrorResponse($res['message']);
+      }
     }
 
-    $steps['receive'] = [$request->ansower, $request->discription, Carbon::now()];
+    $steps['receive'] = [$request->ansower, $request->description, Carbon::now()];
     $purchase->delivery_steps = $steps;
     $purchase->status = ['accept' => 'client_accept', 'refuse' => 'client_refuse'][$request->ansower];
     $purchase->unreades = Admin::unreades();
@@ -350,11 +318,7 @@ class PurchaseController extends Controller {
     return $this->apiSuccessResponse('Successfully ansowering');
   }
 
-  public function clientAbsent(Request $request, $id) {
-    $purchase = Purchase::find($id);
-    if (is_null($purchase)) {
-      return $this->apiErrorResponse('Invalid id', [], 404);
-    }
+  public function sellerReport(Request $request, $purchase) {
     $purchase->linking();
 
     $user = $request->user();
@@ -364,7 +328,7 @@ class PurchaseController extends Controller {
     }
 
     $validator = Validator::make($request->all(), [
-      'discription' => 'required|string',
+      'report' => 'required|string',
     ]);
 
     if($validator->fails()) {
@@ -373,20 +337,17 @@ class PurchaseController extends Controller {
       ]);
     }
 
-    $steps = $purchase->delivery_steps;
-
-    if(!is_null($steps['receive'])) {
-      return $this->apiErrorResponse('This purchase already ansowerd');
+    if($purchase->status != 'seller_accept' && $purchase->status != 'waiting_client_ansower') {
+      return $this->apiErrorResponse('Unauthenticated');
     }
 
-    $purchase->product_price_exchange->refuse($request->discription);
-    $purchase->delivery_cost_exchange->refuse($request->discription);
-    $steps['receive'] = ['absent', $request->discription, Carbon::now()];
+    $steps = $purchase->delivery_steps;
+    $steps['receive'] = ['seller_report', $request->report, Carbon::now()];
     $purchase->delivery_steps = $steps;
-    $purchase->unreades = Admin::unreades($user->id);
+    $purchase->status = 'seller_reported';
     $purchase->unlinkingAndSave();
 
-    return $this->apiSuccessResponse('Successfully ansowering');
+    return $this->apiSuccessResponse('Successfully reporting');
   }
 
 }

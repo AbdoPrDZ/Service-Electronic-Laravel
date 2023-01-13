@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Admin;
 use App\Models\Currency;
+use App\Models\File;
 use App\Models\Wallet;
 use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -17,8 +18,6 @@ class CurrencySeeder extends Seeder {
       'user_id' => 1,
       'user_model' => Admin::class,
       'balance' => 0,
-      'total_received_balance' => 0,
-      'total_withdrawn_balance' => 0,
       'status' => 'active',
       'answored_at' => Carbon::now(),
     ]);
@@ -35,84 +34,111 @@ class CurrencySeeder extends Seeder {
       'id' => 1,
       'name' => 'Payssera',
       'char' => '€',
-      'max_receive' => 200,
-      'wallet'=> 'thowalid16@gmail.com',
+      'proof_is_required' => true,
+      'image_pick_type' => 'gallery',
+      'wallet' => 'thowalid16@gmail.com, Service',
       'platform_wallet_id' => $wallet_id,
-      'prices'=> [
-         '1' => ['d' => 1 , 'w' => 0.9], // payssera
-         '2' => ['d' => 2 , 'w' => 1], // webmony
-         '3' => ['d' => 0.9 , 'w' => 0.8], // prfect
-         '9' => ['d' => 220 , 'w' => 200], // ccp
-         '12' => ['d' => 220 , 'w' => 200], // ccp
+      'prices' => [
+        "3" => ["buy" => 220,"sell" => 200],
+        "4" => ["buy" => 220,"sell" => 200]
       ],
+      'unreades' => Admin::unreades(),
     ]);
     $this->createCurrencyWallet($wallet_id);
+
     $wallet_id = bin2hex('w-' . date_format(Carbon::now(), 'yyyy-MM-dd') . "-c-2");
     Currency::create([
       'id' => 2,
-      'name' => 'Webmony',
+      'name' => 'Wise',
       'char' => '$',
-      'max_receive' => 30000,
-      'wallet'=> 'thowalid16@gmail.com',
+      'proof_is_required' => true,
+      'image_pick_type' => 'gallery',
+      'wallet' => 'thowalid16@gmail.com',
       'platform_wallet_id' => $wallet_id,
-      'prices'=> [
-        '1' => ['d' => 1 , 'w' => 0.9], // payssera
-        '2' => ['d' => 2 , 'w' => 1], // webmony
-        '3' => ['d' => 0.9 , 'w' => 0.8], // prfect
-        '9' => ['d' => 220 , 'w' => 200], // ccp
-        '12' => ['d' => 220 , 'w' => 200], // ccp
+      'prices' => [
+        "1" => ["buy" => 1,"sell" => 1],
+        "3" => ["buy" => 220,"sell" => 200],
       ],
+      'unreades' => Admin::unreades(),
     ]);
     $this->createCurrencyWallet($wallet_id);
+
     $wallet_id = bin2hex('w-' . date_format(Carbon::now(), 'yyyy-MM-dd') . "-c-3");
     Currency::create([
       'id' => 3,
-      'name' => 'Prfect Mony',
-      'char' => '$',
-      'max_receive' => 30000,
-      'wallet'=> 'thowalid16@gmail.com',
-      'platform_wallet_id' => $wallet_id,
-      'prices'=> [
-        '1' => ['d' => 1 , 'w' => 0.9], // payssera
-        '2' => ['d' => 2 , 'w' => 1], // webmony
-        '3' => ['d' => 0.9 , 'w' => 0.8], // prfect
-        '9' => ['d' => 220 , 'w' => 200], // ccp
-        '12' => ['d' => 220 , 'w' => 200], // ccp
-      ],
-    ]);
-    $this->createCurrencyWallet($wallet_id);
-    $wallet_id = bin2hex('w-' . date_format(Carbon::now(), 'yyyy-MM-dd') . "-c-9");
-    Currency::create([
-      'id' => 9,
       'name' => 'CCP',
       'char' => 'DZD',
-      'max_receive' => 30000,
-      'wallet'=> '0023528701 cle 33',
+      'proof_is_required' => true,
+      'image_pick_type' => 'camera',
+      'wallet' => '0023528701 cle 33, Walid Rebbouh, ourgla',
       'platform_wallet_id' => $wallet_id,
-      'prices'=> [
-        '1' => ['d' => 1 , 'w' => 0.9], // payssera
-        '2' => ['d' => 2 , 'w' => 1], // webmony
-        '3' => ['d' => 0.9 , 'w' => 0.8], // prfect
+      'prices' => [
+        "1" => ["buy" => 0.005, "sell" => 0.0045],
+        "4" => ["buy" => 1, "sell" => 1],
       ],
+      'unreades' => Admin::unreades(),
     ]);
     $this->createCurrencyWallet($wallet_id);
-    $wallet_id = bin2hex('w-' . date_format(Carbon::now(), 'yyyy-MM-dd') . "-c-12");
+
+    $wallet_id = bin2hex('w-' . date_format(Carbon::now(), 'yyyy-MM-dd') . "-c-4");
     Currency::create([
-      'id' => 12,
+      'id' => 4,
       'name' => 'Service Electronic',
       'char' => 'SE',
-      'max_receive' => 30000,
-      'wallet'=> '0023528701 cle 33',
-      'platform_wallet_id' => $wallet_id,
       'proof_is_required' => false,
-      'prices'=> [
-        '1' => ['d' => 1 , 'w' => 0.9], // payssera
-        '2' => ['d' => 2 , 'w' => 1], // webmony
-        '3' => ['d' => 0.9 , 'w' => 0.8], // prfect
-        '9' => ['d' => 220 , 'w' => 200], // ccp
-        '12' => ['d' => 220 , 'w' => 200], // ccp
+      'image_pick_type' => 'camera',
+      'wallet' => '0023528701 cle 33, Walid Rebbouh, ourgla',
+      'platform_wallet_id' => $wallet_id,
+      'prices' => [
+        "1" => ["buy" => 0.005, "sell" => 0.0045],
+        "4" => ["buy" => 1, "sell" => 1],
       ],
+      'unreades' => Admin::unreades(),
     ]);
     $this->createCurrencyWallet($wallet_id);
+
+    $wallet_id = bin2hex('w-' . date_format(Carbon::now(), 'yyyy-MM-dd') . "-c-5");
+    Currency::create([
+      'id' => 5,
+      'name' => 'Perfect Money',
+      'char' => '$',
+      'proof_is_required' => true,
+      'image_pick_type' => 'gallery',
+      'wallet' => 'U34081482',
+      'platform_wallet_id' => $wallet_id,
+      'prices' => [
+        "1" => ["buy" => 0.97,"sell" => 0.9],
+        "3" => ["buy" => 212,"sell" => 194],
+        "4" => ["buy" => 212,"sell" => 194]
+      ],
+      'unreades' => Admin::unreades(),
+    ]);
+    $this->createCurrencyWallet($wallet_id);
+
+    $wallet_id = bin2hex('w-' . date_format(Carbon::now(), 'yyyy-MM-dd') . "-c-6");
+    Currency::create([
+      'id' => 6,
+      'name' => 'Baridi Mob',
+      'char' => 'DZD',
+      'proof_is_required' => true,
+      'image_pick_type' => 'gallery',
+      'wallet' => '00799999002966160878',
+      'platform_wallet_id' => $wallet_id,
+      'prices' => [
+        "1" => ["buy" => 0.005, "sell" => 0.0045],
+        "4" => ["buy" => 1, "sell" => 1],
+      ],
+      'unreades' => Admin::unreades(),
+    ]);
+    $this->createCurrencyWallet($wallet_id);
+
+    for ($i=3; $i <= 6; $i++) {
+      File::create([
+        'name' => "currency-$i",
+        'disk' => 'public',
+        'path' => "currencies/$i.png",
+        'type' => 'image',
+      ]);
+    }
   }
 }

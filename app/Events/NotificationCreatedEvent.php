@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Http\SocketBridgeNew\SocketClientNew;
+use App\Http\SocketBridge\SocketClient;
 use App\Models\Admin;
 use App\Models\Notification;
 use App\Models\User;
@@ -25,48 +25,17 @@ class NotificationCreatedEvent {
    */
   public function __construct(Notification $notification) {
     $notification->linking();
-    Log::info('send notification', [$notification]);
     $rooms = [
       User::class => 'api',
       Admin::class => 'admin',
     ];
-    $client = new SocketClientNew($notification->to_id, $rooms[$notification->to_model]);
+    $client = new SocketClient($notification->to_id, $rooms[$notification->to_model]);
     if($notification->type == 'emit') {
-      $client->emit($notification->name, $notification->title, $notification->message, $notification);
+      $client->emitNotification($notification);
     } else {
-      $data = [
-        'token' => $notification->client->messaging_token,
-        'notification' => [
-          'title' => $notification->title,
-          'body' => $notification->message,
-        ],
-        'android' => [
-          'notification' => [
-            'priority' => "high",
-            'icon' => 'stock_ticker_update',
-            'sound' => "default",
-            'color' => '#7e55c3',
-            'imageUrl' => env('APP_URL') . '/file/public/currency-4',
-          ]
-        ],
-        'data' => [
-          'notification_id' => "$notification->id",
-          ...$notification->data,
-        ],
-      ];
-      if($notification->type == 'notify') $client->pushNotification($data);
-      if($notification->type == 'emitOrNotify') $client->emitOrNotify(
-        $notification->name, $notification->title,
-        $notification->message, $data, [
-          'notification_id' => "$notification->id",
-          ...$notification->data,
-        ]);
-      if($notification->type == 'emitAndNotify') $client->emitAndNotify(
-        $notification->name, $notification->title,
-        $notification->message, $data, [
-          'notification_id' => "$notification->id",
-          ...$notification->data,
-        ]);
+      if($notification->type == 'notify') $client->pushNotification($notification);
+      else if($notification->type == 'emitOrNotify') $client->emitOrPushNotification($notification);
+      else if($notification->type == 'emitAndNotify') $client->emitAndPushNotification($notification);
     }
   }
 

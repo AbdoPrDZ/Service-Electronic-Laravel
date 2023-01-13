@@ -69,7 +69,7 @@ return [
   |
   */
 
-  'timezone' => 'UTC',
+  'timezone' => 'GMT',
 
   /*
   |--------------------------------------------------------------------------
@@ -194,8 +194,7 @@ return [
     App\Providers\BroadcastServiceProvider::class,
     App\Providers\EventServiceProvider::class,
     App\Providers\RouteServiceProvider::class,
-    // App\Http\SocketBridge\SocketProvider::class,
-    App\Http\SocketBridgeNew\SocketProviderNew::class,
+    App\Http\SocketBridge\SocketProvider::class,
     Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
     Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
   ],

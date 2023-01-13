@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\SocketBridge;
+
 use Illuminate\Support\Facades\Cache;
 use PHPUnit\Framework\Error;
 
@@ -9,8 +10,11 @@ class SocketRouter {
 
   protected $manager;
 
-  public function __construct($manager) {
+  protected $room;
+
+  public function __construct($manager, $room) {
     $this->manager = $manager;
+    $this->room = $room;
   }
 
   // public function router() {}
@@ -26,19 +30,11 @@ class SocketRouter {
   }
 
   public function setupRoutes() {
-    // include base_path('routes/socket.php');
-    // $clients = config('socket_bridge.manager.clients');
-    // foreach ($clients as $client) {
-    //   include $client['routes_source'];
-    // }
-    include base_path(config('socket_bridge.manager.routes_source'));
-    // foreach ($routes as $route) {
-    //   print_r($route);
-    // }
+    include base_path(config("socket_bridge.manager.rooms.$this->room.routes_source"));
   }
 
   public function all() {
-    return Cache::store('file')->get(config('socket_bridge.manager.cache.routes'));
+    return Cache::store('file')->get(config('socket_bridge.manager.cache.routes'))[$this->room];
   }
 
   public function routeExists($routeName) {

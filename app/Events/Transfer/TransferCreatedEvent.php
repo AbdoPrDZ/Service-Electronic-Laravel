@@ -13,8 +13,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class TransferCreatedEvent
-{
+class TransferCreatedEvent {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
 
@@ -25,20 +24,17 @@ class TransferCreatedEvent
    */
   public function __construct(Transfer $transfer) {
     $transfer->linking();
-    // $admins = Admin::all();
-    // foreach ($admins as $admin) {
-      // $admin_id = $admin->id;
-    foreach ($transfer->unreades as $admin_id) {
+    foreach ($transfer->unreades ?? [] as $admin_id) {
       $values = [
         'to_id' => $admin_id,
         'to_model' => Admin::class,
         'data' => [
           'transfer_id' => $transfer->id,
         ],
-        'image_id' => 'currency-4',
+        'image_id' => 'logo',
         'type' => 'emit',
       ];
-      if($transfer->for_what == 'trnsfer') {
+      if($transfer->for_what == 'transfer') {
         $values['name'] = 'new-transfer-created';
         $values['title'] = 'New Transfer Add from user (#' . $transfer->user->id . ')';
         $values['message'] = 'User (' .

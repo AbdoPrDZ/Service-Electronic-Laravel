@@ -233,22 +233,6 @@ body>div {
   display: block;
 }
 
-.table-img {
-  margin: auto;
-  width: fit-content;
-  height: auto;
-  border-radius: 0.5rem;
-  padding: 4px;
-  background-color: white;
-  border: 0.02px solid #ccc;
-}
-
-.table-img img {
-  width: 100px;
-  min-width: 100px;
-  height: 100px;
-}
-
 .currency-price {
   font-size: 16px;
   font-weight: bold;
@@ -349,7 +333,19 @@ body>div {
   text-align: center;
 }
 
-.tox-tinymce {
-
-  height: 90vh;
+#loading-dialog-modal .modal-dialog {
+  margin: auto;
+  width: 35vw;
+}
+#loading-dialog-modal .modal-body {
+  display: flex;
+  align-items: center;
+}
+#loading-dialog-modal .modal-body span.spinner-border {
+  margin: 0 1rem;
+  width: 30px;
+  height: 30px;
+}
+#loading-dialog-modal .modal-body span.dialog-message {
+  font-size: 16px;
 }

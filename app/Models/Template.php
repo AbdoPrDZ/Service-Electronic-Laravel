@@ -2,23 +2,36 @@
 
 namespace App\Models;
 
+use App\Events\TemplateCreatedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Template extends Model {
-  use HasFactory;
+
+  use HasFactory, GetNextSequenceValue;
+
+  public $incrementing = false;
+
+  protected $primaryKey = 'name';
 
   protected $fillable = [
+    'name',
     'content',
     'args',
-    'for_what',
+    'type',
     'unreades',
+    'is_deleted',
   ];
 
   protected $casts = [
     'args' => 'array',
     'unreades' => 'array',
+    'is_deleted' => 'boolean',
     'created_at' => 'datetime:Y-m-d H:m:s',
+  ];
+
+  protected $dispatchesEvents = [
+    'created' => TemplateCreatedEvent::class,
   ];
 
   static function news($admin_id) {
@@ -38,4 +51,10 @@ class Template extends Model {
       $item->save();
     }
   }
+
+  public function preDelete() {
+    $this->is_deleted = true;
+    $this->save();
+  }
+
 }

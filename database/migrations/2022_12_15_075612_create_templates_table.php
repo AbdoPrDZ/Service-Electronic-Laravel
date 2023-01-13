@@ -12,11 +12,12 @@ return new class extends Migration {
    */
   public function up() {
     Schema::create('templates', function (Blueprint $table) {
-      $table->id();
+      $table->string('name')->primary();
       $table->longText('content');
       $table->json('args')->default('{}');
-      $table->enum('for_what', ['mail', 'export', '*'])->default('*');
+      $table->enum('type', ['mail', 'export'])->default('mail');
       $table->json('unreades')->default('[]');
+      $table->boolean('is_deleted')->default(false);
       $table->timestamps();
     });
   }

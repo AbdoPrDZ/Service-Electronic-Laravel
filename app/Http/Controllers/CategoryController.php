@@ -11,7 +11,7 @@ class CategoryController extends Controller {
   }
 
   public function all() {
-    $data = Category::all();
+    $data = Category::where('is_deleted', '=', 0)->get();
     $items = [];
     foreach ($data as $item) {
       $items[$item->id] = $item;

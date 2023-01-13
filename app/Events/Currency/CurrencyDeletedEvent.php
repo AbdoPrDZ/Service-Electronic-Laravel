@@ -4,6 +4,7 @@ namespace App\Events\Currency;
 
 use App\Models\Currency;
 use App\Models\File;
+use App\Models\Notification;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -12,8 +13,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class CurrencyDeletedEvent
-{
+class CurrencyDeletedEvent {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
   /**
@@ -32,8 +32,7 @@ class CurrencyDeletedEvent
    *
    * @return \Illuminate\Broadcasting\Channel|array
    */
-  public function broadcastOn()
-  {
+  public function broadcastOn() {
     return new PrivateChannel('channel-name');
   }
 }

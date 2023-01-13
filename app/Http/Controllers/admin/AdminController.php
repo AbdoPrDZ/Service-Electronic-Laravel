@@ -4,13 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
-use App\Models\Currency;
-use App\Models\Mail;
-use App\Models\Notification;
-use App\Models\Product;
-use App\Models\Seller;
-use App\Models\Transfer;
-use App\Models\User;
 use App\Models\VerifyToken;
 use Hash;
 use Illuminate\Http\Request;
@@ -27,22 +20,23 @@ class AdminController extends Controller {
   }
 
   public function index(Request $request) {
+    $admin = $request->user();
+    $admin->linking();
     if(!$request->session()->exists('socketToken')) {
       $socketToken = Hash::make(csrf_token());
       VerifyToken::create([
         'token' => $socketToken,
-        'user_id' => $request->user()->id,
+        'user_id' => $admin->id,
         'model' => Admin::class,
         'code' => '',
       ]);
       $request->session()->put('socketToken', $socketToken);
     }
-    $user = $request->user();
+
     return view('admin.index', [
-      'admin' => $user,
+      'admin' => $admin,
       'token' => $request->session()->get('token'),
       'socketToken' => $request->session()->get('socketToken'),
-      'notifications' => Notification::allUnreaded($user->id),
     ]);
   }
 
@@ -78,6 +72,7 @@ class AdminController extends Controller {
       ]);
     }
 
+    session()->flush();
     if (!Auth::guard('admin')->attempt($validator->validated())) {
       $request->session()->regenerate();
       return view('admin.login', [
@@ -101,73 +96,30 @@ class AdminController extends Controller {
     }
 
   }
-  public function logout() {
+
+  public function logout(Request $request) {
+    VerifyToken::find($request->session()->get('socketToken'))?->delete();
     session()->flush();
     // auth()->guard('admins')->logout();
     auth()->logout();
     return redirect()->route('admin.login');
   }
 
-  public function loadTab(Request $request, $target) {
-    $targets = [
+  public function loadTab(Request $request, $tabName) {
+    $tabNames = [
       'users' => UserController::class,
       'sellers' => SellerController::class,
       'transfers' => TransferController::class,
       'currencies' => CurrencyController::class,
       'products' => ProductController::class,
       'purchases' => PurchaseController::class,
+      'offers' => OfferController::class,
       'mails' => MailController::class,
-      // 'settings' => SettingsController::class,
     ];
-    if(array_key_exists($target, $targets)) {
-      return $targets[$target]::all($request);
+    if(array_key_exists($tabName, $tabNames)) {
+      return $tabNames[$tabName]::all($request);
     } else {
-      return $this->apiErrorResponse("Invalid target [$target]");
-    }
-  }
-
-  public function getNews(Request $request, $target) {
-    $targets = [
-      'users' => UserController::class,
-      'sellers' => SellerController::class,
-      'transfers' => TransferController::class,
-      'currencies' => CurrencyController::class,
-      'products' => ProductController::class,
-      'purchases' => PurchaseController::class,
-      'mails' => MailController::class,
-      // 'settings' => SettingsController::class,
-    ];
-    if(array_key_exists($target, $targets)) {
-      try {
-        return $targets[$target]::news($request);
-      } catch (\Throwable $th) {
-        return $this->apiErrorResponse("Invalid target [$target]");
-      }
-    } else {
-      return $this->apiErrorResponse("Invalid target [$target]");
-    }
-  }
-
-  public function readNews(Request $request, $target) {
-    $user = $request->user();
-    $targets = [
-      'users' => UserController::class,
-      'sellers' => SellerController::class,
-      'transfers' => TransferController::class,
-      'currencies' => CurrencyController::class,
-      'products' => ProductController::class,
-      'purchases' => PurchaseController::class,
-      'mails' => MailController::class,
-      // 'settings' => SettingsController::class,
-    ];
-    if(array_key_exists($target, $targets)) {
-      try {
-        return $targets[$target]::readNews($request);
-      } catch (\Throwable $th) {
-        return $this->apiErrorResponse("Invalid target [$target]");
-      }
-    } else {
-      return $this->apiErrorResponse("Invalid [$target]");
+      return $this->apiErrorResponse("Invalid tab name [$tabName]");
     }
   }
 

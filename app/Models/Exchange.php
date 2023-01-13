@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Events\Exchange\ExchangeCreatedEvent;
+use App\Events\ExchangeCreatedEvent;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -62,6 +62,10 @@ class Exchange extends Model {
     'created_at' => 'datetime:Y-m-d H:m:s',
   ];
 
+  protected $dispatchesEvents = [
+    'created' => ExchangeCreatedEvent::class,
+  ];
+
   static function news($admin_id) {
     $exchanges = Exchange::where('unreades', '!=', '[]')->get();
     $newsExchanges = [];
@@ -80,11 +84,12 @@ class Exchange extends Model {
     }
   }
 
-  public function linking() {
+  public function linking($gettingTargetUser = false) {
     $this->from_wallet = Wallet::find($this->from_wallet_id);
     if($this->from_wallet) $this->from_wallet->linking();
     $this->to_wallet = Wallet::find($this->to_wallet_id);
     $this->to_wallet->linking();
+    if ($gettingTargetUser) $this->target_user = User::where('wallet_id', '=', $this->to_wallet_id)->first();
   }
 
   public function unlinking() {
@@ -98,7 +103,14 @@ class Exchange extends Model {
   }
 
   public function accept() {
-    if($this->from_wallet && $this->from_wallet->balance < $this->sended_balance) return [
+    $this->linking();
+    if(!is_null($this->answered_at)) {
+      return [
+        'success' => false,
+        'message' => 'You already ansowred',
+      ];
+    }
+    if($this->from_wallet && $this->from_wallet->checking_withdraw_balance < $this->sended_balance) return [
       'success' => false,
       'message' => 'The sender balance is insufficient',
     ];
@@ -118,6 +130,13 @@ class Exchange extends Model {
   }
 
   public function refuse($message) {
+    $this->linking();
+    if(!is_null($this->answered_at)) {
+      return [
+        'success' => false,
+        'message' => 'You already ansowred',
+      ];
+    }
     $this->anower_description = $message;
     $this->answered_at = Carbon::now();
     $this->status = 'blocked';
@@ -133,8 +152,4 @@ class Exchange extends Model {
       'success' => true,
     ];
   }
-
-  protected $dispatchesEvents = [
-    'created' => ExchangeCreatedEvent::class,
-  ];
 }

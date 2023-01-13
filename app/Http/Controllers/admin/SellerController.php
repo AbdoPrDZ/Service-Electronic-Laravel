@@ -34,23 +34,20 @@ class SellerController extends Controller {
     ]);
   }
 
-  static function news(Request $request) {
-    $admin_id = $request->user()->id;
+  static function news($admin_id) {
     $newsSellers = Seller::news($admin_id);
     $newsNewSellers = array_filter($newsSellers, function ($seller) {
       return $seller->status == 'checking';
     });
-    return [
-      'count' => count($newsSellers) + count($newsNewSellers),
-    ];
+    return count($newsSellers) + count($newsNewSellers);
   }
 
-  static function readNews(Request $request) {
-    Seller::readNews($request->user()->id);
+  static function readNews($admin_id) {
+    Seller::readNews($admin_id);
     return Controller::apiSuccessResponse('successfully reading news');
   }
 
-  public function changeStatus(Request $request, $id) {
+  public function changeStatus(Request $request, Seller $seller) {
     $validator = Validator::make($request->all(), [
       'status' => 'required|string',
       'description' => '',
@@ -58,43 +55,39 @@ class SellerController extends Controller {
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, ['errors' =>$validator->errors(), 'all' => $request->all()]);
     }
-    $seller = Seller::find($id);
-    if(!is_null($seller)) {
-      if(in_array($request->status, ['accepted', 'banned', 'refused'])) {
-        if(($request->status == 'banned' || $request->status == 'refused') && $request->description) {
-          return $this->apiErrorResponse('Discription required');
-        }
-        if($request->status == 'accepted' && $seller->answered_at != null) {
-          return $this->apiErrorResponse('This Seller already ansowred');
-        }
-        $seller->status = $request->status;
-        $seller->anower_description = $request->description;
-        $seller->answered_at = Carbon::now();
-        $seller->save();
-        $messages = [ 'accepted' => 'Congratulations, your request has been accepted' ];
-        Notification::create([
-          'name' => 'notifications',
-          'title' => 'Seller register result',
-          'message' => $request->description ?? $messages[$request->status] ?? '',
-          'from_id' => $request->user()->id,
-          'from_model' => Admin::class,
-          'to_id' => $seller->user_id,
-          'to_model' => User::class,
-          'data' => [
-            'event_name' => 'seller-register-status-change',
-            'data' => json_encode([
-              'status' => $request->status,
-            ]),
-          ],
-          'image_id' => 'currency-4',
-          'type' => 'emitOrNotify',
-        ]);
-        return $this->apiSuccessResponse('Successfully changing status');
-      } else {
-        return $this->apiErrorResponse('Invalid status');
+    if(in_array($request->status, ['accepted', 'banned', 'refused'])) {
+      if(($request->status == 'banned' || $request->status == 'refused') && $request->description) {
+        return $this->apiErrorResponse('description required');
       }
+      if($request->status == 'accepted' && $seller->answered_at != null) {
+        return $this->apiErrorResponse('This Seller already ansowred');
+      }
+      $seller->status = $request->status;
+      $seller->anower_description = $request->description;
+      $seller->answered_at = Carbon::now();
+      $seller->unreades = Admin::unreades($request->user()->id);
+      $seller->unlinkingAndSave();
+      $messages = [ 'accepted' => 'Congratulations, your request has been accepted' ];
+      Notification::create([
+        'name' => 'notifications',
+        'title' => 'Seller register result',
+        'message' => $request->description ?? $messages[$request->status] ?? '',
+        'from_id' => $request->user()->id,
+        'from_model' => Admin::class,
+        'to_id' => $seller->user_id,
+        'to_model' => User::class,
+        'data' => [
+          'event_name' => 'seller-register-status-change',
+          'data' => json_encode([
+            'status' => $request->status,
+          ]),
+        ],
+        'image_id' => 'logo',
+        'type' => 'emitOrNotify',
+      ]);
+      return $this->apiSuccessResponse('Successfully changing status');
     } else {
-      return $this->apiErrorResponse('Invalid id');
+      return $this->apiErrorResponse('Invalid status');
     }
   }
 }

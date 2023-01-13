@@ -23,6 +23,7 @@ return new class extends Migration {
       $table->double('total_price');
       $table->integer('delivery_cost_exchange_id');
       $table->integer('product_price_exchange_id');
+      $table->integer('commission_exchange_id');
       $table->json('delivery_steps')->default(json_encode([
         'seller_accept' => [
           'readed_at' => null,
@@ -37,7 +38,7 @@ return new class extends Migration {
         ],
         'receive' => null,
       ]));
-      $table->enum('status', ['waiting', 'received', 'seller_accept', 'client_accept', 'seller_refuse', 'client_refuse'])->default('waitting');
+      $table->enum('status', ['waiting', 'received', 'seller_accept', 'seller_refuse', 'waiting_client_ansower', 'client_accept', 'client_refuse', 'seller_reported', 'admin_ansowred'])->default('waiting');
       $table->json('unreades')->default('[]');
       $table->timestamps();
     });

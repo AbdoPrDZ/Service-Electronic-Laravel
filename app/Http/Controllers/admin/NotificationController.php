@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 
@@ -13,7 +14,7 @@ class NotificationController extends Controller {
   }
 
   public function all(Request $request) {
-    $notifications = Notification::allUnreaded($request->user()->id);
+    $notifications = Notification::allUnreaded($request->user()->id, Admin::class);
     $fNotifications = [];
     foreach ($notifications as $notification) {
       $notification->linking();
@@ -22,14 +23,10 @@ class NotificationController extends Controller {
     return $fNotifications;
   }
 
-  public function markAsRead(Request $request, $id)  {
-    $notification = Notification::find($id);
-    if($notification) {
-      $notification->is_readed = true;
-      $notification->save();
-      return $this->apiSuccessResponse('Successfully marking as readed');
-    }
-    return $this->apiErrorResponse('Invalid notfication id');
+  public function markAsRead(Request $request, Notification $notification)  {
+    $notification->is_readed = true;
+    $notification->save();
+    return $this->apiSuccessResponse('Successfully marking as readed');
   }
 
 }

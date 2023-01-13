@@ -24,7 +24,6 @@
         </div>
         <hr>
 
-
         <div class="form-group">
           <h5>المحفظة:</h5>
           <input type="text" class="form-control" name="currency_wallet">

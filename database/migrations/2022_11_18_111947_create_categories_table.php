@@ -16,6 +16,7 @@ return new class extends Migration {
       $table->json('name');
       $table->string('image_id');
       $table->json('unreades')->default('[]');
+      $table->boolean('is_deleted')->default(false);
       $table->timestamps();
     });
   }

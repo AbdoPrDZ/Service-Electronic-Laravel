@@ -33,22 +33,22 @@
                   <th style="min-width: 80px; max-width: 80px;"></th>
                 </thead>
                 <tbody>
-                  <tfoot>
-                    <tr>
-                      <th order="false"></th>
-                      <th search="true">#</th>
-                      <th search="true">المستخدم</th>
-                      <th search="true">الرصيد المستقبل</th>
-                      <th search="true">الرصيد المرسل</th>
-                      <th search="true">العملة المرسلة</th>
-                      <th search="true">العملة المرسلة</th>
-                      <th search="true">المحفظة</th>
-                      <th search="true">الوضعية</th>
-                      <th search="true">تم الرد في</th>
-                      <th search="true">أنشئ في</th>
-                      <th></th>
-                    </tr>
-                  </tfoot>
                 </tbody>
+                <tfoot>
+                  <tr>
+                    <th order="false"></th>
+                    <th search="true">#</th>
+                    <th search="true">المستخدم</th>
+                    <th search="true">الرصيد المستقبل</th>
+                    <th search="true">الرصيد المرسل</th>
+                    <th search="true">العملة المرسلة</th>
+                    <th search="true">العملة المرسلة</th>
+                    <th search="true">المحفظة</th>
+                    <th search="true">الوضعية</th>
+                    <th search="true">تم الرد في</th>
+                    <th search="true">أنشئ في</th>
+                    <th></th>
+                  </tr>
+                </tfoot>
               </table>
             </div>

@@ -2,6 +2,7 @@
 
 namespace App\Events\Transfer;
 
+use App\Models\File;
 use App\Models\Transfer;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -20,7 +21,8 @@ class TransferDeletedEvent {
    * @return void
    */
   public function __construct(Transfer $transfer) {
-    //
+    $transfer->linking();
+    if ($transfer->proof_id) File::find($transfer->proof_id)?->delete();
   }
 
   /**

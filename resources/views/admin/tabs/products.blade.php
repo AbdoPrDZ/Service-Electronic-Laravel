@@ -27,17 +27,17 @@
                   <th style="min-width: 120px; max-width: 120px;"></th>
                 </thead>
                 <tbody>
-                  <tfoot>
-                    <tr>
-                      <th></th>
-                      <th search="true">#</th>
-                      <th></th>
-                      <th search="true">الأسماء</th>
-                      <th search="true">أنشئ في</th>
-                      <th></th>
-                    </tr>
-                  </tfoot>
                 </tbody>
+                <tfoot>
+                  <tr>
+                    <th></th>
+                    <th search="true">#</th>
+                    <th></th>
+                    <th search="true">الأسماء</th>
+                    <th search="true">أنشئ في</th>
+                    <th></th>
+                  </tr>
+                </tfoot>
               </table>
             </div>
 
@@ -73,20 +73,20 @@
                   <th style="min-width: 120px; max-width: 120px;"></th>
                 </thead>
                 <tbody>
-                  <tfoot>
-                    <tr>
-                      <th></th>
-                      <th search="true">#</th>
-                      <th></th>
-                      <th search="true">الاسم</th>
-                      <th search="true">البائع</th>
-                      <th search="true">السعر</th>
-                      <th search="true">النوع</th>
-                      <th search="true">الوصف</th>
-                      <th search="true">أنشئ في</th>
-                      <th></th>
-                    </tr>
-                  </tfoot>
                 </tbody>
+                <tfoot>
+                  <tr>
+                    <th></th>
+                    <th search="true">#</th>
+                    <th></th>
+                    <th search="true">الاسم</th>
+                    <th search="true">البائع</th>
+                    <th search="true">السعر</th>
+                    <th search="true">النوع</th>
+                    <th search="true">الوصف</th>
+                    <th search="true">أنشئ في</th>
+                    <th></th>
+                  </tr>
+                </tfoot>
               </table>
             </div>

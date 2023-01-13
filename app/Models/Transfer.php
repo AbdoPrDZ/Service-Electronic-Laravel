@@ -49,7 +49,7 @@ use Illuminate\Support\Facades\Log;
  * @mixin \Eloquent
  */
 class Transfer extends Model  {
-  use HasFactory;
+  use HasFactory, GetNextSequenceValue;
 
   protected $fillable = [
     'user_id',
@@ -73,17 +73,10 @@ class Transfer extends Model  {
     'created_at' => 'datetime:Y-m-d H:m:s',
   ];
 
-  public function linking() {
-    $this->user = User::find($this->user_id);
-    $this->sended_currency = Currency::find($this->sended_currency_id);
-    $this->sended_currency->linking();
-    $this->received_currency = Currency::find($this->received_currency_id);
-    $this->received_currency->linking();
-    $this->exchange = Exchange::find($this->exchange_id);
-    if(!is_null($this->exchange)) $this->exchange->linking();
-    $this->proof = File::find($this->proof_id);
-    return $this;
-  }
+  protected $dispatchesEvents = [
+    'created' => TransferCreatedEvent::class,
+    'deleted' => TransferDeletedEvent::class,
+  ];
 
   static function news($admin_id, $forWhat) {
     $transfers = Transfer::where([['unreades', '!=', '[]'], ['for_what', '=', $forWhat]])->get();
@@ -101,6 +94,31 @@ class Transfer extends Model  {
       $item->unreades = array_diff($item->unreades, [$admin_id]);
       $item->save();
     }
+  }
+
+  public function linking() {
+    $this->user = User::find($this->user_id);
+    $this->sended_currency = Currency::find($this->sended_currency_id);
+    $this->sended_currency->linking();
+    $this->received_currency = Currency::find($this->received_currency_id);
+    $this->received_currency->linking();
+    $this->exchange = Exchange::find($this->exchange_id);
+    if(!is_null($this->exchange)) $this->exchange->linking();
+    $this->proof = File::find($this->proof_id);
+    return $this;
+  }
+
+  public function unlinking() {
+    unset($this->user);
+    unset($this->sended_currency);
+    unset($this->received_currency);
+    unset($this->exchange);
+    unset($this->proof);
+  }
+
+  public function unlinkingAndSave() {
+    $this->unlinking();
+    $this->save();
   }
 
   public function ansower($status, $answer_description, $admin_id) {
@@ -145,7 +163,7 @@ class Transfer extends Model  {
       $user->wallet->unlinkingAndSave();
     } else {
       $sended_currency->platform_wallet->balance += $this->sended_balance;
-      $sended_currency->platform_wallet->save();
+      $sended_currency->platform_wallet->unlinkingAndSave();
     }
     $notification = Notification::create([
       'name' => 'notifications',
@@ -162,12 +180,11 @@ class Transfer extends Model  {
           'status' => $this->status,
         ]),
       ],
-      'image_id' => 'currency-4',
+      'image_id' => 'logo',
       'type' => 'emitOrNotify',
     ]);
-    Log::info('send transfer update notification', [$notification]);
 
-    $this->save();
+    $this->unlinkingAndSave();
     return [
       'success' => true,
       'message' => 'successfully',
@@ -226,9 +243,4 @@ class Transfer extends Model  {
     }
     return $fTransfers;
   }
-
-  protected $dispatchesEvents = [
-    'created' => TransferCreatedEvent::class,
-    'deleted' => TransferDeletedEvent::class,
-  ];
 }
