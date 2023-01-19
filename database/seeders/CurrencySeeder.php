@@ -132,7 +132,7 @@ class CurrencySeeder extends Seeder {
     ]);
     $this->createCurrencyWallet($wallet_id);
 
-    for ($i=3; $i <= 6; $i++) {
+    for ($i=1; $i <= 6; $i++) {
       File::create([
         'name' => "currency-$i",
         'disk' => 'public',
