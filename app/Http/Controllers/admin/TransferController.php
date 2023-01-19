@@ -67,7 +67,7 @@ class TransferController extends Controller {
       $transfer->exchange->delete();
     }
     if (!is_null($transfer->proof)) {
-      $transfer->proof->delete();
+      File::find($transfer->proof_id)->delete();
     }
     $transfer->delete();
     return $this->apiSuccessResponse('Successflully deleting transfer');

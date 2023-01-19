@@ -15,7 +15,9 @@ trait GetNextSequenceValue {
     if (!$self->getIncrementing()) {
       throw new \Exception(sprintf('Model (%s) is not auto-incremented', static::class));
     }
-    $sequenceName = "{$self->getTable()}_id_seq";
-    return DB::selectOne("SELECT nextval('{$sequenceName}') AS val")->val;
+    $sequenceName = $self->getTable();
+    return DB::selectOne(
+      "SELECT AUTO_INCREMENT AS id FROM information_schema.tables WHERE table_name = '$sequenceName' and table_schema = DATABASE();"
+    )->id;
   }
 }

@@ -134,7 +134,7 @@ class UserController extends Controller {
     Mail::create([
       'title' => 'Email Verification',
       'template_id' => Setting::emailVerificationTemplateId(),
-      'data' => ['$code' => $verifyCode],
+      'data' => ['<-user->' => $user->fullname, '<-code->' => $verifyCode],
       'targets' => [$request->email]
     ]);
 
@@ -212,6 +212,7 @@ class UserController extends Controller {
           'errors' => ['email' => 'Email not verfited, please verify your email']
         ]);
       }
+      $user->linking();
       // send email
       $verifyCode = random_int(100000, 999999);
       $token = Str::random(64);
@@ -223,7 +224,7 @@ class UserController extends Controller {
       Mail::create([
         'title' => 'Email Verification',
         'template_id' => Setting::emailVerificationTemplateId(),
-        'data' => ['$code' => $verifyCode],
+        'data' => ['<-code->' => $verifyCode, '<-user->' => $user->fullname],
         'targets' => [$request->email]
       ]);
       return $this->apiSuccessResponse("Successfully verifing email code", [
@@ -456,7 +457,7 @@ class UserController extends Controller {
     Mail::create([
       'title' => 'Email Verification',
       'template_id' => Setting::emailVerificationTemplateId(),
-      'data' => ['$code' => $verifyCode],
+      'data' => ['<-user->' => $user->fullname, '<-code->' => $verifyCode],
       'targets' => [$request->email]
     ]);
     $user->tokens()->delete();

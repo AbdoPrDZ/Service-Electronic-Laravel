@@ -13,8 +13,8 @@ return new class extends Migration {
   public function up() {
     Schema::create('mails', function (Blueprint $table) {
       $table->id();
-      $table->integer('template_id');
-      $table->string('manager');
+      $table->string('title');
+      $table->string('template_id');
       $table->json('data')->default('{}');
       $table->json('targets');
       $table->json('unreades')->default('[]');

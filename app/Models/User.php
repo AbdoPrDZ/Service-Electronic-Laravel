@@ -71,8 +71,9 @@ class User extends Authenticatable {
     'identity_status',
     'identity_answer_description',
     'messaging_token',
-    'is_deleted',
     'settings',
+    'unreades',
+    'is_deleted',
   ];
 
   protected $hidden = [
@@ -85,6 +86,7 @@ class User extends Authenticatable {
     'verification_images_ids' => 'array',
     'identity_verifited_at' => 'datetime:Y-m-d H:m:s',
     'settings' => 'array',
+    'unreades' => 'array',
     'is_deleted' => 'boolean',
     'created_at' => 'datetime:Y-m-d H:m:s',
   ];
@@ -114,7 +116,6 @@ class User extends Authenticatable {
   public function linking($linkSeller = true) {
     $this->fullname = $this->firstname . ' ' . $this->lastname;
     $this->email_verified = !is_null($this->email_verified_at);
-    $this->profile_image = File::find($this->profile_image_id)->name;
     $seller = Seller::where('user_id', '=', $this->id)->first();
     if(!is_null($seller)) {
       $this->seller = $seller;
@@ -144,7 +145,6 @@ class User extends Authenticatable {
   public function unlinking($linkSeller = true) {
     unset($this->fullname);
     unset($this->email_verified);
-    unset($this->profile_image);
     unset($this->wallet);
     unset($this->balance);
     unset($this->checking_balance);

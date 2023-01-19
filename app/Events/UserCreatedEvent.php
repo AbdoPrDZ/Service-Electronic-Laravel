@@ -23,7 +23,7 @@ class UserCreatedEvent {
    */
   public function __construct(User $user) {
     $user->linking();
-    foreach ($user->unreades as $admin_id) {
+    foreach (($user->unreades ?? []) as $admin_id) {
       Notification::create([
         'to_id' => $admin_id,
         'to_model' => Admin::class,

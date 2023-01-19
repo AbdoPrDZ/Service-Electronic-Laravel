@@ -104,7 +104,6 @@ class Transfer extends Model  {
     $this->received_currency->linking();
     $this->exchange = Exchange::find($this->exchange_id);
     if(!is_null($this->exchange)) $this->exchange->linking();
-    $this->proof = File::find($this->proof_id);
     return $this;
   }
 
@@ -113,7 +112,6 @@ class Transfer extends Model  {
     unset($this->sended_currency);
     unset($this->received_currency);
     unset($this->exchange);
-    unset($this->proof);
   }
 
   public function unlinkingAndSave() {

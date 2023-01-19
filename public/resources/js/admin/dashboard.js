@@ -770,7 +770,7 @@ $(document).ready(function() {
   });
   socket.on('disconnect', function () {
     console.log('Disconnected');
-    // window.location.href = "./admin/logout";
+    window.location.href = "./admin/logout";
     window.connected = false;
   });
   socket.on('connect_failed', (err) => {
