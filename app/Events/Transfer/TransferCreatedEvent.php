@@ -3,9 +3,7 @@
 namespace App\Events\Transfer;
 
 use App\Models\Admin;
-use App\Models\Mail;
 use App\Models\Notification;
-use App\Models\Setting;
 use App\Models\Transfer;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -25,41 +23,6 @@ class TransferCreatedEvent {
    */
   public function __construct(Transfer $transfer) {
     $transfer->linking();
-    if(in_array($transfer->for_what, ['recharge', 'withdraw'])) {
-      $titles = [
-        'recharge' => [
-          'You recharged your account',
-          Setting::userRechargeEmailTemplateId(),
-          [
-            '<-sended_balance ->' => "{$transfer->sended_balance} {$transfer->sended_currency->char}",
-            '<-received_balance ->' => "{$transfer->received_balance} {$transfer->received_currency->char}",
-            '<-received_currency ->' => $transfer->received_currency->name,
-            '<-sended_currency ->' => $transfer->sended_currency->name,
-            '<-wallet ->' => $transfer->wallet,
-            '<-recharge_date ->' => $transfer->exchange->answered_at,
-          ]
-        ],
-        'withdraw' => [
-          'You withdraw from your account',
-          Setting::userWithdrawEmailTemplateId(),
-          [
-            '<-sended_balance ->' => "{$transfer->sended_balance} {$transfer->sended_currency->char}",
-            '<-received_balance ->' => "{$transfer->received_balance} {$transfer->received_currency->char}",
-            '<-received_currency ->' => $transfer->received_currency->name,
-            '<-sended_currency ->' => $transfer->sended_currency->name,
-            '<-to_wallet ->' => $transfer->wallet,
-            '<-withdraw_date ->' => $transfer->exchange->answered_at,
-          ]
-        ],
-      ];
-      Mail::create([
-        'title' => $titles[$transfer->for_whet][0],
-        'template_id' => $titles[$transfer->for_whet][1],
-        'data' => $titles[$transfer->for_whet][2],
-        'targets' => [$transfer->user_id],
-        'unreades' => Admin::unreades(),
-      ]);
-    }
     foreach ($transfer->unreades ?? [] as $admin_id) {
       $values = [
         'to_id' => $admin_id,

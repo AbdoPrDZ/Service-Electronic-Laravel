@@ -104,6 +104,7 @@ class UserController extends Controller {
         '<-datetime->' => Carbon::now(),
       ],
       'targets' => [$request->user()->id],
+      'unreades' => Admin::unreades(),
     ]);
     return $this->apiSuccessResponse('Successfully changing status');
   }

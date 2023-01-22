@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Admin;
 use App\Models\Currency;
 use App\Models\Exchange;
+use App\Models\Mail;
 use App\Models\Notification;
 use App\Models\Setting;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -89,6 +90,18 @@ class ExchangeController extends Controller {
       ],
       'image_id' => 'logo',
       'type' => 'emitOrNotify',
+    ]);
+    Mail::create([
+      'title' => 'Credit Received',
+      'template_id' => Setting::userCreditReceiveEmailTemplateId(),
+      'data' => [
+        '<-from->' => $user->email,
+        '<-balance->' => $request->balance,
+        '<-exchange_id->' => $exchange->id,
+        '<-datetime->' => $exchange->created_at,
+      ],
+      'targets' => [$target_user->id],
+      'unreades' => Admin::unreades(),
     ]);
 
     return $this->apiSuccessResponse('Successfully exchanging');

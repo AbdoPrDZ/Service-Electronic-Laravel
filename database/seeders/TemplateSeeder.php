@@ -158,6 +158,7 @@ class TemplateSeeder extends Seeder {
                 Received Balance: <span style="font-weight: normal;"><-received_balance->.</span><br>
                 Withdrawed At: <span style="font-weight: normal;"><-withdraw_date->.</span><br>
                 Wallet: <span style="font-weight: normal;"><-wallet->.</span><br>
+                Answer: <span style="font-weight: normal;"><-answer_description->.</span><br>
               </div>
             </div>
             <div style="height: 0.1px; width: 98%; background-color: #ccc; margin: auto;"> </div>
@@ -223,6 +224,7 @@ class TemplateSeeder extends Seeder {
         ["name" => '<-recharge_date->', "type" => "datetime"],
         ["name" => '<-wallet->', "type" => "text"],
         ["name" => '<-answer->', "type" => "text"],
+        ["name" => '<-answer_description->', "type" => "text"],
       ],
       'type' => 'mail',
       'unreades' => Admin::unreades(),
@@ -266,6 +268,7 @@ class TemplateSeeder extends Seeder {
                 Received Balance: <span style="font-weight: normal;"><-received_balance->.</span><br>
                 Withdrawed At: <span style="font-weight: normal;"><-withdraw_date->.</span><br>
                 To Wallet: <span style="font-weight: normal;"><-to_wallet->.</span><br>
+                Answer: <span style="font-weight: normal;"><-answer_description->.</span><br>
               </div>
             </div>
             <div style="height: 0.1px; width: 98%; background-color: #ccc; margin: auto;"> </div>
@@ -331,6 +334,7 @@ class TemplateSeeder extends Seeder {
         ["name" => '<-withdraw_date->', "type" => "datetime"],
         ["name" => '<-to_wallet->', "type" => "text"],
         ["name" => '<-answer->', "type" => "text"],
+        ["name" => '<-answer_description->', "type" => "text"],
       ],
       'type' => 'mail',
       'unreades' => Admin::unreades(),
@@ -372,7 +376,7 @@ class TemplateSeeder extends Seeder {
                 Exchange Id: <span style="font-weight: normal;">#<-exchange_id->.</span><br>
                 From: <span style="font-weight: normal;"><-from->.</span><br>
                 Balance: <span style="font-weight: normal;"><-balance->.</span><br>
-                Sended At: <span style="font-weight: normal;"><-datime->.</span><br>
+                Sended At: <span style="font-weight: normal;"><-datetime->.</span><br>
               </div>
             </div>
             <div style="height: 0.1px; width: 98%; background-color: #ccc; margin: auto;"> </div>
@@ -430,8 +434,8 @@ class TemplateSeeder extends Seeder {
       'name' => 'credit-receive',
       'content' => $creditReceiveContent,
       'args' => [
-        ["name" => '<-exchange_id->', "type" => "text"],
         ["name" => '<-from->', "type" => "text"],
+        ["name" => '<-exchange_id->', "type" => "text"],
         ["name" => '<-balance->', "type" => "number"],
         ["name" => '<-datetime->', "type" => "datetime"],
       ],
@@ -529,9 +533,9 @@ class TemplateSeeder extends Seeder {
       'name' => 'identity-confirm',
       'content' => $identityConfirmContent,
       'args' => [
-        ["name" => '<-datetime->', "type" => "datetime"],
-        ["name" => '<-answer_description->', "type" => "text"],
         ["name" => '<-answer->', "type" => "text"],
+        ["name" => '<-answer_description->', "type" => "text"],
+        ["name" => '<-datetime->', "type" => "datetime"],
       ],
       'type' => 'mail',
       'unreades' => Admin::unreades(),

@@ -60,6 +60,7 @@ Route::group([
 Route::get('/category', [CategoryController::class, 'all']);
 Route::get('/currency', [CurrencyController::class, 'all']);
 Route::get('/offer', [OfferController::class, 'all']);
+Route::get('/exchanges', [ExchangeController::class, 'all']);
 Route::post('/send_mony', [ExchangeController::class, 'create']);
 
 Route::group([
@@ -72,13 +73,10 @@ Route::group([
   Route::post('/withdraw', [TransferController::class, 'createWithdraw']);
 });
 
-Route::get('/exchanges', [ExchangeController::class, 'all']);
-
 Route::group([
   'prefix' => 'seller',
   'middleware' => ['multi.auth:sanctum'],
 ], function ($router) {
-  // Route::get('/', [SellerController::class, 'all']);
   Route::post('/register', [SellerController::class, 'register']);
   Route::post('/edit', [SellerController::class, 'edit']);
 });

@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use App\Models\Mail;
 use App\Models\Notification;
+use App\Models\Setting;
 use App\Models\Transfer;
 use Illuminate\Http\Request;
 use Validator;
@@ -32,23 +34,58 @@ class TransferController extends Controller {
     return Controller::apiSuccessResponse('successfully reading news');
   }
 
-  public function changeStatus(Request $request, $transfer) {
+  public function changeStatus(Request $request, Transfer $transfer) {
     $validator = Validator::make($request->all(), [
-      'status' => 'required|string',
+      'status' => 'required|in:accepted,refused',
       'description' => '',
     ]);
     if ($validator->fails()) {
-      return $this->apiErrorResponse(null, ['errors' =>$validator->errors(), 'all' => $request->all()]);
+      return $this->apiErrorResponse(null, ['errors' => $validator->errors()]);
     }
-    if(in_array($request->status, ['accepted', 'refused'])) {
-      $answerRes = $transfer->answer($request->status, $request->description, $request->user()->id);
-      if(!$answerRes['success']) {
-        return $this->apiErrorResponse($answerRes['message']);
-      }
-      return $this->apiSuccessResponse('Successfully changing status');
-    } else {
-      return $this->apiErrorResponse('Invalid status');
+    $answerRes = $transfer->answer($request->status, $request->description, $request->user()->id);
+    if(!$answerRes['success']) {
+      return $this->apiErrorResponse($answerRes['message']);
     }
+    if(in_array($transfer->for_what, ['recharge', 'withdraw'])) {
+      $titles = [
+        'recharge' => [
+          'You recharged your account',
+          Setting::userRechargeEmailTemplateId(),
+          [
+            '<-sended_balance->' => "{$transfer->sended_balance} {$transfer->sended_currency->char}",
+            '<-received_balance->' => "{$transfer->received_balance} {$transfer->received_currency->char}",
+            '<-received_currency->' => $transfer->received_currency->name,
+            '<-sended_currency->' => $transfer->sended_currency->name,
+            '<-wallet->' => $transfer->wallet,
+            '<-recharge_date->' => $transfer->exchange->answered_at,
+            '<-answer->' => $request->status,
+            '<-answer_description->' => $request->description ?? $request->status,
+          ]
+        ],
+        'withdraw' => [
+          'You withdraw from your account',
+          Setting::userWithdrawEmailTemplateId(),
+          [
+            '<-sended_balance->' => "{$transfer->sended_balance} {$transfer->sended_currency->char}",
+            '<-received_balance->' => "{$transfer->received_balance} {$transfer->received_currency->char}",
+            '<-received_currency->' => $transfer->received_currency->name,
+            '<-sended_currency->' => $transfer->sended_currency->name,
+            '<-to_wallet->' => $transfer->wallet,
+            '<-withdraw_date->' => $transfer->exchange->answered_at,
+            '<-answer->' => $request->status,
+            '<-answer_description->' => $request->description ?? $request->status,
+          ]
+        ],
+      ];
+      Mail::create([
+        'title' => $titles[$transfer->for_whet][0],
+        'template_id' => $titles[$transfer->for_whet][1],
+        'data' => $titles[$transfer->for_whet][2],
+        'targets' => [$transfer->user_id],
+        'unreades' => Admin::unreades(),
+      ]);
+    }
+    return $this->apiSuccessResponse('Successfully changing status');
   }
 
   public function delete(Request $request, $transfer) {
