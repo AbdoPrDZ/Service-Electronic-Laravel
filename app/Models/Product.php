@@ -5,8 +5,6 @@ namespace App\Models;
 use App\Events\ProductCreatedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
-use App\Models\File;
 
 /**
  * App\Models\Product

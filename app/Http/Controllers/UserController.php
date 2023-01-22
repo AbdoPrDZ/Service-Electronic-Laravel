@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\EmailVerify;
 use App\Models\Admin;
 use App\Models\File;
 use App\Models\Mail;
@@ -14,7 +13,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Str;
 use Validator;

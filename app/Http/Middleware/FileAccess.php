@@ -2,15 +2,9 @@
 
 namespace App\Http\Middleware;
 
-use App\Http\Controllers\Controller;
-use App\Models\File;
 use Closure;
-use ErrorException;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use \Illuminate\Contracts\Auth\Factory as Auth;
-use Illuminate\Support\Facades\Log;
-use Storage;
 
 class FileAccess {
   /**

@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Events\PurchaseCreatedEvent;
-use App\Events\PurchaseEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 

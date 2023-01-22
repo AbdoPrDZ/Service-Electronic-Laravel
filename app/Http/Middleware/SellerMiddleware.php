@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use App\Http\Controllers\Controller;
 use App\Models\Seller;
 use Closure;
-use Exception;
 use Illuminate\Http\Request;
 
 class SellerMiddleware {

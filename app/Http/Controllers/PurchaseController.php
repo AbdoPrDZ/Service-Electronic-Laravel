@@ -2,18 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\SocketBridge\SocketClient;
 use App\Models\Admin;
 use App\Models\Exchange;
 use App\Models\Notification;
-use App\Models\Product;
 use App\Models\Purchase;
-use App\Models\Seller;
 use App\Models\Setting;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Validator;
 
 class PurchaseController extends Controller {
@@ -27,15 +23,6 @@ class PurchaseController extends Controller {
     $user = $request->user();
     $user->linking();
     $purchases = $user->seller->purchases();
-    // $purchases = [];
-    // $sellerProducts = Product::where('seller_id', '=', $user->seller->id)->get();
-    // foreach ($sellerProducts as $product) {
-    //   $items = Purchase::where('product_id', '=', $product->id)->get();
-    //   foreach ($items as $purchase) {
-    //     $purchase->linking();
-    //     $purchases[$purchase->id] = $purchase;
-    //   }
-    // }
     return $this->apiSuccessResponse('Successfully getting data', [
       'purchases' => $purchases,
     ]);

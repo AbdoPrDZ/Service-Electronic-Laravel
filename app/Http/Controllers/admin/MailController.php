@@ -9,7 +9,6 @@ use App\Models\Mail;
 use App\Models\Template;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Log;
 use Validator;
 
 class MailController extends Controller {
@@ -54,7 +53,6 @@ class MailController extends Controller {
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
         'errors' => $validator->errors(),
-        'all' => $request->all(),
       ]);
     }
 
@@ -101,7 +99,6 @@ class MailController extends Controller {
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
         'errors' => $validator->errors(),
-        'all' => $request->all(),
       ]);
     }
     $ids = $request->ids;
@@ -111,9 +108,7 @@ class MailController extends Controller {
     } else {
       async(function () use ($admin, $ids) {
         $this->deleteMails($admin, $ids);
-      })->start()->catch(function (\Throwable $th) {
-        Log::error($th);
-      });
+      })->start();
     }
 
     return $this->apiSuccessResponse('deleting mails in progress');
@@ -125,8 +120,6 @@ class MailController extends Controller {
       $mail = Mail::find($id);
       if ($mail) {
         $mail->delete();
-      } else {
-        Log::error("Undefined Mail Id $id");
       }
     }
     $client = new SocketClient($admin->id, 'admin');

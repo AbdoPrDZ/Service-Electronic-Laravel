@@ -2,12 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Middleware\MultiAuth;
 use App\Http\Controllers\Controller;
 use App\Http\SocketBridge\SocketClient;
-use App\Models\Admin;
-use App\Models\Notification;
-use Illuminate\Http\Request;
 use Log;
 
 class SocketController extends Controller {
@@ -46,7 +42,6 @@ class SocketController extends Controller {
       async(function () use ($tabName, $client, $controller) {
         $controller::readNews($client->clientId);
         $client->emit('news-readed', ['tabName' => $tabName]);
-        Log::info('news-readed', [$tabName, $client, $controller]);
       })->start();
     } else {
       return $this->apiErrorResponse("Invalid tab name [$tabName]");

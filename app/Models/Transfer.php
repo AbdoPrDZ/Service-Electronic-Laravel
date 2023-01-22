@@ -4,12 +4,9 @@ namespace App\Models;
 
 use App\Events\Transfer\TransferCreatedEvent;
 use App\Events\Transfer\TransferDeletedEvent;
-use App\Models\Currency;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
 
 
 /**

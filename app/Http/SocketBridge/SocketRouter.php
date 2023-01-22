@@ -17,14 +17,6 @@ class SocketRouter {
     $this->room = $room;
   }
 
-  // public function router() {}
-
-  // private function route($route) {
-  //   // $route = new SocketRoute($this);
-  //   $this->routes[] = $route;
-  //   return $route;
-  // }
-
   public function emitToFunction($class, $funcName, ...$args) {
     return $class::$funcName(...$args);
   }

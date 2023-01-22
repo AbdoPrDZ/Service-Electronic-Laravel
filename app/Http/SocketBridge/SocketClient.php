@@ -4,9 +4,7 @@ namespace App\Http\SocketBridge;
 
 use App\Models\Notification;
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use PHPUnit\Framework\Error;
 
 class SocketClient {
 
@@ -41,7 +39,6 @@ class SocketClient {
   }
 
   public function emit(string $routeName, array $args) {
-    // try {
       return json_decode($this->guzzleClient->post(
         config('socket_bridge.bridge.protocol').'://'
         .config('socket_bridge.bridge.host').':'
@@ -57,10 +54,6 @@ class SocketClient {
         ]
       )->getBody()
        ->getContents());
-    // } catch (\Throwable $th) {
-    //   Log::error('emit to client', ['throw' => $th, 'room' => $this->room, 'clientId' => $this->clientId, 'routeName' => $routeName, 'args' => $args]);
-    //   return ['success' => false, 'throw' => $th];
-    // }
   }
 
   public function emitNotification(Notification $notification) {
@@ -75,7 +68,7 @@ class SocketClient {
       )->getBody()->getContents());
     } catch (\Throwable $th) {
       Log::error('notify to client', ['throw' => $th, 'room' => $this->room, 'clientId' => $this->clientId, 'notification' => $notification]);
-      return ['success' => false, 'throw' => $th];
+      return ['success' => false];
     }
   }
 
@@ -91,13 +84,12 @@ class SocketClient {
       )->getBody()->getContents());
     } catch (\Throwable $th) {
       Log::error('notify to client', ['throw' => $th, 'room' => $this->room, 'clientId' => $this->clientId, 'notification' => $notification]);
-      return ['success' => false, 'throw' => $th];
+      return ['success' => false];
     }
   }
 
   public function emitOrPushNotification(Notification $notification) {
     $response = $this->emitNotification($notification);
-    Log::info('emit response', [$response]);
     if(!$response->success) {
       return $this->pushNotification($notification);
     }
@@ -106,9 +98,7 @@ class SocketClient {
 
   public function emitAndPushNotification(Notification $notification) {
     $response = $this->emitNotification($notification);
-    Log::info('emit response', [$response]);
     $notifyResponse = $this->pushNotification($notification);
-    Log::info('notify response', [$response]);
     return [
       'emit_response' => $response,
       'notify_response' => $notifyResponse,

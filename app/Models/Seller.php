@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Events\SellerCreatedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Storage;
 
 /**
  * App\Models\Seller

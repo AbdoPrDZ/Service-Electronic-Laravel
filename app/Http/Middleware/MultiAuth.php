@@ -4,11 +4,9 @@ namespace App\Http\Middleware;
 
 use App\Http\Controllers\Controller;
 use Closure;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Factory as Auth;
 use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 
 class MultiAuth implements AuthenticatesRequests {
   /**

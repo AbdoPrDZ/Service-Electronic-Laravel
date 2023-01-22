@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
 
 /**
  * App\Models\VerifyToken
@@ -26,8 +25,7 @@ use App\Models\User;
  * @method static \Illuminate\Database\Eloquent\Builder|VerifyToken whereUserId($value)
  * @mixin \Eloquent
  */
-class VerifyToken extends Model
-{
+class VerifyToken extends Model {
   use HasFactory;
 
   protected $table = 'verify_token';

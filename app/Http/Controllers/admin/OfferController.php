@@ -67,7 +67,6 @@ class OfferController extends Controller {
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
         'errors' =>$validator->errors(),
-        'all' => $request->all(),
       ]);
     }
 
@@ -121,7 +120,6 @@ class OfferController extends Controller {
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
         'errors' =>$validator->errors(),
-        'all' => $request->all(),
       ]);
     }
 

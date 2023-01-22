@@ -3,8 +3,6 @@
 
 namespace App\Http\SocketBridge;
 
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 
 class SocketProvider extends ServiceProvider {

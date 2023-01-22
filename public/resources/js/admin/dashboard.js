@@ -69,8 +69,6 @@ async function loadData(tabName) {
   if(response.data) {
     StorageDatabase.collection(tabName).set(response.data);
     return response.data;
-  } else {
-    console.log(response);
   }
 }
 
@@ -97,7 +95,6 @@ async function loadNotifications() {
 window.readNotification = async function (id) {
   const notification = StorageDatabase.collection('notifications').doc(id).get()
   $.get(`./admin/notifications/${id}/read`).then((readRes) => {
-    if(!readRes.success) console.log(readRes);
     loadNotifications();
   });
   if(notification) {
@@ -764,17 +761,14 @@ window.connected = false;
 $(document).ready(function() {
   socket.connect()
   socket.on('connect_error', (err) => {
-    console.log(err)
     $('#body-loading .loading-message').css('display', 'block').html(`خطأ في الإتصال:<br> ${err.toString().replace('Error:', '')}`);
     socket.disconnect();
   });
   socket.on('disconnect', function () {
-    console.log('Disconnected');
     window.location.href = "./admin/logout";
     window.connected = false;
   });
   socket.on('connect_failed', (err) => {
-    console.log(`Connect failed: ${err}`);
     socket.disconnect();
   });
   socket.on('connect', (_) => {
@@ -795,9 +789,7 @@ $(document).ready(function() {
     for (const tabName in window.news) {
       try {
         countingNews(tabName);
-      } catch (error) {
-        console.log(tabName, error)
-      }
+      } catch (error) {}
     }
   });
 
@@ -813,14 +805,9 @@ $(document).ready(function() {
   });
 
   socket.on('notifications', (notification) => {
-    console.log(notification);
     loadNotifications();
     socket.emit('news');
     alertMessage("new-notification", notification.title, notification.message, 'success', 60000);
-  });
-
-  $on('#person-dropdown', 'onSelect[value="account"]', function(event, item) {
-    console.log('goto account')
   });
 });
 
@@ -878,7 +865,6 @@ $on('#send-notification-modal .btn[action="send"]', 'click', async function() {
     processData: false,
     data: formData,
   });
-  console.log(data);
   if(data.success) {
     $('#send-notification-modal').modal('hide');
     window.ImagePicker['send-notification-image-picker'] = undefined;
@@ -956,7 +942,6 @@ $on(`#view-user .modal-body button[name="change-status"]`, 'click', async functi
     data: {status: status, description: description},
     dataType: 'JSON',
   });
-  console.log(data)
   if(data.errors) {
     for (const field in data.errors) {
       data.errors[field].forEach(error => {
@@ -989,7 +974,6 @@ $on(`#view-seller .modal-body button[name="change-status"]`, 'click', async func
     },
     dataType: 'JSON',
   });
-  console.log(data)
   if(data.errors) {
     for (const field in data.errors) {
       data.errors[field].forEach(error => {
@@ -1103,7 +1087,6 @@ $on('#create-edit-currency .btn[action="create"]', 'click', async function() {
     processData: false,
     data: formData,
   });
-  console.log(data);
   if(data.success) {
     $('#create-edit-currency').modal('hide');
     window.ImagePicker['currency-image-picker'] = undefined;
@@ -1136,7 +1119,6 @@ $on('#create-edit-currency .btn[action="edit"]', 'click', async function() {
     processData: false,
     data: formData,
   });
-  console.log(data);
   if(data.success) {
     $('#create-edit-currency').modal('hide');
     alertMessage('edit-currency-message', 'تعديل العملة', data.message, 'success');
@@ -1173,7 +1155,6 @@ $on('#all-transfers table tr td button[action="delete"]', 'click', function () {
           headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
           dataType: 'JSON',
         });
-        console.log(data);
         $('#message-dialog-modal').modal('hide');
         alertMessage('delete-transfer-response',
           'حذف التحويل',
@@ -1206,7 +1187,6 @@ $on(`#view-transfer .modal-body button[name="change-status"]`, 'click', async fu
     },
     dataType: 'JSON',
   });
-  console.log(data)
   alertMessage('change-transfer-status-message', 'تغيير حالة التحويل', data.message, data.success ? 'success' : 'danger');
   $('#view-transfer').modal('hide');
   await loadTab();
@@ -1265,7 +1245,6 @@ $on('#all-categories table tr td button[action="delete"]', 'click', function () 
           headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
           dataType: 'JSON',
         });
-        console.log(data);
         $('#message-dialog-modal').modal('hide');
         alertMessage('delete-category-response',
           'حذف النوع',
@@ -1298,7 +1277,6 @@ $on('#create-edit-category .btn[action="create"]', 'click', async function() {
     processData: false,
     data: formData,
   });
-  console.log(data);
   if(data.success) {
     $('#create-edit-category').modal('hide');
     window.ImagePicker['category-image-picker'] = undefined;
@@ -1326,7 +1304,6 @@ $on('#create-edit-category .btn[action="edit"]', 'click', async function() {
     processData: false,
     data: formData,
   });
-  console.log(data);
   if(data.success) {
     $('#create-edit-category').modal('hide');
     window.ImagePicker['category-image-picker'] = undefined;
@@ -1356,7 +1333,6 @@ $on('#view-purchase .modal-body button[name="answer"]', 'click', async function(
     data: {answer: $('#view-purchase .modal-body .form-control[name="answer"]').val()},
     dataType: 'JSON',
   });
-  console.log(data)
   alertMessage('answer-purchase-message', 'إجابة المدير', data.message, data.success ? 'success' : 'danger');
   $('#view-purchase').modal('hide');
   await loadTab();
@@ -1421,7 +1397,6 @@ $on('#all-offers table tr td button[action="delete"]', 'click', function () {
           headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
           dataType: 'JSON',
         });
-        console.log(data);
         $('#message-dialog-modal').modal('hide');
         alertMessage('delete-offer-response',
           'حذف النوع',
@@ -1460,7 +1435,6 @@ $on('#create-edit-offer .modal-footer button[action="create"]', 'click', async f
     processData: false,
     data: formData,
   });
-  console.log(data);
   if(data.success) {
     $('#create-edit-offer').modal('hide');
     window.ImagePicker['offer-image-picker'] = undefined;
@@ -1540,7 +1514,6 @@ $on('#view-offer-request .form-group[name="answer_form"] .btn[action="submit"]',
     alertMessage('answer-offer-request-message', 'إجابة طلب العرض', data.message, 'success');
     changeTab(window.currentTabName);
   } else {
-    console.log(data);
     if(data.message) {
       alertMessage('answer-offer-request-message', 'إجابة طلب العرض', error, 'danger');
     } else {
@@ -1605,7 +1578,6 @@ $on('#all-templates tr td button[action="delete"]', 'click', function () {
           dataType: 'JSON',
         });
         $('#message-dialog-modal').modal('hide');
-        console.log(data);
         alertMessage('delete-template-response',
           'حذف القالب',
           data.message ?? 'يوجد خطأ',
@@ -1640,7 +1612,6 @@ $on('#create-edit-template .modal-footer .btn[action="create"]', 'click', async 
     processData: false,
     data: formData,
   });
-  console.log(data);
   if(data.success) {
     $('#create-edit-template').modal('hide');
     alertMessage('create-template-message', 'إنشاء قالب', data.message, 'success');
@@ -1671,7 +1642,6 @@ $on('#create-edit-template .modal-footer .btn[action="edit"]', 'click', async fu
     processData: false,
     data: formData,
   });
-  console.log(data);
   if(data.success) {
     $('#create-edit-template').modal('hide');
     alertMessage('edit-template-message', 'تعديل القالب', data.message, 'success');
@@ -1744,7 +1714,6 @@ $on('#all-mails .custom-table-header-actions button[action="create"]', 'click', 
     if(fields == null) {
       fields = '';
       template.args.forEach(arg => {
-        console.log(arg)
         fields += `
           <input type="${arg.type}" class="form-control" name="${arg.name}" placeholder="${arg.name}">
         `;
@@ -1782,7 +1751,6 @@ $on('#all-mails .custom-table-header-actions button[action="delete"]', 'click', 
           processData: false,
           data: formData,
         });
-        console.log(data);
         if(data.success) {
           $('#delete-mails').modal('hide');
           alertMessage('delete-mails-message', 'حذف الإيمايلات', data.message, 'success');
@@ -1808,10 +1776,6 @@ $on('#all-mails .custom-table-header-actions button[action="delete"]', 'click', 
 $on('#all-mails', 'onRowActionClick[action="delete"]', function(event, row) {
   const id = $(row).attr('id').replace('all-mails-item-', '');
   const mail = StorageDatabase.collection('mails').doc('mails').doc(id).get()
-  console.log(mail);
-  // const btnHtml = $(this).html();
-  // $(this).html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
-  // $(this).attr('disabled', true);
   messageDialog(
     'ask-delete-mail',
     'حذف البريد الإلكتروني',
@@ -1845,8 +1809,7 @@ $on('#all-mails', 'onRowActionClick[action="delete"]', function(event, row) {
   );
 });
 $on('#create-mail select[name="template"]', 'change', function() {
-  const template = StorageDatabase.collection('mails').doc('templates').doc($(this).val()).get()
-  console.log(template)
+  const template = StorageDatabase.collection('mails').doc('templates').doc($(this).val()).get();
   var fields = '';
   template.args.forEach(arg => {
     fields += `
@@ -1883,7 +1846,6 @@ $on('#create-mail .modal-footer .btn[action="create"]', 'click', async function(
     processData: false,
     data: formData,
   });
-  console.log(data);
   if(data.success) {
     $('#create-mail').modal('hide');
     alertMessage('create-mail-message', 'إنشاء قالب', data.message, 'success');
@@ -1897,7 +1859,6 @@ $on('#create-mail .modal-footer .btn[action="create"]', 'click', async function(
   $('#loading-dialog-modal').modal('hide');
 });
 $on('#create-mail', 'onHidden', function() {
-  console.log('here');
   $('#all-mails .custom-table-header-actions button[action="create"]').html('<span class="material-symbols-sharp">add</span>إنشاء');
   $('#all-mails .custom-table-header-actions button[action="create"]').prop('disabled', false);
 });

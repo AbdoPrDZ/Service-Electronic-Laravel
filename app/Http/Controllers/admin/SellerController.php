@@ -52,7 +52,9 @@ class SellerController extends Controller {
       'description' => '',
     ]);
     if ($validator->fails()) {
-      return $this->apiErrorResponse(null, ['errors' =>$validator->errors(), 'all' => $request->all()]);
+      return $this->apiErrorResponse(null, [
+        'errors' =>$validator->errors()
+      ]);
     }
     if(in_array($request->status, ['accepted', 'banned', 'refused'])) {
       if(($request->status == 'banned' || $request->status == 'refused') && $request->description) {

@@ -504,14 +504,12 @@ async function compressImage(file, {quality = 1, type = file.type}) {
 window.ImagePicker = {};
 $on('.form-group .btn.btn-img-picker', 'click', async function() {
   var imgFile = await selectFile('image/png, image/jpeg, image/gif');
-  console.log(imgFile.size / 1024)
   if(imgFile.size > 102400) {
     quality = 0.1;
     imgFile = await compressImage(imgFile, {
       quality: quality,
       type: imgFile.type,
     });
-    console.log('q:', quality, 'ns:', imgFile.size / 1024)
   }
 
   const reader = new FileReader();

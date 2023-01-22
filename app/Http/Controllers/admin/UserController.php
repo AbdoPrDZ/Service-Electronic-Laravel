@@ -3,19 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\SocketBridge\SocketClient;
 use App\Models\Admin;
 use App\Models\File;
 use App\Models\Mail;
 use App\Models\Notification;
-use App\Models\Product;
-use App\Models\Purchase;
 use App\Models\Setting;
 use App\Models\Transfer;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 use Storage;
 use Validator;
 
@@ -60,7 +56,9 @@ class UserController extends Controller {
     ]);
 
     if ($validator->fails()) {
-      return $this->apiErrorResponse(null, ['errors' =>$validator->errors(), 'all' => $request->all()]);
+      return $this->apiErrorResponse(null, [
+        'errors' =>$validator->errors()
+      ]);
     }
 
     if($user->identity_verifited_at != null) {
@@ -100,7 +98,7 @@ class UserController extends Controller {
       'data' => [
         '<-answer->' => $request->status,
         '<-answer_description->' => $request->answer_description,
-        '<-datetime->' => Carbon::now(),
+        '<-datetime->' => date_format(now(),"Y/m/d H:i:s"),
       ],
       'targets' => [$request->user()->id],
       'unreades' => Admin::unreades(),

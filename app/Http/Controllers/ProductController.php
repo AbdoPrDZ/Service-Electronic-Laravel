@@ -8,7 +8,6 @@ use App\Models\Seller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 use App\Models\Product;
 use App\Models\File;
 use Validator;

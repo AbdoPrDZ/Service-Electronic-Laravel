@@ -6,7 +6,6 @@ use App\Events\Currency\CurrencyCreatedEvent;
 use App\Events\Currency\CurrencyDeletedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Transfer;
 
 /**
  * App\Models\Currency

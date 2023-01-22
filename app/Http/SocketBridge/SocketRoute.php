@@ -2,9 +2,6 @@
 
 namespace App\Http\SocketBridge;
 
-use App\Http\Kernel;
-use App\Http\Middleware\MultiAuth;
-use GuzzleHttp\Middleware;
 use Illuminate\Support\Facades\Cache;
 use PHPUnit\Framework\Error;
 
@@ -43,19 +40,13 @@ class SocketRoute {
   static function on($room, $routeName, $callback, $targets = ['*']) {
     $class = null;
     $funcName = null;
-    // $defualtArgs = [];
     if(is_array($callback)) {
       list($class, $funcName) = $callback;
-      // $class = $target[0];
-      // $target = $target[1];
     } else if(is_string($callback) && strpos($callback, '@')) {
       list($class, $funcName) = explode('@', $callback);
       $class = app('App\\Http\\Controllers\\'.$class);
     } else if(is_callable($callback)) {
       throw new Error('Invalid target');
-      // $class = SocketRoute::class;
-      // $funcName = 'toFunction';
-      // $defualtArgs[] = $target;
     } else {
       throw new Error('Invalid target ' . gettype($callback));
     }
@@ -75,10 +66,6 @@ class SocketRoute {
     }
     $this->middlewares = $middlware;
   }
-
-  // static function toFunction($function, ...$args) {
-  //   $function(...$args);
-  // }
 
   public function call($client, ...$args) {
     // $gotoNext = true;

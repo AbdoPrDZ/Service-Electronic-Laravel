@@ -1,4 +1,4 @@
-<?php // GetNextSequenceValue.php
+<?php
 
 namespace App\Models;
 

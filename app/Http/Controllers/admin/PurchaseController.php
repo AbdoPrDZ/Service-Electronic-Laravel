@@ -41,7 +41,9 @@ class PurchaseController extends Controller {
       'answer' => 'required|in:accept_delivery_cost,accept_all,refuse_all',
     ]);
     if ($validator->fails()) {
-      return $this->apiErrorResponse(null, ['errors' =>$validator->errors(), 'all' => $request->all()]);
+      return $this->apiErrorResponse(null, [
+        'errors' =>$validator->errors()
+      ]);
     }
 
     $steps = $purchase->delivery_steps;
