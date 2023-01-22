@@ -32,7 +32,6 @@ class CurrencyController extends Controller {
 
   static function readNews($admin_id) {
     Currency::readNews($admin_id);
-    return Controller::apiSuccessResponse('successfully reading news');
   }
 
   public function create(Request $request) {

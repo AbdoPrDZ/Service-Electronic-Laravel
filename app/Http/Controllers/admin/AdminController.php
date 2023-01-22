@@ -54,21 +54,14 @@ class AdminController extends Controller {
       'password' => 'required|string|min:6',
     ]);
     if ($validator->fails()) {
-      $messages = [];
-
+      $invalidates = [];
       foreach ($validator->errors()->toArray() as $name => $error) {
-        $messages[] = [
-          'title' => 'Login Error',
-          'name' => $name,
-          'text' => $error,
-          'type' => 'danger',
-        ];
+        $invalidates[$name] = $error[0];
       }
       return view('admin.login', [
         'email' => $request->email,
         'password' => $request->password,
-        'invalidates' => $validator->errors()->toArray(),
-        'messages' => $messages,
+        'invalidates' => $invalidates,
       ]);
     }
 
@@ -79,22 +72,13 @@ class AdminController extends Controller {
         'email' => $request->email,
         'password' => '',
         'invalidates' => [
-          'email' => ['Invalid email'],
-          'password' => ['Invalid password'],
+          'email' => 'Invalid email',
+          'password' => 'Invalid password',
         ],
-        'messages' => [
-          [
-            'title' => 'Login error',
-            'name' => 'password-error',
-            'text' => 'Invalid email or password',
-            'type' => 'danger',
-          ]
-        ]
       ]);
     } else {
       return redirect()->route('admin.dashboard');
     }
-
   }
 
   public function logout(Request $request) {

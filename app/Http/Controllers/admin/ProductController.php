@@ -40,6 +40,5 @@ class ProductController extends Controller {
   static function readNews($admin_id) {
     Product::readNews($admin_id);
     Category::readNews($admin_id);
-    return Controller::apiSuccessResponse('successfully reading news');
   }
 }

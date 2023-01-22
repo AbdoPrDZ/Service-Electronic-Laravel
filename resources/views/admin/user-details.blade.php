@@ -18,14 +18,14 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     @include('admin.src.headers')
-    <link href="{{ asset('resources/css/admin/main.css') }}?time={{ now() }}" rel="stylesheet">
-    <link href="{{ asset('resources/css/admin/user-details.css') }}?time={{ now() }}" rel="stylesheet">
+    <link href="{{ asset('resources/css/admin/main.css') }}" rel="stylesheet">
+    <link href="{{ asset('resources/css/admin/user-details.css') }}" rel="stylesheet">
     <title>User Details #{{ $user->id }}</title>
   </head>
   <body>
     <div class="topbar">
       <div class="topbar-logo">
-        <img src="{{ asset('resources/media/logo.png') }}?time={{ now() }}">
+        <img src="{{ asset('resources/media/logo.png') }}">
         <h3><span class="danger">Service|</span><span class="success">Electronic</span> </h3>
       </div>
       <div class="topbar-actions">
@@ -362,7 +362,7 @@
         @endif
       </div>
     </div>
-    <script src="{{ asset('/resources/js/admin/main.js') }}?time={{ now() }}"></script>
+    <script src="{{ asset('/resources/js/admin/main.js') }}"></script>
     <script>
       initTable('#all-user-transfers table', [[1, 'desc']]).draw();
       initTable('#all-user-products table', [[1, 'desc']]).draw();

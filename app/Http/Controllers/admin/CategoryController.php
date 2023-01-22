@@ -20,7 +20,6 @@ class CategoryController extends Controller {
 
   static function readNews(Request $request) {
     Category::readNews($request->user()->id);
-    return Controller::apiSuccessResponse('successfully reading news');
   }
 
   public function create(Request $request) {

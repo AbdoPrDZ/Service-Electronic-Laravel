@@ -42,16 +42,12 @@ class SocketController extends Controller {
       'mails' => MailController::class,
     ];
     if(array_key_exists($tabName, $tabNames)) {
-      // try {
-        $res = $tabNames[$tabName]::readNews($client->clientId);
-        if($res->getData()->success) {
-          $client->emit('news-readed', ['tabName' => $tabName]);
-        }
-        return $res;
-      // } catch (\Throwable $th) {
-      //   print_r($th);
-      //   return $this->apiErrorResponse("cannot read news of tabName [$tabName]");
-      // }
+      $controller = $tabNames[$tabName];
+      async(function () use ($tabName, $client, $controller) {
+        $controller::readNews($client->clientId);
+        $client->emit('news-readed', ['tabName' => $tabName]);
+        Log::info('news-readed', [$tabName, $client, $controller]);
+      })->start();
     } else {
       return $this->apiErrorResponse("Invalid tab name [$tabName]");
     }

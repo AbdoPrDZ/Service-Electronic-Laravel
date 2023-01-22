@@ -1707,7 +1707,7 @@ $on('#template-editor .content textarea', 'change keyup paste', function() {
 $on('#all-mails .custom-table-header-actions button[action="create"]', 'click', async function() {
   const btnHtml = $(this).html();
   $(this).html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>يرجى الإنتظار...`);
-  $(this).attr('disabled', true);
+  $(this).prop('disabled', true);
   $('#create-mail input').val('');
   await loadData('users');
   var table = initTable(`#create-mail-all-users table`, [[1, 'desc']]);
@@ -1897,6 +1897,7 @@ $on('#create-mail .modal-footer .btn[action="create"]', 'click', async function(
   $('#loading-dialog-modal').modal('hide');
 });
 $on('#create-mail', 'onHidden', function() {
+  console.log('here');
   $('#all-mails .custom-table-header-actions button[action="create"]').html('<span class="material-symbols-sharp">add</span>إنشاء');
-  $('#all-mails .custom-table-header-actions button[action="create"]').attr('disabled', true);
+  $('#all-mails .custom-table-header-actions button[action="create"]').prop('disabled', false);
 });

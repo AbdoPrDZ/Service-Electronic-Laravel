@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @include('admin.src.headers')
-    <link href="{{ asset('resources/css/admin/main.css') }}?time={{ now() }}" rel="stylesheet">
+    <link href="{{ asset('resources/css/admin/main.css') }}" rel="stylesheet">
     <title>تسجيل الدخول</title>
   </head>
   <body>
@@ -17,8 +17,7 @@
         <h5>البريد الإلكتروني:</h5>
         <input type="text" class="form-control <?= key_exists('email', $invalidates) ? 'is-invalid': '' ?>" name="email" value="<?= $email ?>" required>
         <div class="invalid-feedback ">
-          <?php print_r($invalidates)?>
-          <?= key_exists('email', $invalidates) ? $invalidates['email'][0] : '' ?>
+          <?= key_exists('email', $invalidates) ? $invalidates['email'] : '' ?>
         </div>
       </div>
 
@@ -29,9 +28,9 @@
           <div class="btn input-group-text" style="border-radius: 0px 5px 5px 0px; padding: 0 5px;">
             <span class="material-symbols-sharp" style="font-size: 20px">visibility</span>
           </div>
-        </div>
-        <div class="invalid-feedback ">
-            <?= key_exists('password', $invalidates) ? $invalidates['password'][0] : '' ?>
+          <div class="invalid-feedback ">
+            <?= key_exists('password', $invalidates) ? $invalidates['password'] : '' ?>
+          </div>
         </div>
       </div>
 
@@ -47,7 +46,7 @@
       @include('admin.src.footer')
     </form>
     <div id="alerts" class="noties topright"></div>
-    <script src="{{ asset('/resources/js/admin/main.js') }}?time={{ now() }}"></script>
+    <script src="{{ asset('/resources/js/admin/main.js') }}"></script>
     <script>
       $on('.form-group[name="password"] .btn.input-group-text', 'click', function() {
         var nextType = $('.form-control[name="password"]').attr('type') == 'password' ? 'text' : 'password';
@@ -55,17 +54,5 @@
         $(this).html(`<span class="material-symbols-sharp" style="font-size: 20px">${nextType == 'text' ? 'visibility_off' : 'visibility'}</span>`)
       })
     </script>
-    @if (isset($messages) && !is_null($messages))
-        <script>
-            @foreach ($messages as $message)
-                alertMessage(
-                  'login-message-{{ $message["name"] }}',
-                  "{{ $message['title'] }}",
-                  "{{ $message['text'] }}",
-                  "{{ $message['type'] }}"
-                )
-            @endforeach
-        </script>
-    @endif
   </body>
 </html>

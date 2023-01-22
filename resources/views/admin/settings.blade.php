@@ -6,14 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     @include('admin.src.headers')
-    <link href="{{ asset('resources/css/admin/main.css') }}?time={{ now() }}" rel="stylesheet">
-    <link href="{{ asset('resources/css/admin/settings.css') }}?time={{ now() }}" rel="stylesheet">
+    <link href="{{ asset('resources/css/admin/main.css') }}" rel="stylesheet">
+    <link href="{{ asset('resources/css/admin/settings.css') }}" rel="stylesheet">
     <title>Service Electronic | Settings</title>
   </head>
   <body>
     <div class="topbar">
       <a class="topbar-logo" href="./">
-        <img src="{{ asset('resources/media/logo.png') }}?time={{ now() }}">
+        <img src="{{ asset('resources/media/logo.png') }}">
         <h3><span class="danger">Service|</span><span class="success">Electronic</span> </h3>
       </a>
       <div class="topbar-actions">
@@ -160,7 +160,7 @@
 
     </div>
 
-    <script src="{{ asset('/resources/js/admin/main.js') }}?time={{ now() }}"></script>
+    <script src="{{ asset('/resources/js/admin/main.js') }}"></script>
     <script>
       function saveSetting(button, name) {
         const actions = {

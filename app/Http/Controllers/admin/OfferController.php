@@ -40,7 +40,6 @@ class OfferController extends Controller {
   static function readNews($admin_id) {
     Offer::readNews($admin_id);
     OfferRequest::readNews($admin_id);
-    return Controller::apiSuccessResponse('successfully reading news');
   }
 
   public function listMap2Map(array $listMap, $field = 'name') {

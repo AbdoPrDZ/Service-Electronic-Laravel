@@ -7,8 +7,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <meta name="socket-token" content="{{ $socketToken }}" />
     @include('admin.src.headers')
-    <link href="{{ asset('resources/css/admin/main.css') }}?time={{ now() }}" rel="stylesheet">
-    <link href="{{ asset('resources/css/admin/dashboard.css') }}?time={{ now() }}" rel="stylesheet">
+    <link href="{{ asset('resources/css/admin/main.css') }}" rel="stylesheet">
+    <link href="{{ asset('resources/css/admin/dashboard.css') }}" rel="stylesheet">
     <title>Service Electronic | Admin Panel</title>
   </head>
   <body auto-display="false">
@@ -23,7 +23,7 @@
       <div id="dashboard">
           <div class="topbar">
             <div class="topbar-logo">
-              <img src="{{ asset('resources/media/logo.png') }}?time={{ now() }}">
+              <img src="{{ asset('resources/media/logo.png') }}">
               <h3><span class="danger">Service|</span><span class="success">Electronic</span> </h3>
             </div>
             <div class="topbar-actions">
@@ -214,9 +214,9 @@
 
     </div>
 
-    <script src="{{ asset('/resources/js/admin/main.js') }}?time={{ now() }}"></script>
-    <script src="{{ asset('/resources/js/address-input/index.js') }}?time={{ now() }}"></script>
-    <script type="module" src="{{ asset('/resources/js/admin/dashboard.js') }}?time={{ now() }}"></script>
+    <script src="{{ asset('/resources/js/admin/main.js') }}"></script>
+    <script src="{{ asset('/resources/js/address-input/index.js') }}"></script>
+    <script type="module" src="{{ asset('/resources/js/admin/dashboard.js') }}"></script>
 
   </body>
 </html>

@@ -11,7 +11,6 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Log;
 use Validator;
-use Async;
 
 class MailController extends Controller {
 
@@ -42,7 +41,6 @@ class MailController extends Controller {
   static function readNews($admin_id) {
     Mail::readNews($admin_id);
     Template::readNews($admin_id);
-    return Controller::apiSuccessResponse('successfully reading news');
   }
 
   public function create(Request $request) {
@@ -111,13 +109,11 @@ class MailController extends Controller {
     if ($ids <= 10) {
       $this->deleteMails($admin, $ids);
     } else {
-      Async::run(function () use ($admin, $ids) {
+      async(function () use ($admin, $ids) {
         $this->deleteMails($admin, $ids);
-      }, [
-        'error' => function (\Throwable $th) {
-          Log::error($th);
-        },
-      ]);
+      })->start()->catch(function (\Throwable $th) {
+        Log::error($th);
+      });
     }
 
     return $this->apiSuccessResponse('deleting mails in progress');

@@ -44,7 +44,6 @@ class SellerController extends Controller {
 
   static function readNews($admin_id) {
     Seller::readNews($admin_id);
-    return Controller::apiSuccessResponse('successfully reading news');
   }
 
   public function changeStatus(Request $request, Seller $seller) {

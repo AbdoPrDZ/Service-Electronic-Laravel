@@ -45,7 +45,6 @@ class UserController extends Controller {
     User::readNews($admin_id);
     Transfer::readNews($admin_id, 'recharge');
     Transfer::readNews($admin_id, 'withdraw');
-    return Controller::apiSuccessResponse('successfully reading news');
   }
 
   public function delete(Request $request, User $user) {

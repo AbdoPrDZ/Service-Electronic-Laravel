@@ -31,7 +31,6 @@ class TransferController extends Controller {
 
   static function readNews($admin_id) {
     Transfer::readNews($admin_id, 'transfer');
-    return Controller::apiSuccessResponse('successfully reading news');
   }
 
   public function changeStatus(Request $request, Transfer $transfer) {

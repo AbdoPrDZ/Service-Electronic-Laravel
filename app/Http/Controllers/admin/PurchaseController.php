@@ -33,7 +33,6 @@ class PurchaseController extends Controller {
 
   static function readNews($admin_id) {
     Purchase::readNews($admin_id);
-    return Controller::apiSuccessResponse('successfully reading news');
   }
 
   public function answer(Request $request, $purchase) {
