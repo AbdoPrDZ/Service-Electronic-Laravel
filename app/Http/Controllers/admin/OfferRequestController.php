@@ -9,17 +9,17 @@ use Validator;
 
 class OfferRequestController extends Controller {
 
-  public function ansower(Request $request, $offerRequest) {
+  public function answer(Request $request, $offerRequest) {
     $offerRequest->linking();
 
     $validates = [
-      'ansower' => 'required|in:accept,refuse',
+      'answer' => 'required|in:accept,refuse',
     ];
-    if($request->ansower == 'accept') {
+    if($request->answer == 'accept') {
       foreach ($offerRequest->offer->data as $name => $item) {
         $validates[$name] = $item['validate'];
       }
-    } else if($request->ansower == 'refuse') {
+    } else if($request->answer == 'refuse') {
       $validates['description'] = 'required|string';
     }
     $validator = Validator::make($request->all(), $validates);
@@ -31,10 +31,10 @@ class OfferRequestController extends Controller {
     }
 
     if($offerRequest->status != 'waiting_admin_accept') {
-      return $this->apiErrorResponse('You Already ansower this request');
+      return $this->apiErrorResponse('You Already answer this request');
     }
 
-    if($request->ansower == 'accept') {
+    if($request->answer == 'accept') {
       $data = [];
       foreach ($offerRequest->offer->data as $name => $item) {
         $data[$name] = $request->get($name);

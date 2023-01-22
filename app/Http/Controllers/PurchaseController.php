@@ -19,7 +19,7 @@ use Validator;
 class PurchaseController extends Controller {
   public function __construct() {
     $this->middleware('seller.access', [
-      'except' => ['create', 'userAll', 'clientAnsower'],
+      'except' => ['create', 'userAll', 'clientAnswer'],
     ]);
   }
 
@@ -160,7 +160,7 @@ class PurchaseController extends Controller {
     return $this->apiSuccessResponse('Successfully reading purchase');
   }
 
-  public function sellerAnsower(Request $request, $purchase) {
+  public function sellerAnswer(Request $request, $purchase) {
     $purchase->linking();
 
     $user = $request->user();
@@ -170,8 +170,8 @@ class PurchaseController extends Controller {
     }
 
     $validator = Validator::make($request->all(), [
-      'ansower' => 'required|in:accept,refuse',
-      'description' => $request->ansower == 'refuse' ? 'required|string' : '',
+      'answer' => 'required|in:accept,refuse',
+      'description' => $request->answer == 'refuse' ? 'required|string' : '',
     ]);
 
     if($validator->fails()) {
@@ -182,11 +182,11 @@ class PurchaseController extends Controller {
 
     $steps = $purchase->delivery_steps;
 
-    if(!is_null($steps['seller_accept']['ansower'])) {
-      return $this->apiErrorResponse('You are already ansowerd');
+    if(!is_null($steps['seller_accept']['answer'])) {
+      return $this->apiErrorResponse('You are already answerd');
     }
 
-    if ($request->ansower == 'refuse') {
+    if ($request->answer == 'refuse') {
       $res = $purchase->delivery_cost_exchange->refuse($request->description);
       if(!$res['success']) {
         return $this->apiErrorResponse($res['message']);
@@ -201,9 +201,9 @@ class PurchaseController extends Controller {
       }
     }
 
-    $steps['seller_accept']['ansower'] = [$request->ansower, $request->description, Carbon::now()];
+    $steps['seller_accept']['answer'] = [$request->answer, $request->description, Carbon::now()];
     $purchase->delivery_steps = $steps;
-    $purchase->status = ['accept' => 'seller_accept', 'refuse' => 'seller_refuse'][$request->ansower];
+    $purchase->status = ['accept' => 'seller_accept', 'refuse' => 'seller_refuse'][$request->answer];
     $purchase->unreades = Admin::unreades($user->id);
     $purchase->unlinkingAndSave();
 
@@ -216,16 +216,16 @@ class PurchaseController extends Controller {
       'title' => [
         'accept' => 'Purchase request accepted',
         'refuse' => 'Purchase request refused',
-      ][$request->ansower],
+      ][$request->answer],
       'message' => [
         'accept' => $request->description ?? 'Your request to purchase the product has been approved. You can track the product',
         'refuse' => $request->description,
-      ][$request->ansower],
+      ][$request->answer],
       'data' => [
-        'event_name' => 'purchase-seller-ansower',
+        'event_name' => 'purchase-seller-answer',
         'data' => json_encode([
           'purchase_id' => $purchase->id,
-          'ansower' => $request->ansower,
+          'answer' => $request->answer,
           'description' => $request->description,
         ]),
       ],
@@ -233,7 +233,7 @@ class PurchaseController extends Controller {
       'type' => 'emitAndNotify',
     ]);
 
-    return $this->apiSuccessResponse('Successfully ansower a purchase');
+    return $this->apiSuccessResponse('Successfully answer a purchase');
   }
 
   public function nextStep(Request $request, $purchase) {
@@ -260,7 +260,7 @@ class PurchaseController extends Controller {
     $steps['location_steps'][$nextStep] = Carbon::now();
     $purchase->delivery_steps = $steps;
     if ($nextStep == 'delivering_to_client') {
-      $purchase->status = 'waiting_client_ansower';
+      $purchase->status = 'waiting_client_answer';
     }
     $purchase->unreades = Admin::unreades();
     $purchase->unlinkingAndSave();
@@ -268,7 +268,7 @@ class PurchaseController extends Controller {
     return $this->apiSuccessResponse('Successfully changing step');
   }
 
-  public function clientAnsower(Request $request, $purchase) {
+  public function clientAnswer(Request $request, $purchase) {
     $purchase->linking();
 
     $user = $request->user();
@@ -278,8 +278,8 @@ class PurchaseController extends Controller {
     }
 
     $validator = Validator::make($request->all(), [
-      'ansower' => 'required|in:accept,refuse',
-      'description' => $request->ansower == 'refuse' ? 'required|string' : '',
+      'answer' => 'required|in:accept,refuse',
+      'description' => $request->answer == 'refuse' ? 'required|string' : '',
     ]);
 
     if($validator->fails()) {
@@ -291,10 +291,10 @@ class PurchaseController extends Controller {
     $steps = $purchase->delivery_steps;
 
     if(!is_null($steps['receive'])) {
-      return $this->apiErrorResponse('You already ansowerd');
+      return $this->apiErrorResponse('You already answerd');
     }
 
-    if($request->ansower == 'accept') {
+    if($request->answer == 'accept') {
       $res = $purchase->product_price_exchange->accept();
       if(!$res['success']) {
         return $this->apiErrorResponse($res['message']);
@@ -309,13 +309,13 @@ class PurchaseController extends Controller {
       }
     }
 
-    $steps['receive'] = [$request->ansower, $request->description, Carbon::now()];
+    $steps['receive'] = [$request->answer, $request->description, Carbon::now()];
     $purchase->delivery_steps = $steps;
-    $purchase->status = ['accept' => 'client_accept', 'refuse' => 'client_refuse'][$request->ansower];
+    $purchase->status = ['accept' => 'client_accept', 'refuse' => 'client_refuse'][$request->answer];
     $purchase->unreades = Admin::unreades();
     $purchase->unlinkingAndSave();
 
-    return $this->apiSuccessResponse('Successfully ansowering');
+    return $this->apiSuccessResponse('Successfully answering');
   }
 
   public function sellerReport(Request $request, $purchase) {
@@ -337,7 +337,7 @@ class PurchaseController extends Controller {
       ]);
     }
 
-    if($purchase->status != 'seller_accept' && $purchase->status != 'waiting_client_ansower') {
+    if($purchase->status != 'seller_accept' && $purchase->status != 'waiting_client_answer') {
       return $this->apiErrorResponse('Unauthenticated');
     }
 

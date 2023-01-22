@@ -27,7 +27,7 @@ return new class extends Migration {
       $table->json('delivery_steps')->default(json_encode([
         'seller_accept' => [
           'readed_at' => null,
-          'ansower' => null,
+          'answer' => null,
         ],
         'location_steps' => [
           'charging' => null,
@@ -38,7 +38,7 @@ return new class extends Migration {
         ],
         'receive' => null,
       ]));
-      $table->enum('status', ['waiting', 'received', 'seller_accept', 'seller_refuse', 'waiting_client_ansower', 'client_accept', 'client_refuse', 'seller_reported', 'admin_ansowred'])->default('waiting');
+      $table->enum('status', ['waiting', 'received', 'seller_accept', 'seller_refuse', 'waiting_client_answer', 'client_accept', 'client_refuse', 'seller_reported', 'admin_ansowred'])->default('waiting');
       $table->json('unreades')->default('[]');
       $table->timestamps();
     });

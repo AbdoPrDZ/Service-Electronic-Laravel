@@ -75,12 +75,12 @@
           <textarea class="form-control" name="client_report" disabled></textarea>
           <h5>تقرير البائع:</h5>
           <textarea class="form-control" name="seller_report" disabled></textarea>
-          <select class="form-control" name="ansower">
+          <select class="form-control" name="answer">
             <option value="accept_all">قبول الكل</option>
             <option value="refuse_all">رفض الكل</option>
             <option value="accept_delivery_cost">قبول الشخن</option>
           </select>
-          <button class="btn btn-success" style="width: 100%;" name="ansower">إجابة</button>
+          <button class="btn btn-success" style="width: 100%;" name="answer">إجابة</button>
         </div>
         <hr>
 

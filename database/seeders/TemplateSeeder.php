@@ -14,6 +14,7 @@ class TemplateSeeder extends Seeder {
    * @return void
    */
   public function run() {
+    $appUrl = env('APP_URL');
     $emailVerificationContent = <<<HTML
       <div style="
         font: 15px cursive;
@@ -29,7 +30,7 @@ class TemplateSeeder extends Seeder {
             align-items: center;
             margin: auto;
             gap: 1rem;">
-        <img src="http://service-electronic.ddns.net/storage/currencies/4.png" style="width: 8.5vw;">
+        <img src="$appUrl/storage/defaults/logo.png" style="width: 8.5vw;">
         <h2 style="color:#f1f1f1">Service Electronic</h2>
       </div>
       <div style="
@@ -133,7 +134,7 @@ class TemplateSeeder extends Seeder {
               align-items: center;
               margin: auto;
               gap: 1rem;">
-          <img src="http://service-electronic.ddns.net/storage/currencies/4.png" style="width: 8.5vw;">
+          <img src="$appUrl/storage/defaults/logo.png" style="width: 8.5vw;">
           <h2 style="color:#f1f1f1">Service Electronic</h2>
         </div>
         <div style="
@@ -143,12 +144,12 @@ class TemplateSeeder extends Seeder {
               border-radius: 5px;
               padding: 20px 30px;">
           <h1 style="font-size: 24px; margin: 0.5rem 2rem 1rem 0;">
-            Account Withdraw <-ansower->
+            Account Withdraw <-answer->
           </h1>
           <div>
             <div style="height: 0.1px; width: 98%; background-color: #ccc; margin: auto;"> </div>
             <div style="margin: 10px 20px;">
-              You Request to withdraw from your account balance (<span style="color: rgb(204, 0, 0);"><-sended_balance-></span>) as (<span style="color: #0c0;"><-received_balance-></span>) at <span style="color: #06c;"><-withdraw_date->.</span> has been <-ansower->
+              You Request to withdraw from your account balance (<span style="color: rgb(204, 0, 0);"><-sended_balance-></span>) as (<span style="color: #0c0;"><-received_balance-></span>) at <span style="color: #06c;"><-withdraw_date->.</span> has been <-answer->
               <div style="font-weight: bold; font-size: 13px; margin: 10px 0 10px 10px;">
                 Request Id: <span style="font-weight: normal;">#<-request_id->.</span><br>
                 Sended Currency: <span style="font-weight: normal;"><-sended_currency->.</span><br>
@@ -221,7 +222,7 @@ class TemplateSeeder extends Seeder {
         ["name" => '<-received_balance->', "type" => "number"],
         ["name" => '<-recharge_date->', "type" => "datetime"],
         ["name" => '<-wallet->', "type" => "text"],
-        ["name" => '<-ansower->', "type" => "text"],
+        ["name" => '<-answer->', "type" => "text"],
       ],
       'type' => 'mail',
       'unreades' => Admin::unreades(),
@@ -241,7 +242,7 @@ class TemplateSeeder extends Seeder {
               align-items: center;
               margin: auto;
               gap: 1rem;">
-          <img src="http://service-electronic.ddns.net/storage/currencies/4.png" style="width: 8.5vw;">
+          <img src="$appUrl/storage/defaults/logo.png" style="width: 8.5vw;">
           <h2 style="color:#f1f1f1">Service Electronic</h2>
         </div>
         <div style="
@@ -251,12 +252,12 @@ class TemplateSeeder extends Seeder {
               border-radius: 5px;
               padding: 20px 30px;">
           <h1 style="font-size: 24px; margin: 0.5rem 2rem 1rem 0;">
-            Account Withdraw <-ansower->
+            Account Withdraw <-answer->
           </h1>
           <div>
             <div style="height: 0.1px; width: 98%; background-color: #ccc; margin: auto;"> </div>
             <div style="margin: 10px 20px;">
-              You Request to withdraw from your account balance (<span style="color: rgb(204, 0, 0);"><-sended_balance-></span>) as (<span style="color: #0c0;"><-received_balance-></span>) at <span style="color: #06c;"><-withdraw_date->.</span> has been <-ansower->
+              You Request to withdraw from your account balance (<span style="color: rgb(204, 0, 0);"><-sended_balance-></span>) as (<span style="color: #0c0;"><-received_balance-></span>) at <span style="color: #06c;"><-withdraw_date->.</span> has been <-answer->
               <div style="font-weight: bold; font-size: 13px; margin: 10px 0 10px 10px;">
                 Request Id: <span style="font-weight: normal;">#<-request_id->.</span><br>
                 Sended Currency: <span style="font-weight: normal;"><-sended_currency->.</span><br>
@@ -329,7 +330,7 @@ class TemplateSeeder extends Seeder {
         ["name" => '<-received_balance->', "type" => "number"],
         ["name" => '<-withdraw_date->', "type" => "datetime"],
         ["name" => '<-to_wallet->', "type" => "text"],
-        ["name" => '<-ansower->', "type" => "text"],
+        ["name" => '<-answer->', "type" => "text"],
       ],
       'type' => 'mail',
       'unreades' => Admin::unreades(),
@@ -349,7 +350,7 @@ class TemplateSeeder extends Seeder {
               align-items: center;
               margin: auto;
               gap: 1rem;">
-          <img src="http://service-electronic.ddns.net/storage/currencies/4.png" style="width: 8.5vw;">
+          <img src="$appUrl/storage/defaults/logo.png" style="width: 8.5vw;">
           <h2 style="color:#f1f1f1">Service Electronic</h2>
         </div>
         <div style="
@@ -452,7 +453,7 @@ class TemplateSeeder extends Seeder {
               align-items: center;
               margin: auto;
               gap: 1rem;">
-          <img src="http://service-electronic.ddns.net/storage/currencies/4.png" style="width: 8.5vw;">
+          <img src="$appUrl/storage/defaults/logo.png" style="width: 8.5vw;">
           <h2 style="color:#f1f1f1">Service Electronic</h2>
         </div>
         <div style="
@@ -462,15 +463,15 @@ class TemplateSeeder extends Seeder {
               border-radius: 5px;
               padding: 20px 30px;">
           <h1 style="font-size: 24px; margin: 0.5rem 2rem 1rem 0;">
-            Identity Confirmation <-ansower->
+            Identity Confirmation <-answer->
           </h1>
           <div>
             <div style="height: 0.1px; width: 98%; background-color: #ccc; margin: auto;"> </div>
             <div style="margin: 10px 20px;">
-              Your request to confirm your identity has been <-ansower->
+              Your request to confirm your identity has been <-answer->
               at <span style="color: #06c;"><-datetime->.</span>
               <div style="font-weight: bold; font-size: 13px; margin: 10px 0 10px 10px;">
-                <-ansower_description->
+                <-answer_description->
               </div>
             </div>
             <div style="height: 0.1px; width: 98%; background-color: #ccc; margin: auto;"> </div>
@@ -529,8 +530,8 @@ class TemplateSeeder extends Seeder {
       'content' => $identityConfirmContent,
       'args' => [
         ["name" => '<-datetime->', "type" => "datetime"],
-        ["name" => '<-ansower_description->', "type" => "text"],
-        ["name" => '<-ansower->', "type" => "text"],
+        ["name" => '<-answer_description->', "type" => "text"],
+        ["name" => '<-answer->', "type" => "text"],
       ],
       'type' => 'mail',
       'unreades' => Admin::unreades(),

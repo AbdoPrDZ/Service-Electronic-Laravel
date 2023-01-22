@@ -13,9 +13,6 @@ use Illuminate\Http\Request;
 use Validator;
 
 class CurrencyController extends Controller {
-  public function __construct() {
-    $this->middleware('multi.auth:admin');
-  }
 
   static function all(Request $request) {
     $items = Currency::where('is_deleted', '=', 0)->get();

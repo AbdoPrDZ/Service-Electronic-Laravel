@@ -56,18 +56,33 @@ Route::group([
 
 Route::post('/seller/{id}/change_status', [SellerController::class, 'changeStatus'])->middleware('valid_id:' . Seller::class);
 
-Route::post('/transfer/{id}/change_status', [TransferController::class, 'changeStatus'])->middleware('valid_id:' . Transfer::class);
-Route::delete('/transfer/{id}/delete', [TransferController::class, 'delete'])->middleware('valid_id:' . Transfer::class);
+Route::group([
+  'prefix' => 'transfer',
+  'middleware' => ['multi.auth:admin', 'valid_id:' . Transfer::class],
+], function ($router) {
+  Route::post('/{id}/change_status', [TransferController::class, 'changeStatus']);
+  Route::delete('/{id}/delete', [TransferController::class, 'delete']);
+});
 
-Route::post('/currency/create_currency', [CurrencyController::class, 'create']);
-Route::post('/currency/{id}/edit', [CurrencyController::class, 'edit'])->middleware('valid_id:' . Currency::class);
-Route::delete('/currency/{id}/delete', [CurrencyController::class, 'delete'])->middleware('valid_id:' . Currency::class);
+Route::group([
+  'prefix' => 'currency',
+  'middleware' => ['multi.auth:admin'],
+], function ($router) {
+  Route::post('/create_currency', [CurrencyController::class, 'create']);
+  Route::post('/{id}/edit', [CurrencyController::class, 'edit'])->middleware('valid_id:' . Currency::class);
+  Route::delete('/{id}/delete', [CurrencyController::class, 'delete'])->middleware('valid_id:' . Currency::class);
+});
 
-Route::post('/category/create_category', [CategoryController::class, 'create']);
-Route::post('/category/{id}/edit', [CategoryController::class, 'edit'])->middleware('valid_id:' . Category::class);
-Route::delete('/category/{id}/delete', [CategoryController::class, 'delete'])->middleware('valid_id:' . Category::class);
+Route::group([
+  'prefix' => 'category',
+  'middleware' => ['multi.auth:admin'],
+], function ($router) {
+  Route::post('/create_category', [CategoryController::class, 'create']);
+  Route::post('/{id}/edit', [CategoryController::class, 'edit'])->middleware('valid_id:' . Category::class);
+  Route::delete('/{id}/delete', [CategoryController::class, 'delete'])->middleware('valid_id:' . Category::class);
+});
 
-Route::post('/purchase/{id}/ansower', [PurchaseController::class, 'ansower'])->middleware('valid_id:' . Purchase::class);
+Route::post('/purchase/{id}/answer', [PurchaseController::class, 'answer'])->middleware('valid_id:' . Purchase::class);
 
 Route::group([
   'prefix' => 'offer',
@@ -78,13 +93,15 @@ Route::group([
   Route::post('/{id}/edit', [OfferController::class, 'edit'])->middleware('valid_id:' . Offer::class);
   Route::delete('/{id}/delete', [OfferController::class, 'delete'])->middleware('valid_id:' . Offer::class);
 });
+
 Route::group([
   'prefix' => 'offer_request',
-  'middleware' => ['multi.auth:admin'],
+  'middleware' => ['multi.auth:admin', 'valid_id:' . OfferRequest::class],
 ], function ($router) {
-  Route::post('/{id}/ansower', [OfferRequestController::class, 'ansower'])->middleware('valid_id:' . OfferRequest::class);
-  Route::delete('/{id}/delete', [OfferRequestController::class, 'delete'])->middleware('valid_id:' . OfferRequest::class);
+  Route::post('/{id}/answer', [OfferRequestController::class, 'answer']);
+  Route::delete('/{id}/delete', [OfferRequestController::class, 'delete']);
 });
+
 Route::group([
   'prefix' => 'template',
   'middleware' => ['multi.auth:admin'],

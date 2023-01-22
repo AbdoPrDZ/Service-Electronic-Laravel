@@ -56,18 +56,18 @@ class AdminController extends Controller {
     if ($validator->fails()) {
       $messages = [];
 
-      foreach ($validator->errors()->all() as $name => $error) {
-      $messages[] = [
-        'title' => 'Login Error',
-        'name' => $name,
-        'text' => $error,
-        'type' => 'danger',
-      ];
+      foreach ($validator->errors()->toArray() as $name => $error) {
+        $messages[] = [
+          'title' => 'Login Error',
+          'name' => $name,
+          'text' => $error,
+          'type' => 'danger',
+        ];
       }
       return view('admin.login', [
         'email' => $request->email,
         'password' => $request->password,
-        'invalidates' => $validator->errors(),
+        'invalidates' => $validator->errors()->toArray(),
         'messages' => $messages,
       ]);
     }
@@ -79,14 +79,14 @@ class AdminController extends Controller {
         'email' => $request->email,
         'password' => '',
         'invalidates' => [
-          'email' => 'Invalid email',
-          'password' => 'Invalid password',
+          'email' => ['Invalid email'],
+          'password' => ['Invalid password'],
         ],
         'messages' => [
           [
             'title' => 'Login error',
             'name' => 'password-error',
-            'text' => 'Invalid  email or password',
+            'text' => 'Invalid email or password',
             'type' => 'danger',
           ]
         ]

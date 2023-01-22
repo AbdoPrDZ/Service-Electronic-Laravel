@@ -32,8 +32,8 @@ use Illuminate\Support\Facades\Log;
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer query()
- * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereAnsowerDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereAnsowerdAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereAnswerDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereAnswerdAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereExchangeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereId($value)
@@ -119,7 +119,7 @@ class Transfer extends Model  {
     $this->save();
   }
 
-  public function ansower($status, $answer_description, $admin_id) {
+  public function answer($status, $answer_description, $admin_id) {
     if(!in_array($status, ['accepted', 'refused'])) return [
       'success' => false,
       'message' => 'Invalid status',
@@ -137,20 +137,20 @@ class Transfer extends Model  {
     $sended_currency = Currency::find($this->sended_currency_id);
     $sended_currency->linking();
 
-    $ansowers = [
+    $answers = [
       'accepted' => 'Congratulations, your transfer request has been accepted',
       'refused' => 'Unfortunately your transfer request has been refused, for more information please contact support.'
     ];
-    $eventName = 'transfer-ansower';
+    $eventName = 'transfer-answer';
     if($this->for_what == 'recharge') {
       if($this->status == 'accepted') $exchangeRes = $exchange->accept();
       else $exchangeRes = $exchange->refuse($answer_description);
       if(!$exchangeRes['success']) return $exchangeRes;
-      $ansowers = [
+      $answers = [
         'accepted' => 'Congratulations, your recharge request has been accepted',
         'refused' => 'Unfortunately your recharge request has been refused, for more information please contact support.'
       ];
-      $eventName = 'transfer-ansower';
+      $eventName = 'transfer-answer';
     } else if($this->for_what == 'withdraw') {
       $user = User::find($this->user_id);
       $user->linking();
@@ -166,7 +166,7 @@ class Transfer extends Model  {
     $notification = Notification::create([
       'name' => 'notifications',
       'title' => "Transfer (#$this->id) Status Changed",
-      'message' => $ansowers[$this->status],
+      'message' => $answers[$this->status],
       'from_id' => $admin_id,
       'from_model' => Admin::class,
       'to_id' => $this->user_id,

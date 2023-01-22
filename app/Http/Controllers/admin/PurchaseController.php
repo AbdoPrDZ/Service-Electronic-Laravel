@@ -36,10 +36,10 @@ class PurchaseController extends Controller {
     return Controller::apiSuccessResponse('successfully reading news');
   }
 
-  public function ansower(Request $request, $purchase) {
+  public function answer(Request $request, $purchase) {
     $purchase->linking();
     $validator = Validator::make($request->all(), [
-      'ansower' => 'required|in:accept_delivery_cost,accept_all,refuse_all',
+      'answer' => 'required|in:accept_delivery_cost,accept_all,refuse_all',
     ]);
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, ['errors' =>$validator->errors(), 'all' => $request->all()]);
@@ -47,10 +47,10 @@ class PurchaseController extends Controller {
 
     $steps = $purchase->delivery_steps;
     if(!in_array($purchase->status, ['client_refuse', 'seller_reported'])) {
-      return $this->apiErrorResponse('You Already ansowerd');
+      return $this->apiErrorResponse('You Already answerd');
     }
 
-    if($request->ansower == 'accept_all') {
+    if($request->answer == 'accept_all') {
       $res = $purchase->product_price_exchange->accept();
       if(!$res['success']) {
         return $this->apiErrorResponse($res['message']);
@@ -63,7 +63,7 @@ class PurchaseController extends Controller {
       if(!$res['success']) {
         return $this->apiErrorResponse($res['message']);
       }
-    } else if($request->ansower == 'refuse_all') {
+    } else if($request->answer == 'refuse_all') {
       $res = $purchase->product_price_exchange->refuse('admin-refuse');
       if(!$res['success']) {
         return $this->apiErrorResponse($res['message']);
@@ -76,7 +76,7 @@ class PurchaseController extends Controller {
       if(!$res['success']) {
         return $this->apiErrorResponse($res['message']);
       }
-    } else if($request->ansower == 'accept_delivery_cost') {
+    } else if($request->answer == 'accept_delivery_cost') {
       $res = $purchase->delivery_cost_exchange->accept();
       if(!$res['success']) {
         return $this->apiErrorResponse($res['message']);
@@ -90,7 +90,7 @@ class PurchaseController extends Controller {
         return $this->apiErrorResponse($res['message']);
       }
     }
-    $steps['admin_ansower'] = [$request->ansower, Carbon::now()];
+    $steps['admin_answer'] = [$request->answer, Carbon::now()];
     $purchase->delivery_steps = $steps;
     $purchase->status = 'admin_ansowred';
     $purchase->unreades = Admin::unreades($request->user()->id);

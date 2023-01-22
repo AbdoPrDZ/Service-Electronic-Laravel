@@ -15,18 +15,23 @@
 
       <div class="form-group">
         <h5>البريد الإلكتروني:</h5>
-        <input type="text" class="form-control <?= isset($invalidates->email) && !is_null($invalidates->email) ? 'is-invalid': '' ?>" name="email" value="<?= $email ?>" required>
+        <input type="text" class="form-control <?= key_exists('email', $invalidates) ? 'is-invalid': '' ?>" name="email" value="<?= $email ?>" required>
         <div class="invalid-feedback ">
-            <?= json_encode($invalidates)?>
-          <?= isset($invalidates->email) && !is_null($invalidates->email) ? $invalidates->email: '' ?>
+          <?php print_r($invalidates)?>
+          <?= key_exists('email', $invalidates) ? $invalidates['email'][0] : '' ?>
         </div>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" name="password">
         <h5>كلمة السر:</h5>
-        <input type="password" class="form-control <?= isset($invalidates->password) && !is_null($invalidates->password) ? 'is-invalid': '' ?>" name="password" value="<?= $password ?>" required>
+        <div class="input-group">
+          <input type="password" class="form-control <?= key_exists('password', $invalidates) ? 'is-invalid': '' ?>" name="password" value="<?= $password ?>" required>
+          <div class="btn input-group-text" style="border-radius: 0px 5px 5px 0px; padding: 0 5px;">
+            <span class="material-symbols-sharp" style="font-size: 20px">visibility</span>
+          </div>
+        </div>
         <div class="invalid-feedback ">
-            <?= isset($invalidates->password) && !is_null($invalidates->password) ? $invalidates->password: '' ?>
+            <?= key_exists('password', $invalidates) ? $invalidates['password'][0] : '' ?>
         </div>
       </div>
 
@@ -37,13 +42,19 @@
         </div>
       </div> -->
 
-
       <input type="submit" class="btn form-btn btn-primary btn-lg btn-block" value="تسجيل الدخول" name="login"/>
       <br>
       @include('admin.src.footer')
     </form>
     <div id="alerts" class="noties topright"></div>
     <script src="{{ asset('/resources/js/admin/main.js') }}?time={{ now() }}"></script>
+    <script>
+      $on('.form-group[name="password"] .btn.input-group-text', 'click', function() {
+        var nextType = $('.form-control[name="password"]').attr('type') == 'password' ? 'text' : 'password';
+        $('.form-control[name="password"]').attr('type', nextType)
+        $(this).html(`<span class="material-symbols-sharp" style="font-size: 20px">${nextType == 'text' ? 'visibility_off' : 'visibility'}</span>`)
+      })
+    </script>
     @if (isset($messages) && !is_null($messages))
         <script>
             @foreach ($messages as $message)

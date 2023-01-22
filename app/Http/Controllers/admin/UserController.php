@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\SocketBridge\SocketClient;
 use App\Models\Admin;
 use App\Models\File;
+use App\Models\Mail;
 use App\Models\Notification;
 use App\Models\Product;
 use App\Models\Purchase;
+use App\Models\Setting;
 use App\Models\Transfer;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -18,7 +20,6 @@ use Storage;
 use Validator;
 
 class UserController extends Controller {
-
 
   static function all(Request $request) {
     $items = User::all();
@@ -64,7 +65,7 @@ class UserController extends Controller {
     }
 
     if($user->identity_verifited_at != null) {
-      return $this->apiErrorResponse('This User already ansowered');
+      return $this->apiErrorResponse('This User already answered');
     }
     $message = '';
     if($request->status == 'verifited') {
@@ -93,6 +94,16 @@ class UserController extends Controller {
       ],
       'image_id' => 'logo',
       'type' => 'emitOrNotify',
+    ]);
+    Mail::create([
+      'title' => 'Identity Verify Result',
+      'template_id' => Setting::userIdentityConfirmEmailTemplateId(),
+      'data' => [
+        '<-answer->' => $request->status,
+        '<-answer_description->' => $request->answer_description,
+        '<-datetime->' => Carbon::now(),
+      ],
+      'targets' => [$request->user()->id],
     ]);
     return $this->apiSuccessResponse('Successfully changing status');
   }

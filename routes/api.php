@@ -30,11 +30,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-  return $request->user();
-});
-
-Route::group(['prefix' => 'auth'], function($router) {
+Route::group([
+  'prefix' => 'auth'
+], function($router) {
   Route::post('/login', [UserController::class, 'login']);
   Route::post('/signup', [UserController::class, 'signup']);
   Route::post('/email_verify', [UserController::class, 'emailVerify']);
@@ -58,6 +56,7 @@ Route::group([
   Route::get('/all', [NotificationController::class, 'all']);
   Route::get('/{id}/read', [NotificationController::class, 'all'])->middleware('valid_id:' . Notification::class);
 });
+
 Route::get('/category', [CategoryController::class, 'all']);
 Route::get('/currency', [CurrencyController::class, 'all']);
 Route::get('/offer', [OfferController::class, 'all']);
@@ -105,9 +104,9 @@ Route::group([
   Route::get('/user/all', [PurchaseController::class, 'userAll']);
   Route::post('/{product_id}/create', [PurchaseController::class, 'create'])->middleware('valid_id:' . Product::class . ',product_id');
   Route::get('/{id}/read', [PurchaseController::class, 'read'])->middleware('valid_id:' . Purchase::class);
-  Route::post('/{id}/seller_ansower', [PurchaseController::class, 'sellerAnsower'])->middleware('valid_id:' . Purchase::class);
+  Route::post('/{id}/seller_answer', [PurchaseController::class, 'sellerAnswer'])->middleware('valid_id:' . Purchase::class);
   Route::get('/{id}/next_step', [PurchaseController::class, 'nextStep'])->middleware('valid_id:' . Purchase::class);
-  Route::post('/{id}/client_ansower', [PurchaseController::class, 'clientAnsower'])->middleware('valid_id:' . Purchase::class);
+  Route::post('/{id}/client_answer', [PurchaseController::class, 'clientAnswer'])->middleware('valid_id:' . Purchase::class);
   Route::post('/{id}/seller_report', [PurchaseController::class, 'sellerReport'])->middleware('valid_id:' . Purchase::class);
 });
 
@@ -119,7 +118,4 @@ Route::group([
   Route::get('/all', [OfferRequestController::class, 'all']);
   Route::post('/{offer_id}/create', [OfferRequestController::class, 'create'])->middleware('valid_id:' . Offer::class . ',offer_id');
 });
-// Route::get('/files/{filename}/', function(Request $request, $filename, $fileRow = null) {
-//   print_r($request->get('file')->name);
-// })->middleware('file.access:public');
 

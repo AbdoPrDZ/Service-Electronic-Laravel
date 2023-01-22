@@ -66,10 +66,10 @@
         </div>
         <hr>
 
-        <div class="form-group" name="ansower_form">
+        <div class="form-group" name="answer_form">
           <h5>إجابة:</h5>
-          <div class="select-group-tabs" id="offer-request-admin-ansower">
-            <select class="form-control select-group-tabs-select" name="admin-ansower">
+          <div class="select-group-tabs" id="offer-request-admin-answer">
+            <select class="form-control select-group-tabs-select" name="admin-answer">
               <option value="accept" selected>قبول</option>
               <option value="refuse">رفض</option>
             </select>
@@ -95,9 +95,9 @@
         </div>
         <hr>
 
-        <div class="form-group" name="ansower">
+        <div class="form-group" name="answer">
           <h5>المعلومات الإجاية:</h5>
-          <div class="form-control details" name="ansower_data" style="height: fit-content"></div>
+          <div class="form-control details" name="answer_data" style="height: fit-content"></div>
           <hr>
         </div>
 

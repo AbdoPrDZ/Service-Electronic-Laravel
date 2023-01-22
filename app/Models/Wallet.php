@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Wallet newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Wallet newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Wallet query()
- * @method static \Illuminate\Database\Eloquent\Builder|Wallet whereAnsowerDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Wallet whereAnswerDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Wallet whereAnsworedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Wallet whereBalance($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Wallet whereCheckingBalance($value)

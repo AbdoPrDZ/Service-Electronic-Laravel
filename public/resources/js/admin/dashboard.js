@@ -639,9 +639,9 @@ function viewOfferRequest(offerRequest) {
   }
   $(`#view-offer-request .modal-body .form-control[name="offer_fields"]`).html(fieldsData.join(''));
   if(offerRequest.status == 'waiting_admin_accept') {
-    $('#view-offer-request .modal-body .form-group[name="ansower"]').css('display', 'none');
+    $('#view-offer-request .modal-body .form-group[name="answer"]').css('display', 'none');
     // data fields
-    $('#view-offer-request .modal-body .form-group[name="ansower_form"]').css('display', 'block');
+    $('#view-offer-request .modal-body .form-group[name="answer_form"]').css('display', 'block');
     var fields = [];
     for (const name in offerRequest.offer.data) {
       const item = offerRequest.offer.data[name];
@@ -652,28 +652,28 @@ function viewOfferRequest(offerRequest) {
         <input type="${item.type}" class="form-control" name="${name}" placeholder="${item.title_en}">
       `);
     }
-    $(`#view-offer-request .modal-body .form-group[name="ansower_form"] .data_fields`).html(fields.join(''));
+    $(`#view-offer-request .modal-body .form-group[name="answer_form"] .data_fields`).html(fields.join(''));
   } else {
-    $('#view-offer-request .modal-body .form-group[name="ansower_form"]').css('display', 'none');
+    $('#view-offer-request .modal-body .form-group[name="answer_form"]').css('display', 'none');
   }
   $(`#view-offer-request .modal-body .form-control[name="status"]`).html(statuses[offerRequest.status]);
   if(offerRequest.status == 'admin_accept') {
-    // ansower
-    $('#view-offer-request .modal-body .form-group[name="ansower"]').css('display', 'block');
-    var ansowerData = [
+    // answer
+    $('#view-offer-request .modal-body .form-group[name="answer"]').css('display', 'block');
+    var answerData = [
     ];
     for (const name in offerRequest.data) {
-      ansowerData.push(`<span>
+      answerData.push(`<span>
         ${offerRequest.offer.data[name].title_en}: <span>${offerRequest.data[name]}</span>
       </span>`);
     }
-    $('#view-offer-request .modal-body .form-group[name="ansower"] .form-control[name="ansower_data"]').html(ansowerData.join(''));
+    $('#view-offer-request .modal-body .form-group[name="answer"] .form-control[name="answer_data"]').html(answerData.join(''));
   } else {
-    // ansower
-    $('#view-offer-request .modal-body .form-group[name="ansower"]').css('display', 'bliock');
-    $('#view-offer-request .modal-body .form-group[name="ansower"] .form-control[name="ansower_data"]').html(`
+    // answer
+    $('#view-offer-request .modal-body .form-group[name="answer"]').css('display', 'bliock');
+    $('#view-offer-request .modal-body .form-group[name="answer"] .form-control[name="answer_data"]').html(`
       <span>
-        سبب الرفض: <span>${offerRequest.exchange.ansower_description}</span>
+        سبب الرفض: <span>${offerRequest.exchange.answer_description}</span>
       </span>
     `);
   }
@@ -1346,18 +1346,18 @@ $on('#all-purchases table tr td button[action="view"]', 'click', function() {
   const purchase = StorageDatabase.collection('purchases').doc(rowId).get();
   if(purchase) viewPurchase(purchase);
 });
-$on('#view-purchase .modal-body button[name="ansower"]', 'click', async function() {
+$on('#view-purchase .modal-body button[name="answer"]', 'click', async function() {
   loadingDialog('create-template', 'الإجابة', 'يرجى الإنتظار لحين الإجابة...');
   const id = $('#view-purchase .modal-title #view-purchase-id').html();
   const data = $.ajax({
-    url: `./admin/purchase/${id}/ansower`,
+    url: `./admin/purchase/${id}/answer`,
     type: 'POST',
     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-    data: {ansower: $('#view-purchase .modal-body .form-control[name="ansower"]').val()},
+    data: {answer: $('#view-purchase .modal-body .form-control[name="answer"]').val()},
     dataType: 'JSON',
   });
   console.log(data)
-  alertMessage('ansower-purchase-message', 'إجابة المدير', data.message, data.success ? 'success' : 'danger');
+  alertMessage('answer-purchase-message', 'إجابة المدير', data.message, data.success ? 'success' : 'danger');
   $('#view-purchase').modal('hide');
   await loadTab();
   $('#loading-dialog-modal').modal('hide');
@@ -1513,22 +1513,22 @@ $on('#all-offer-requests table tr td button[action="view"]', 'click', function (
   const offerRequest = StorageDatabase.collection('offers').doc('offer_requests').doc(rowId).get();
   if(offerRequest) viewOfferRequest(offerRequest);
 });
-$on('#view-offer-request .form-group[name="ansower_form"] .btn[action="submit"]', 'click',async function() {
+$on('#view-offer-request .form-group[name="answer_form"] .btn[action="submit"]', 'click',async function() {
   loadingDialog('create-template', 'لإجابة الطلب', 'يرجى الإنتظار لحين لإجابة الطلب...');
   const id = $('#view-offer-request #view-offer-request-id').html();
   const offerRequest = StorageDatabase.collection('offers').doc('offer_requests').doc(id).get();
   const formData = new FormData();
-  const ansower = $('#view-offer-request .form-group[name="ansower_form"] .form-control[name="admin-ansower"]').val();
-  formData.append('ansower', ansower);
-  if(ansower == 'accept') {
+  const answer = $('#view-offer-request .form-group[name="answer_form"] .form-control[name="admin-answer"]').val();
+  formData.append('answer', answer);
+  if(answer == 'accept') {
     for (const name in offerRequest.offer.data) {
-      formData.append(name, $(`#view-offer-request .modal-body .form-group[name="ansower_form"] .data_fields .form-control[name="${name}"]`).val());
+      formData.append(name, $(`#view-offer-request .modal-body .form-group[name="answer_form"] .data_fields .form-control[name="${name}"]`).val());
     }
   } else {
-    formData.append('description', $(`#view-offer-request .modal-body .form-group[name="ansower_form"] .form-control[name="refuse_description"]`).val());
+    formData.append('description', $(`#view-offer-request .modal-body .form-group[name="answer_form"] .form-control[name="refuse_description"]`).val());
   }
   const data = await $.ajax({
-    url: `./admin/offer_request/${id}/ansower`,
+    url: `./admin/offer_request/${id}/answer`,
     type: 'POST',
     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
     contentType: false,
@@ -1537,16 +1537,16 @@ $on('#view-offer-request .form-group[name="ansower_form"] .btn[action="submit"]'
   });
   if(data.success) {
     $('#view-offer-request').modal('hide');
-    alertMessage('ansower-offer-request-message', 'إجابة طلب العرض', data.message, 'success');
+    alertMessage('answer-offer-request-message', 'إجابة طلب العرض', data.message, 'success');
     changeTab(window.currentTabName);
   } else {
     console.log(data);
     if(data.message) {
-      alertMessage('ansower-offer-request-message', 'إجابة طلب العرض', error, 'danger');
+      alertMessage('answer-offer-request-message', 'إجابة طلب العرض', error, 'danger');
     } else {
       for (const key in data.errors) {
         const error = data.errors[key];
-        alertMessage('ansower-offer-request-message', 'إجابة طلب العرض', error, 'danger');
+        alertMessage('answer-offer-request-message', 'إجابة طلب العرض', error, 'danger');
       }
     }
   }
@@ -1556,7 +1556,7 @@ $on('#view-offer-request .form-group[name="ansower_form"] .btn[action="submit"]'
 $on('#all-templates .custom-table-header-actions button[action="create"]', 'click', function() {
   $('#create-edit-template .modal-body input').val('');
   $('#create-edit-template .modal-body #template-editor textarea[name="template-content"]').val('');
-  $('#create-edit-template .modal-body #template-editor .preivew').html('');
+  $('#create-edit-template .modal-body #template-editor .preview').html('');
   // templateEditor.html.set('');
   clearMultiInputValues('#template-args');
   $('#create-edit-template .modal-title').html(`إنشاء القالب`);
@@ -1578,7 +1578,7 @@ $on('#all-templates tr td button[action="edit"]', 'click', function () {
   $('#create-edit-template select[name="template_type"]').val(template.type);
   // templateEditor.html.set(template.content);
   $('#create-edit-template .modal-body #template-editor textarea[name="template-content"]').val(template.content);
-  $('#create-edit-template .modal-body #template-editor .preivew').html(template.content);
+  $('#create-edit-template .modal-body #template-editor .preview').html(template.content);
   clearMultiInputValues('#template-args');
   template.args.forEach(arg => {
     addMultiInputItem('#template-args', arg);

@@ -11,10 +11,6 @@ use Validator;
 
 class TransferController extends Controller {
 
-  public function __construct() {
-    $this->middleware('multi.auth:admin');
-  }
-
   static function all(Request $request) {
     $items = Transfer::trnasfers();
     $transfers = [];
@@ -45,9 +41,9 @@ class TransferController extends Controller {
       return $this->apiErrorResponse(null, ['errors' =>$validator->errors(), 'all' => $request->all()]);
     }
     if(in_array($request->status, ['accepted', 'refused'])) {
-      $ansowerRes = $transfer->ansower($request->status, $request->description, $request->user()->id);
-      if(!$ansowerRes['success']) {
-        return $this->apiErrorResponse($ansowerRes['message']);
+      $answerRes = $transfer->answer($request->status, $request->description, $request->user()->id);
+      if(!$answerRes['success']) {
+        return $this->apiErrorResponse($answerRes['message']);
       }
       return $this->apiSuccessResponse('Successfully changing status');
     } else {

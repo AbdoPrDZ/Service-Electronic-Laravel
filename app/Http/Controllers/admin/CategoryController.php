@@ -13,10 +13,6 @@ use Validator;
 
 class CategoryController extends Controller {
 
-  public function __construct() {
-    $this->middleware('multi.auth:admin');
-  }
-
   static function news(Request $request) {
     $admin_id = $request->user()->id;
     return count(Category::news($admin_id));
