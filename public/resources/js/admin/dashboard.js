@@ -1,7 +1,5 @@
 import { io } from '../socket.io.esm.min.js';
 
-// window.permissions = JSON.parse(CryptoJS.AES.decrypt(permissions, document.cookie.replace('adminAuth=', '')).toString(CryptoJS.enc.Utf8));
-
 const socket = io.connect(':8000', {
   path: '/admin/',
   autoConnect: false,
@@ -852,7 +850,7 @@ $on('#all-users table tr td button[action="send_notification"] ', 'click', funct
   $('#send-notification-modal').modal('show');
 });
 $on('#send-notification-modal .btn[action="send"]', 'click', async function() {
-  loadingDialog('create-template', 'إرسال الرسالة', 'يرجى الإنتظار لحين إرسال الرسالة...');
+  loadingDialog('إرسال الرسالة', 'يرجى الإنتظار لحين إرسال الرسالة...');
   const userId = $('#send-notification-modal .modal-title').html().split('#')[1];
   const formData = new FormData();
   formData.append('message', $('#send-notification-modal textarea[name="message"]').val());
@@ -889,7 +887,7 @@ $on('#all-users table tr td button[action="delete"]', 'click', function () {
     '<h4>هل أنت متأكد من أنك تريد حذف هذا المستخدم?</h4>',
     async (action) => {
       if(action == 'نعم') {
-        loadingDialog('create-template', 'حذف المستخدم', 'يرجى الإنتظار لحين حذف المستخدم...');
+        loadingDialog('حذف المستخدم', 'يرجى الإنتظار لحين حذف المستخدم...');
         const data = await $.ajax({
           url: `./admin/user/${rowId}/delete`,
           type: 'DELETE',
@@ -931,7 +929,7 @@ $on('#all-users-withdrawes table tr td button[action="view"]', 'click', function
   if(transfer) viewTransfer(transfer);
 });
 $on(`#view-user .modal-body button[name="change-status"]`, 'click', async function() {
-  loadingDialog('create-template', 'تغيير حالة المستخدم', 'يرجى الإنتظار لحين تغيير حالة المستخدم ...');
+  loadingDialog('تغيير حالة المستخدم', 'يرجى الإنتظار لحين تغيير حالة المستخدم ...');
   const id = $('#view-user .modal-title #view-user-id').html();
   const status = $('#view-user .modal-body .form-control[name="status"]').val();
   const description = $('#view-user .modal-body .form-control[name="status-description"]').val();
@@ -962,7 +960,7 @@ $on('#all-new-sellers table tr td button[action="view"]', 'click', function () {
   if(seller) viewSeller(seller);
 });
 $on(`#view-seller .modal-body button[name="change-status"]`, 'click', async function() {
-  loadingDialog('create-template', 'تغيير حالة البائع', 'يرجى الإنتظار لحين تغيير حالة البائع ...');
+  loadingDialog('تغيير حالة البائع', 'يرجى الإنتظار لحين تغيير حالة البائع ...');
   const id = $('#view-seller .modal-title #view-seller-id').html();
   const data = await $.ajax({
     url: `./admin/seller/${id}/change_status`,
@@ -1040,7 +1038,7 @@ $on('#all-currencies table tr td button[action="delete"]', 'click', function () 
     '<h4>هل أنت تأكد من أنك تريد حذف هذه العملة?</h4>',
     async (action) => {
       if(action == 'نعم') {
-        loadingDialog('delete-currency', 'حذف العملة', 'يرجى الإنتظار لحين حذف العملة...');
+        loadingDialog('حذف العملة', 'يرجى الإنتظار لحين حذف العملة...');
         const data = await $.ajax({
           url: `./admin/currency/${rowId}/delete`,
           type: 'DELETE',
@@ -1054,6 +1052,7 @@ $on('#all-currencies table tr td button[action="delete"]', 'click', function () 
         )
         changeTab(window.currentTabName);
         $('#loading-dialog-modal').modal('hide');
+        $('#message-dialog-modal').modal('hide');
       } else {
         $('#message-dialog-modal').modal('hide');
       }
@@ -1070,7 +1069,7 @@ $on('#all-currencies table td select[name="prices"]', 'change', function() {
   $(getElementChild(td, 'span')).html($(this).val())
 });
 $on('#create-edit-currency .btn[action="create"]', 'click', async function() {
-  loadingDialog('create-template', 'إنشاء العملة', 'يرجى الإنتظار لحين إنشاء العملة...');
+  loadingDialog('إنشاء العملة', 'يرجى الإنتظار لحين إنشاء العملة...');
   const formData = new FormData();
   formData.append('name', $('#create-edit-currency input[name="currency_name"]').val());
   formData.append('char', $('#create-edit-currency input[name="currency_char"]').val());
@@ -1101,7 +1100,7 @@ $on('#create-edit-currency .btn[action="create"]', 'click', async function() {
   $('#loading-dialog-modal').modal('hide');
 });
 $on('#create-edit-currency .btn[action="edit"]', 'click', async function() {
-  loadingDialog('create-template', 'تعديل العملة', 'يرجى الإنتظار لحين تعديل العملة...');
+  loadingDialog('تعديل العملة', 'يرجى الإنتظار لحين تعديل العملة...');
   const id = $('#create-edit-currency .modal-title').html().split('#')[1];
   const formData = new FormData();
   formData.append('name', $('#create-edit-currency input[name="currency_name"]').val());
@@ -1148,7 +1147,7 @@ $on('#all-transfers table tr td button[action="delete"]', 'click', function () {
     '<h4>هل أنت متأكد من أنك تريد حذف هذا التحويل?</h4>',
     async (action) => {
       if(action == 'نعم') {
-        loadingDialog('create-template', 'حذف التحويل', 'يرجى الإنتظار لحين حذف التحويل...');
+        loadingDialog('حذف التحويل', 'يرجى الإنتظار لحين حذف التحويل...');
         const data = await $.ajax({
           url: `./admin/transfer/${rowId}/delete`,
           type: 'DELETE',
@@ -1175,7 +1174,7 @@ $on('#all-transfers table tr td button[action="delete"]', 'click', function () {
   );
 });
 $on(`#view-transfer .modal-body button[name="change-status"]`, 'click', async function() {
-  loadingDialog('create-template', 'تغيير حالة تحويل', 'يرجى الإنتظار لحين تغيير حالة تحويل...');
+  loadingDialog('تغيير حالة تحويل', 'يرجى الإنتظار لحين تغيير حالة تحويل...');
   const id = $('#view-transfer .modal-title #view-transfer-id').html();
   const data = await $.ajax({
     url: `./admin/transfer/${id}/change_status`,
@@ -1196,7 +1195,6 @@ $on(`#view-transfer .modal-body button[name="change-status"]`, 'click', async fu
 $on('#all-categories .custom-table-header-actions button[action="create"]', 'click', function() {
   $('#create-edit-category .btn-img-picker').html('<span class="material-symbols-sharp pick-icon">add_a_photo</span>');
   $('#create-edit-category input').val('');
-  clearMultiInputValues('#category-names');
   var button = $($('#create-edit-category .modal-footer button[action="edit"]')[0] ?? $('#create-edit-category .modal-footer button[action="create"]')[0])
   button.html('إنشاء');
   button.attr('action', 'create');
@@ -1216,15 +1214,9 @@ $on('#all-categories table tr td button[action="edit"]', 'click', function () {
   button.attr('action', 'edit');
   $('#create-edit-category .btn-img-picker').html('<span class="material-symbols-sharp pick-icon">add_a_photo</span>');
   $('#create-edit-category input').val('');
+  $('#create-edit-category input[name="name_en"]').val(category.name.en);
+  $('#create-edit-category input[name="name_ar"]').val(category.name.ar);
   $('#create-edit-category .form-group .btn.btn-img-picker').html(`<img src="./file/public/${category.image_id}">`);
-  clearMultiInputValues('#category-names');
-  for (const langCode in category.name) {
-    const name = category.name[langCode];
-    addMultiInputItem('#category-names', {
-      lang_code: langCode,
-      text: name,
-    });
-  }
   $('#create-edit-category').modal('show');
 });
 $on('#all-categories table tr td button[action="delete"]', 'click', function () {
@@ -1238,7 +1230,7 @@ $on('#all-categories table tr td button[action="delete"]', 'click', function () 
     '<h4>هل أنت متأكد من أنك تريد حذف هذا النوع?</h4>',
     async (action) => {
       if(action == 'نعم') {
-        loadingDialog('create-template', 'حذف النوع', 'يرجى الإنتظار لحين حذف النوع...');
+        loadingDialog('حذف النوع', 'يرجى الإنتظار لحين حذف النوع...');
         const data = await $.ajax({
           url: `./admin/category/${rowId}/delete`,
           type: 'DELETE',
@@ -1265,10 +1257,13 @@ $on('#all-categories table tr td button[action="delete"]', 'click', function () 
   );
 });
 $on('#create-edit-category .btn[action="create"]', 'click', async function() {
-  loadingDialog('create-template', 'إنشاء النوع', 'يرجى الإنتظار لحين إنشاء النوع...');
+  loadingDialog('إنشاء النوع', 'يرجى الإنتظار لحين إنشاء النوع...');
   const formData = new FormData();
   formData.append('image', window.ImagePicker['category-image-picker']);
-  formData.append('names', JSON.stringify(getMultiInputValues('#category-names')));
+  formData.append('names', JSON.stringify({
+    en: $('#create-edit-category input[name="name_en"]').val(),
+    ar: $('#create-edit-category input[name="name_ar"]').val(),
+  }));
   const data = await $.ajax({
     url: './admin/category/create_category',
     type: 'POST',
@@ -1291,11 +1286,14 @@ $on('#create-edit-category .btn[action="create"]', 'click', async function() {
   $('#loading-dialog-modal').modal('hide');
 });
 $on('#create-edit-category .btn[action="edit"]', 'click', async function() {
-  loadingDialog('create-template', 'تعديل النوع', 'يرجى الإنتظار لحين تعديل النوع...');
+  loadingDialog('تعديل النوع', 'يرجى الإنتظار لحين تعديل النوع...');
   const id = $('#create-edit-category .modal-title').html().split('#')[1];
   const formData = new FormData();
   formData.append('image', window.ImagePicker['category-image-picker']);
-  formData.append('names', JSON.stringify(getMultiInputValues('#category-names')));
+  formData.append('names', JSON.stringify({
+    en: $('#create-edit-category input[name="name_en"]').val(),
+    ar: $('#create-edit-category input[name="name_ar"]').val(),
+  }));
   const data = await $.ajax({
     url: `./admin/category/${id}/edit`,
     type: 'POST',
@@ -1324,7 +1322,7 @@ $on('#all-purchases table tr td button[action="view"]', 'click', function() {
   if(purchase) viewPurchase(purchase);
 });
 $on('#view-purchase .modal-body button[name="answer"]', 'click', async function() {
-  loadingDialog('create-template', 'الإجابة', 'يرجى الإنتظار لحين الإجابة...');
+  loadingDialog('الإجابة', 'يرجى الإنتظار لحين الإجابة...');
   const id = $('#view-purchase .modal-title #view-purchase-id').html();
   const data = $.ajax({
     url: `./admin/purchase/${id}/answer`,
@@ -1390,7 +1388,7 @@ $on('#all-offers table tr td button[action="delete"]', 'click', function () {
     '<h4>هل أنت متأكد من أنك تريد حذف هذا العرض?</h4>',
     async (action) => {
       if(action == 'نعم') {
-        loadingDialog('create-template', 'حذف العرض', 'يرجى الإنتظار لحين حذف العرض...');
+        loadingDialog('حذف العرض', 'يرجى الإنتظار لحين حذف العرض...');
         const data = await $.ajax({
           url: `./admin/offer/${rowId}/delete`,
           type: 'DELETE',
@@ -1417,12 +1415,12 @@ $on('#all-offers table tr td button[action="delete"]', 'click', function () {
   );
 });
 $on('#create-edit-offer .modal-footer button[action="create"]', 'click', async function() {
-  loadingDialog('create-template', 'إنشاء العرض', 'يرجى الإنتظار لحين إنشاء العرض...');
+  loadingDialog('إنشاء العرض', 'يرجى الإنتظار لحين إنشاء العرض...');
   const formData = new FormData();
   formData.append('title_en', $('#create-edit-offer input[name="offer_title_en"]').val());
   formData.append('title_ar', $('#create-edit-offer input[name="offer_title_ar"]').val());
-  formData.append('description_en', $('#create-edit-offer input[name="offer_description_en"]').val());
-  formData.append('description_ar', $('#create-edit-offer input[name="offer_description_ar"]').val());
+  formData.append('description_en', $('#create-edit-offer textarea[name="offer_description_en"]').val());
+  formData.append('description_ar', $('#create-edit-offer textarea[name="offer_description_ar"]').val());
   formData.append('sub_offers', JSON.stringify(getMultiInputValues('#offer-sub-offers')));
   formData.append('fields', JSON.stringify(getMultiInputValues('#offer-fields')));
   formData.append('data', JSON.stringify(getMultiInputValues('#offer-data')));
@@ -1449,13 +1447,14 @@ $on('#create-edit-offer .modal-footer button[action="create"]', 'click', async f
   $('#loading-dialog-modal').modal('hide');
 });
 $on('#create-edit-offer .modal-footer button[action="edit"]', 'click', async function() {
-  loadingDialog('create-template', 'إنشاء العرض', 'يرجى الإنتظار لحين إنشاء العرض...');
+  loadingDialog('إنشاء العرض', 'يرجى الإنتظار لحين إنشاء العرض...');
+  const now = Date.now();
   const id = $('#create-edit-offer .modal-title').html().split('#')[1];
   const formData = new FormData();
   formData.append('title_en', $('#create-edit-offer input[name="offer_title_en"]').val());
   formData.append('title_ar', $('#create-edit-offer input[name="offer_title_ar"]').val());
-  formData.append('description_en', $('#create-edit-offer input[name="offer_description_en"]').val());
-  formData.append('description_ar', $('#create-edit-offer input[name="offer_description_ar"]').val());
+  formData.append('description_en', $('#create-edit-offer textarea[name="offer_description_en"]').val());
+  formData.append('description_ar', $('#create-edit-offer textarea[name="offer_description_ar"]').val());
   formData.append('sub_offers', JSON.stringify(getMultiInputValues('#offer-sub-offers')));
   formData.append('fields', JSON.stringify(getMultiInputValues('#offer-fields')));
   formData.append('data', JSON.stringify(getMultiInputValues('#offer-data')));
@@ -1479,6 +1478,8 @@ $on('#create-edit-offer .modal-footer button[action="edit"]', 'click', async fun
       alertMessage('create-offer-message', 'تعديل العرض', error, 'danger');
     }
   }
+  const d = Date.now() - now;
+  if(d < 2000) await delay(d)
   $('#loading-dialog-modal').modal('hide');
 });
 
@@ -1488,7 +1489,7 @@ $on('#all-offer-requests table tr td button[action="view"]', 'click', function (
   if(offerRequest) viewOfferRequest(offerRequest);
 });
 $on('#view-offer-request .form-group[name="answer_form"] .btn[action="submit"]', 'click',async function() {
-  loadingDialog('create-template', 'لإجابة الطلب', 'يرجى الإنتظار لحين لإجابة الطلب...');
+  loadingDialog('لإجابة الطلب', 'يرجى الإنتظار لحين لإجابة الطلب...');
   const id = $('#view-offer-request #view-offer-request-id').html();
   const offerRequest = StorageDatabase.collection('offers').doc('offer_requests').doc(id).get();
   const formData = new FormData();
@@ -1570,7 +1571,7 @@ $on('#all-templates tr td button[action="delete"]', 'click', function () {
     '<h4>هل أنت متأكد من أنك تريد حذف هذا القالب?</h4>',
     async (action) => {
       if(action == 'نعم') {
-        loadingDialog('create-template', 'حذف القالب', 'يرجى الإنتظار لحين حذف القالب...');
+        loadingDialog('حذف القالب', 'يرجى الإنتظار لحين حذف القالب...');
         const data = await $.ajax({
           url: `./admin/template/${rowId}/delete`,
           type: 'DELETE',
@@ -1597,7 +1598,7 @@ $on('#all-templates tr td button[action="delete"]', 'click', function () {
   );
 });
 $on('#create-edit-template .modal-footer .btn[action="create"]', 'click', async function() {
-  loadingDialog('create-template', 'إنشاء القالب', 'يرجى الإنتظار لحين إنشاء القالب...');
+  loadingDialog('إنشاء القالب', 'يرجى الإنتظار لحين إنشاء القالب...');
   const formData = new FormData();
   formData.append('name', $('#create-edit-template input[name="template_name"]').val());
   formData.append('type', $('#create-edit-template select[name="template_type"]').val());
@@ -1625,7 +1626,7 @@ $on('#create-edit-template .modal-footer .btn[action="create"]', 'click', async 
   $('#loading-dialog-modal').modal('hide');
 });
 $on('#create-edit-template .modal-footer .btn[action="edit"]', 'click', async function() {
-  loadingDialog('create-template', 'تعديل القالب', 'يرجى الإنتظار لحين تعديل القالب...');
+  loadingDialog('تعديل القالب', 'يرجى الإنتظار لحين تعديل القالب...');
   const id = $('#create-edit-template .modal-title').html().split('#')[1];
   const formData = new FormData();
   formData.append('name', $('#create-edit-template input[name="template_name"]').val());
@@ -1740,7 +1741,7 @@ $on('#all-mails .custom-table-header-actions button[action="delete"]', 'click', 
     'هل أنت متأكد من حذف هؤلاء الإمايلات?',
     async (action) => {
       if(action == 'نعم') {
-        loadingDialog('create-template', 'حذف الإمايات', 'يرجى الإنتظار لحين حذف الإمايات...');
+        loadingDialog('حذف الإمايات', 'يرجى الإنتظار لحين حذف الإمايات...');
         const formData = new FormData();
         formData.append('ids', JSON.stringify(mailsIds));
         const data = await $.ajax({
@@ -1782,7 +1783,7 @@ $on('#all-mails', 'onRowActionClick[action="delete"]', function(event, row) {
     '<h4>هل أنت متأكد من أنك تريد حذف هذا البريد الإلكتروني?</h4>',
     async (action) => {
       if(action == 'نعم') {
-        loadingDialog('delete-mail', 'حذف البريد الإلكتروني', 'يرجى الإنتظار لحين حذف البريد الإلكتروني...');
+        loadingDialog('حذف البريد الإلكتروني', 'يرجى الإنتظار لحين حذف البريد الإلكتروني...');
         const data = await $.ajax({
           url: `./admin/mail/${id}/delete`,
           type: 'DELETE',
@@ -1819,7 +1820,7 @@ $on('#create-mail select[name="template"]', 'change', function() {
   $('#create-mail .form-group[name="data"] .data_fields').html(fields);
 });
 $on('#create-mail .modal-footer .btn[action="create"]', 'click', async function() {
-  loadingDialog('create-template', 'إرسال البريد الإلكتروني', 'يرجى الإنتظار لحين إرسال البريد الإلكتروني...');
+  loadingDialog('إرسال البريد الإلكتروني', 'يرجى الإنتظار لحين إرسال البريد الإلكتروني...');
   const formData = new FormData();
   formData.append('title', $('#create-mail input[name="title"]').val());
   formData.append('template_id', $('#create-mail select[name="template"]').val());

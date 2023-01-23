@@ -22,7 +22,6 @@ class OfferCreatedEvent {
    * @return void
    */
   public function __construct(Offer $offer) {
-    $offer->linking();
     foreach ($offer->unreades ?? [] as $admin_id) {
       Notification::create([
         'to_id' => $admin_id,

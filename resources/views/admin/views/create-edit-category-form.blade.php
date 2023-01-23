@@ -7,13 +7,14 @@
       <div class="modal-body">
 
         <div class="form-group">
-          <h5>الأسماء:</h5>
-          <div id="category-names" class="multi-input"
-               inputs='[{"name": "lang_code", "text": "رمز اللغة", "type": "string"}, {"name": "text", "text": "الاسم", "type": "text"}]'
-               add-btn-text="إضافة">
-            <div class="multi-input-header"></div>
-            <div class="multi-input-body"></div>
-          </div>
+          <h5>لإسم(en):</h5>
+          <input type="text" class="form-control" name="name_en">
+        </div>
+        <hr>
+
+        <div class="form-group">
+          <h5>لإسم(ar):</h5>
+          <input type="text" class="form-control" name="name_ar">
         </div>
         <hr>
 

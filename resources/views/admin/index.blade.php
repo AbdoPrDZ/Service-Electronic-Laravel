@@ -43,8 +43,6 @@
                       <h2><?= $admin->username ?></h2>
                     </span>
                   </div>
-                  <!-- <div class="dropdown-divider"></div> -->
-                  <!-- <div class="dropdown-item" value="account"></div> -->
                   <div class="dropdown-divider"></div>
                   <a href="./admin/setting" class="dropdown-item" style="display: flex;">
                     <span class="material-symbols-sharp" style="margin-right: 10px">settings</span>
@@ -101,13 +99,13 @@
                 <h3>المنتجات</h3>
               </div>
               <div id="purchases" class="sidebar-item">
-                <span class="material-symbols-sharp">category
+                <span class="material-symbols-sharp">shopping_bag
                   <span class="news-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger hide"></span>
                 </span>
                 <h3>مبيعات المنتجات</h3>
               </div>
               <div id="offers" class="sidebar-item">
-                <span class="material-symbols-sharp">price_change
+                <span class="material-symbols-sharp">style
                   <span class="news-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger hide"></span>
                 </span>
                 <h3>العروض</h3>
@@ -214,9 +212,26 @@
 
     </div>
 
-    <script src="{{ asset('/resources/js/admin/main.js') }}"></script>
-    <script src="{{ asset('/resources/js/address-input/index.js') }}"></script>
-    <script type="module" src="{{ asset('/resources/js/admin/dashboard.js') }}"></script>
+    <script src="{{ asset('/resources/js/admin/main.js') }}?time={{ now() }}"></script>
+    <script type="module" src="{{ asset('/resources/js/admin/dashboard.js') }}?time={{ now() }}"></script>
+    <script>
+      window.rules = [
+        ['required|string', 'text'],
+        ['required|number', 'number'],
+        ['required|numeric', 'float'],
+        ['required|email', 'email'],
+        ['required|phone', 'phone'],
+      ];
+      window.inputTypes = [
+        ['text', 'text'],
+        ['textarea', 'multi line text'],
+        ['datetime', 'datetime'],
+        ['phone', 'phone'],
+        ['email', 'email'],
+        ['address', 'address'],
+        ['number', 'number'],
+      ];
+    </script>
 
   </body>
 </html>

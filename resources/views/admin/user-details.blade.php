@@ -362,7 +362,7 @@
         @endif
       </div>
     </div>
-    <script src="{{ asset('/resources/js/admin/main.js') }}"></script>
+    <script src="{{ asset('/resources/js/admin/main.js') }}?time={{ now() }}"></script>
     <script>
       initTable('#all-user-transfers table', [[1, 'desc']]).draw();
       initTable('#all-user-products table', [[1, 'desc']]).draw();

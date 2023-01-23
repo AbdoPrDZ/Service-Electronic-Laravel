@@ -160,7 +160,7 @@
 
     </div>
 
-    <script src="{{ asset('/resources/js/admin/main.js') }}"></script>
+    <script src="{{ asset('/resources/js/admin/main.js') }}?time={{ now() }}"></script>
     <script>
       function saveSetting(button, name) {
         const actions = {

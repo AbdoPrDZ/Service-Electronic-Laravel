@@ -19,8 +19,6 @@ return new class extends Migration {
       $table->json('sub_offers')->default('[]');
       $table->json('fields');
       $table->json('data');
-      $table->json('detect_steps');
-      $table->json('prices');
       $table->json('unreades')->default('[]');
       $table->boolean('is_deleted')->default(false);
       $table->timestamps();

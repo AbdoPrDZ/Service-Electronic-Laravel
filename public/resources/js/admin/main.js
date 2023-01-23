@@ -185,25 +185,24 @@ function messageDialog(dialogId, title, message, onActionClick, buttons = {OK: '
 }
 /**
  * Alert Loading Dialog
- * @param {string} dialogId
  * @param {string} title
  * @param {string} message
  * @param {Promise} callback
  * @param {callback?} onHidden
  */
-async function loadingDialog(dialogId, title, message, callback = async () => {}, onHidden = null) {
-  dialogId = `${dialogId}-${Date.now()}`;
-  $('#loading-dialog-modal').attr('dialog-id', dialogId);
+function loadingDialog(title, message, onHidden = null) {
+  window.loadingDialogSettedAt = Date.now();
   $('#loading-dialog-modal .modal-title').html(title);
   $('#loading-dialog-modal .modal-body .dialog-message').html(message);
-
   $('#loading-dialog-modal').modal('show');
-  await callback();
-  $('#loading-dialog-modal').modal('hide');
-
-  $on(`#loading-dialog-modal[dialog-id="${dialogId}"]`, 'onModalHidden', () => {
+  $on(`#loading-dialog-modal`, 'onModalHidden', () => {
     if (onHidden) onHidden();
   });
+}
+async function hideLoadingDialog() {
+  const d = Date.now() - window.loadingDialogSettedAt;
+  if(d < 2000) await delay(d + 1000);
+  $('#loading-dialog-modal').modal('hide');
 }
 
 async function alertMessage(alertId, title, message, type = 'success', dismissingAfter = 2500) {
@@ -228,9 +227,12 @@ function initMultiInputWidget(element) {
   inputs.forEach((input) => {
     if(input.type == 'select') {
       inputsHtml += `<select class="form-control" name="${input.name}">`;
-      input.options.forEach(option => {
-        inputsHtml += `<option value="${option[0]}">${option[1]}</option>`
+      var options = input.options == 'rules' ? window.rules : input.options == 'inputTypes' ? window.inputTypes : (input.options ?? []);
+      inputsHtml += `<option value="" selected>${input.text}</option>`;
+      options.forEach(option => {
+        inputsHtml += `<option value="${option[0]}">${option[1]}</option>`;
       });
+      inputsHtml += '<select>'
     } else {
       inputsHtml += `<input type="${input.type}" name="${input.name}" class="form-control" placeholder="${input.text}">`;
     }
