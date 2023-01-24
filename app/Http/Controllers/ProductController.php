@@ -15,9 +15,13 @@ use Validator;
 class ProductController extends Controller {
 
   public function all(Request $request) {
+    $query = $request->query();
     $items = Product::where('is_deleted', '=', 0)->get();
+    $from = key_exists('from', $query) && intVal($query['from']) < count($items) && intVal($query['from']) >= 0 ? intVal($query['from']) : 0;
+    $to = key_exists('to', $query) && intVal($query['to']) <= count($items)&& intVal($query['to']) > $from ? intVal($query['to']) : count($items);
     $products = [];
-    foreach ($items as $product) {
+    for ($i = $from; $i < $to; $i++) {
+      $product = $items[$i];
       $product->linking($request->user());
       $products[$product->id] = $product;
     }

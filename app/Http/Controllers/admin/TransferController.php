@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use App\Models\File;
 use App\Models\Mail;
 use App\Models\Setting;
 use App\Models\Transfer;

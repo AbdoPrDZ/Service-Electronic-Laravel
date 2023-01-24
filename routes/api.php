@@ -108,7 +108,6 @@ Route::group([
   Route::post('/{id}/seller_report', [PurchaseController::class, 'sellerReport'])->middleware('valid_id:' . Purchase::class);
 });
 
-
 Route::group([
   'prefix' => 'offer_request',
   'middleware' => ['multi.auth:sanctum'],
@@ -117,3 +116,4 @@ Route::group([
   Route::post('/{offer_id}/create', [OfferRequestController::class, 'create'])->middleware('valid_id:' . Offer::class . ',offer_id');
 });
 
+Route::get('test', [ProductController::class, 'all']);
