@@ -874,7 +874,7 @@ $on('#send-notification-modal .btn[action="send"]', 'click', async function() {
       alertMessage('send-notification', 'إرسال رسالة', error, 'danger');
     }
   }
-  $('#loading-dialog-modal').modal('hide');
+  hideLoadingDialog()
 });
 $on('#all-users table tr td button[action="delete"]', 'click', function () {
   const rowId = getElementparent(this, 2).id.replace(`all-users-item-`, '');
@@ -901,7 +901,7 @@ $on('#all-users table tr td button[action="delete"]', 'click', function () {
           data.success ? 'success': 'danger'
         )
         changeTab(window.currentTabName);
-        $('#loading-dialog-modal').modal('hide');
+        hideLoadingDialog()
       } else {
         $('#message-dialog-modal').modal('hide');
       }
@@ -951,7 +951,7 @@ $on(`#view-user .modal-body button[name="change-status"]`, 'click', async functi
   }
   $('#view-user').modal('hide');
   await loadTab();
-  $('#loading-dialog-modal').modal('hide');
+  hideLoadingDialog()
 });
 
 $on('#all-new-sellers table tr td button[action="view"]', 'click', function () {
@@ -983,7 +983,7 @@ $on(`#view-seller .modal-body button[name="change-status"]`, 'click', async func
   }
   $('#view-seller').modal('hide');
   await loadTab();
-  $('#loading-dialog-modal').modal('hide');
+  hideLoadingDialog()
 });
 $on('#view-seller .modal-body .form-control[name="delivery_states"]', 'change', function() {
   $('#view-seller .modal-body .form-control[name="delivery_state_price"]').html(`office: ${$(this).attr('office')} | home: ${$(this).attr('home')}`)
@@ -1051,7 +1051,7 @@ $on('#all-currencies table tr td button[action="delete"]', 'click', function () 
           data.success ? 'success': 'danger'
         )
         changeTab(window.currentTabName);
-        $('#loading-dialog-modal').modal('hide');
+        hideLoadingDialog()
         $('#message-dialog-modal').modal('hide');
       } else {
         $('#message-dialog-modal').modal('hide');
@@ -1097,7 +1097,7 @@ $on('#create-edit-currency .btn[action="create"]', 'click', async function() {
       alertMessage('create-currency-message', 'إنشاء عملة', error, 'danger');
     }
   }
-  $('#loading-dialog-modal').modal('hide');
+  hideLoadingDialog()
 });
 $on('#create-edit-currency .btn[action="edit"]', 'click', async function() {
   loadingDialog('تعديل العملة', 'يرجى الإنتظار لحين تعديل العملة...');
@@ -1128,7 +1128,7 @@ $on('#create-edit-currency .btn[action="edit"]', 'click', async function() {
       alertMessage('edit-currency-message', 'تعديل العملة', error, 'danger');
     }
   }
-  $('#loading-dialog-modal').modal('hide');
+  hideLoadingDialog()
 });
 
 $on('#all-transfers table tr td button[action="view"]', 'click', function () {
@@ -1161,7 +1161,7 @@ $on('#all-transfers table tr td button[action="delete"]', 'click', function () {
           data.success ? 'success': 'danger'
         )
         changeTab(window.currentTabName);
-        $('#loading-dialog-modal').modal('hide');
+        hideLoadingDialog()
       } else {
         $('#message-dialog-modal').modal('hide');
       }
@@ -1189,7 +1189,7 @@ $on(`#view-transfer .modal-body button[name="change-status"]`, 'click', async fu
   alertMessage('change-transfer-status-message', 'تغيير حالة التحويل', data.message, data.success ? 'success' : 'danger');
   $('#view-transfer').modal('hide');
   await loadTab();
-  $('#loading-dialog-modal').modal('hide');
+  hideLoadingDialog()
 });
 
 $on('#all-categories .custom-table-header-actions button[action="create"]', 'click', function() {
@@ -1244,7 +1244,7 @@ $on('#all-categories table tr td button[action="delete"]', 'click', function () 
           data.success ? 'success': 'danger'
         )
         changeTab(window.currentTabName);
-        $('#loading-dialog-modal').modal('hide');
+        hideLoadingDialog()
       } else {
         $('#message-dialog-modal').modal('hide');
       }
@@ -1283,7 +1283,7 @@ $on('#create-edit-category .btn[action="create"]', 'click', async function() {
       alertMessage('create-category-message', 'إنشاء نوع', error, 'danger');
     }
   }
-  $('#loading-dialog-modal').modal('hide');
+  hideLoadingDialog()
 });
 $on('#create-edit-category .btn[action="edit"]', 'click', async function() {
   loadingDialog('تعديل النوع', 'يرجى الإنتظار لحين تعديل النوع...');
@@ -1313,7 +1313,7 @@ $on('#create-edit-category .btn[action="edit"]', 'click', async function() {
       alertMessage('create-category-message', 'تعديل النوع', error, 'danger');
     }
   }
-  $('#loading-dialog-modal').modal('hide');
+  hideLoadingDialog()
 });
 
 $on('#all-purchases table tr td button[action="view"]', 'click', function() {
@@ -1334,7 +1334,7 @@ $on('#view-purchase .modal-body button[name="answer"]', 'click', async function(
   alertMessage('answer-purchase-message', 'إجابة المدير', data.message, data.success ? 'success' : 'danger');
   $('#view-purchase').modal('hide');
   await loadTab();
-  $('#loading-dialog-modal').modal('hide');
+  hideLoadingDialog()
 });
 
 $on('#all-offers .custom-table-header-actions button[action="create"]', 'click', function() {
@@ -1402,7 +1402,7 @@ $on('#all-offers table tr td button[action="delete"]', 'click', function () {
           data.success ? 'success': 'danger'
         )
         changeTab(window.currentTabName);
-        $('#loading-dialog-modal').modal('hide');
+        hideLoadingDialog()
       } else {
         $('#message-dialog-modal').modal('hide');
       }
@@ -1444,7 +1444,7 @@ $on('#create-edit-offer .modal-footer button[action="create"]', 'click', async f
       alertMessage('create-offer-message', 'إنشاء عرض', error, 'danger');
     }
   }
-  $('#loading-dialog-modal').modal('hide');
+  hideLoadingDialog()
 });
 $on('#create-edit-offer .modal-footer button[action="edit"]', 'click', async function() {
   loadingDialog('إنشاء العرض', 'يرجى الإنتظار لحين إنشاء العرض...');
@@ -1480,7 +1480,7 @@ $on('#create-edit-offer .modal-footer button[action="edit"]', 'click', async fun
   }
   const d = Date.now() - now;
   if(d < 2000) await delay(d)
-  $('#loading-dialog-modal').modal('hide');
+  hideLoadingDialog()
 });
 
 $on('#all-offer-requests table tr td button[action="view"]', 'click', function () {
@@ -1524,7 +1524,7 @@ $on('#view-offer-request .form-group[name="answer_form"] .btn[action="submit"]',
       }
     }
   }
-  $('#loading-dialog-modal').modal('hide');
+  hideLoadingDialog()
 });
 
 $on('#all-templates .custom-table-header-actions button[action="create"]', 'click', function() {
@@ -1585,7 +1585,7 @@ $on('#all-templates tr td button[action="delete"]', 'click', function () {
           data.success ? 'success': 'danger'
         )
         changeTab(window.currentTabName);
-        $('#loading-dialog-modal').modal('hide');
+        hideLoadingDialog()
       } else {
         $('#message-dialog-modal').modal('hide');
       }
@@ -1623,7 +1623,7 @@ $on('#create-edit-template .modal-footer .btn[action="create"]', 'click', async 
       alertMessage('create-template-message', 'إنشاء قالب', error, 'danger');
     }
   }
-  $('#loading-dialog-modal').modal('hide');
+  hideLoadingDialog()
 });
 $on('#create-edit-template .modal-footer .btn[action="edit"]', 'click', async function() {
   loadingDialog('تعديل القالب', 'يرجى الإنتظار لحين تعديل القالب...');
@@ -1653,7 +1653,7 @@ $on('#create-edit-template .modal-footer .btn[action="edit"]', 'click', async fu
       alertMessage('edit-template-message', 'تعديل القالب', error, 'danger');
     }
   }
-  $('#loading-dialog-modal').modal('hide');
+  hideLoadingDialog()
 });
 window.switchTab = function(button, target) {
   if(target == 'preview') {
@@ -1762,7 +1762,7 @@ $on('#all-mails .custom-table-header-actions button[action="delete"]', 'click', 
             alertMessage('delete-mails-message', 'حذف الإيمايلات', error, 'danger');
           }
         }
-        $('#loading-dialog-modal').modal('hide');
+        hideLoadingDialog()
       } else {
         $('#message-dialog-modal').modal('hide');
       }
@@ -1797,7 +1797,7 @@ $on('#all-mails', 'onRowActionClick[action="delete"]', function(event, row) {
           data.success ? 'success': 'danger'
         )
         changeTab(window.currentTabName);
-        $('#loading-dialog-modal').modal('hide');
+        hideLoadingDialog()
       } else {
         $('#message-dialog-modal').modal('hide');
       }
@@ -1857,7 +1857,7 @@ $on('#create-mail .modal-footer .btn[action="create"]', 'click', async function(
       alertMessage('create-mail-message', 'إنشاء قالب', error, 'danger');
     }
   }
-  $('#loading-dialog-modal').modal('hide');
+  hideLoadingDialog()
 });
 $on('#create-mail', 'onHidden', function() {
   $('#all-mails .custom-table-header-actions button[action="create"]').html('<span class="material-symbols-sharp">add</span>إنشاء');
