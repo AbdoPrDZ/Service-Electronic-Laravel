@@ -55,7 +55,7 @@ class Transfer extends Model  {
     'sended_currency_id',
     'received_currency_id',
     'proof_id',
-    'wallet',
+    'data',
     'exchange_id',
     'for_what',
     'status',
@@ -65,6 +65,7 @@ class Transfer extends Model  {
   ];
 
   protected $casts = [
+    'data' => 'array',
     'answered_at' => 'datetime:Y-m-d H:m:s',
     'unreades' => 'array',
     'created_at' => 'datetime:Y-m-d H:m:s',

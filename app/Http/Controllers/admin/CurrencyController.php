@@ -41,11 +41,13 @@ class CurrencyController extends Controller {
     } catch (\Throwable $th) {
       $request->merge(['balance' => null]);
     }
+    $request->merge(['data' => $this->tryDecodeArray($request->data)]);
     $validator = Validator::make($request->all(), [
       'name' => 'required|string',
       'char' => 'required|string',
       'balance' => 'numeric',
       'wallet' => 'required|string',
+      'data' => 'required|array',
       'image' => 'required|file|mimes:jpg,png,jpeg',
       'proof_is_required' => 'required|boolean',
       'prices' => 'required|string',
@@ -108,6 +110,7 @@ class CurrencyController extends Controller {
       'prices' => $prices,
       'platform_wallet_id' => $walletId,
       'wallet' => $request->wallet,
+      'data' => $this->listMap2Map($request->data),
       'proof_is_required' => $request->proof_is_required,
       'unreades' => Admin::unreades($request->user()->id)
     ]);
@@ -116,10 +119,12 @@ class CurrencyController extends Controller {
 
   public function edit(Request $request, Currency $currency) {
     $request->merge(['proof_is_required' => !is_null($request->proof_is_required) ? $request->proof_is_required == 'true' : null]);
+    $request->merge(['data' => $this->tryDecodeArray($request->data)]);
     $validator = Validator::make($request->all(), [
       'name' => 'string',
       'char' => 'string',
       'wallet' => 'string',
+      'data' => 'array',
       'image' => 'file|mimes:jpg,png,jpeg',
       'proof_is_required' => 'boolean',
       'prices' => 'string',
@@ -157,12 +162,13 @@ class CurrencyController extends Controller {
       }
     }
 
-    $currency->char = $request->char;
-    $currency->wallet = $request->wallet;
-    $currency->proof_is_required = $request->proof_is_required;
+    $currency->char = $request->char ?? $currency->char;
+    $currency->wallet = $request->wallet ?? $currency->wallet;
+    $currency->data = $this->listMap2Map($request->data) ?? $currency->wallet;
+    $currency->proof_is_required = $request->proof_is_required ?? $currency->proof_is_required;
     $currency->save();
     $currency->linking();
-    $currency->platform_wallet->balance = $request->balance;
+    $currency->platform_wallet->balance = $request->balance ?? $currency->platform_wallet->balance;
     $currency->unreades = Admin::unreades($request->user()->id);
     $currency->platform_wallet->save();
 

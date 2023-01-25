@@ -25,11 +25,12 @@ class TransferController extends Controller {
   }
 
   public function create(Request $request) {
+    $request->merge(['data' => $this->tryDecodeArray($request->data)]);
     $validator = Validator::make($request->all(), [
       'received_balance' => 'required|numeric',
       'received_currency_id' => 'required|string',
       'sended_currency_id' => 'required|string',
-      'wallet' => 'string',
+      'data' => 'required|array',
       'proof' => 'file|mimes:jpg,png,jpeg',
     ]);
     if ($validator->fails()) {
@@ -43,6 +44,12 @@ class TransferController extends Controller {
     if(is_null($sended_currency)) return $this->apiErrorResponse('Invalid sended currency', [
       'errors' => ['sended_currency_id' => 'Invalid sended currency'],
     ]);
+    $validator = Validator::make($request->data, $sended_currency->data);
+    if ($validator->fails()) {
+      return $this->apiErrorResponse(null, [
+        'messages' => $validator->errors(),
+      ]);
+    }
 
     $received_currency = Currency::find($request->received_currency_id);
     if(is_null($received_currency)) return $this->apiErrorResponse('Invalid received currency', [
@@ -85,7 +92,7 @@ class TransferController extends Controller {
       'received_balance' => $received_balance,
       'sended_currency_id' => $request->sended_currency_id,
       'received_currency_id' => $request->received_currency_id,
-      'wallet' => $request->wallet,
+      'data' => $request->data,
       'for_what' => 'transfer',
       'unreades' => Admin::unreades()
     ];
@@ -174,7 +181,7 @@ class TransferController extends Controller {
       'received_balance' => $received_balance,
       'sended_currency_id' => $request->sended_currency_id,
       'received_currency_id' => $request->received_currency_id,
-      'wallet' => null,
+      'data' => [],
       'for_what' => 'recharge',
       'unreades' => Admin::unreades()
     ];
@@ -219,9 +226,9 @@ class TransferController extends Controller {
 
   public function createWithdraw(Request $request) {
     $validator = Validator::make($request->all(), [
-      'received_balance' => 'required|numeric', // 100
-      'received_currency_id' => 'required|string', // payseera
-      'sended_currency_id' => 'required|string', // ccp
+      'received_balance' => 'required|numeric',
+      'received_currency_id' => 'required|string',
+      'sended_currency_id' => 'required|string',
     ]);
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
@@ -263,7 +270,7 @@ class TransferController extends Controller {
       'received_balance' => $received_balance,
       'sended_currency_id' => $request->sended_currency_id,
       'received_currency_id' => $request->received_currency_id,
-      'wallet' => null,
+      'data' => [],
       'for_what' => 'withdraw',
       'unreades' => Admin::unreades()
     ];

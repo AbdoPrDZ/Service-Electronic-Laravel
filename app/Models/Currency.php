@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $name
  * @property string $char
  * @property bool $proof_is_required
- * @property string $wallet
+ * @property array $data
  * @property string $platform_wallet_id
  * @property Wallet $platform_wallet
  * @property array $prices
@@ -46,6 +46,7 @@ class Currency extends Model {
     'proof_is_required',
     'image_pick_type',
     'wallet',
+    'data',
     'platform_wallet_id',
     'prices',
     'unreades',
@@ -53,6 +54,7 @@ class Currency extends Model {
   ];
 
   protected $casts = [
+    'data' => 'array',
     'prices' => 'array',
     'unreades' => 'array',
     'proof_is_required' => 'boolean',

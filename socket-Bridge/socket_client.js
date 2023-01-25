@@ -42,7 +42,6 @@ class SocketClient {
   }
 
   async emitToServer(routeName, ...args) {
-    console.log('emit to server', routeName, ...args);
     var headers = this.client.handshake.headers;
     Object.assign(headers, Environment.requestHeaders)
     try {
@@ -53,7 +52,6 @@ class SocketClient {
         {args: args},
         {headers: headers},
       );
-      console.log('emit to server data', data);
       return data;
     } catch (error) {
       console.error('SocketClient:55', error);
@@ -66,13 +64,11 @@ class SocketClient {
     var headers = this.client.handshake.headers;
     Object.assign(headers, Environment.requestHeaders)
     try {
-      console.log(`${Environment.configures.manager.app_url}${Environment.configures.manager.path}/${this.room}${Environment.configures.manager.onConnect}`.replace('{clientId}', this.client.id));
-      var {data} =  await axios.get(
+      const {data} =  await axios.get(
         `${Environment.configures.manager.app_url}${Environment.configures.manager.path}/${this.room}${Environment.configures.manager.onConnect}`
           .replace('{clientId}', this.client.id),
         {headers: headers}
       );
-      console.log(data);
       if(data['success']) {
         this.client.routes = data['routes'];
         this.client.id = data['clientId'];
@@ -93,16 +89,14 @@ class SocketClient {
     var headers = this.client.handshake.headers;
     Object.assign(headers, Environment.requestHeaders)
     try {
-      var {data} = await axios.get(
+      const {data} = await axios.get(
         `${Environment.configures.manager.app_url}${Environment.configures.manager.path}/${this.room}${Environment.configures.manager.onDisconnect}`
           .replace('{clientId}', this.client.id),
         {headers: headers}
       );
-      console.log('data:', data);
     } catch (error) {
       console.log('SocketClient:99', error);
     }
-    // this.client.handshake.headers[Environment.configures.manager.rooms[this.room].auth.auth_type] = null;
     delete(Environment.clients[this.room][this.client.id]);
     delete(this.client);
     this.authed = false;

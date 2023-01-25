@@ -18,9 +18,6 @@ function hostMiddleware(host = '*', port = '*') {
       requestHost = request.headers.host.split(':')[0];
       requestPort = request.headers.host.split(':')[1];
     }
-    // console.log(host, port);
-    // console.log(requestHost, requestPort);
-    // console.log(request.headers['connection-key'])
     if((host == '*' || host == requestHost) && (port == '*' || port == requestPort)) {
       return next();
     }
@@ -47,9 +44,7 @@ async function main() {
     if(Environment.clients[request.params.room]) {
       const client = Environment.clients[request.params.room][request.params.clientId];
       if(client) {
-        console.log(request.params.routeName);
         const response = client.emitToClient(request.params.routeName, request.body);
-        console.log(response);
         success = response.success
         message = response.message;
       } else {
@@ -67,7 +62,6 @@ async function main() {
   // emit notification to client
   Environment.app.post(`${Environment.configures.bridge.path}${Environment.configures.bridge.emit_notification}`, (request, response) => {
     const notification = JSON.parse(request.body[0]);
-    console.log(notification);
     var success = false;
     var message = '';
     if(notification) {
@@ -75,7 +69,6 @@ async function main() {
         const client = Environment.clients[request.params.room][request.params.clientId];
         if(client) {
           const response = client.emitToClient('notifications', notification);
-          console.log(response);
           success = response.success
           message = response.message;
         } else {
@@ -94,12 +87,10 @@ async function main() {
   // push notification to client
   Environment.app.post(`${Environment.configures.bridge.path}${Environment.configures.bridge.push_notification}`, async (request, response) => {
     const notification = JSON.parse(request.body[0]);
-    console.log(notification);
     var success = false;
     var message = '';
     if(notification) {
       try {
-        console.log(notification)
         const message  = {
           'token': notification.client.messaging_token,
           'notification': {
@@ -112,7 +103,6 @@ async function main() {
               'icon': 'stock_ticker_update',
               'sound': "default",
               'color': '#7e55c3',
-              // 'imageUrl': env('APP_URL') + '/storage/defaults/logo.png',
             }
           },
           'data': {
@@ -120,11 +110,9 @@ async function main() {
             ...notification.data
           }
         }
-        console.log(message);
         const messagingResponse =  await admin.messaging().send(message);
         success =  true,
         message = 'Successfully sending message'
-        console.log(messagingResponse);
       } catch (error) {
         console.log('error: ', error);
         message= error;

@@ -34,4 +34,13 @@ class Controller extends BaseController {
       return $text;
     }
   }
+
+  public function listMap2Map(array $listMap, $field = 'name') {
+    $map = [];
+    foreach ($listMap as $item) {
+      $map[$item->{$field}] = $item;
+    }
+    return $map;
+  }
+
 }

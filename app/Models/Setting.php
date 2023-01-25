@@ -61,7 +61,7 @@ class Setting extends Model {
    * @return string
    */
   static function userRechargeEmailTemplateId() {
-    return Setting::find('user_recharge_email_template_id')->value[0];
+    return Setting::find('user_recharge_template_id')->value[0];
   }
 
   /**
@@ -69,7 +69,7 @@ class Setting extends Model {
    * @return string
    */
   static function userWithdrawEmailTemplateId() {
-    return Setting::find('user_withdraw_email_template_id')->value[0];
+    return Setting::find('user_withdraw_template_id')->value[0];
   }
 
   /**

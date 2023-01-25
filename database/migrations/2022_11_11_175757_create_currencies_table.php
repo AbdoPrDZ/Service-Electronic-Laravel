@@ -19,6 +19,7 @@ return new class extends Migration
       $table->boolean('proof_is_required')->default(true);
       $table->enum('image_pick_type', ['gallery', 'camera'])->default('gallery');
       $table->string('wallet');
+      $table->json('data')->default('{}');
       $table->string('platform_wallet_id');
       $table->json('prices')->default('{}');
       $table->json('unreades')->default('[]');

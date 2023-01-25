@@ -763,7 +763,6 @@ $(document).ready(function() {
     socket.disconnect();
   });
   socket.on('disconnect', function () {
-    window.location.href = "./admin/logout";
     window.connected = false;
   });
   socket.on('connect_failed', (err) => {

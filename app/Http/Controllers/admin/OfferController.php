@@ -42,14 +42,6 @@ class OfferController extends Controller {
     OfferRequest::readNews($admin_id);
   }
 
-  public function listMap2Map(array $listMap, $field = 'name') {
-    $map = [];
-    foreach ($listMap as $item) {
-      $map[$item->{$field}] = $item;
-    }
-    return $map;
-  }
-
   public function create(Request $request) {
     $request->merge(['sub_offers' => $this->tryDecodeArray($request->sub_offers)]);
     $request->merge(['fields' => $this->tryDecodeArray($request->fields)]);
