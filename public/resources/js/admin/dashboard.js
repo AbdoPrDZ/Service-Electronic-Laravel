@@ -39,12 +39,15 @@ const notificationsNames = {
   'new-withdraw-created': 'users',
   'new-recharge-created': 'users',
   'new-user-created': 'users',
+  'new-user-sended-identity-verification': 'users',
   'new-seller-created': 'sellers',
   'new-transfer-created': 'transfers',
   'new-currency-created': 'currencies',
   'new-category-created': 'products',
   'new-product-created': 'products',
   'new-product-solded': 'purchases',
+  'purchase-client-answer': 'purchases',
+  'purchase-seller-repport': 'purchases',
   'new-offer-created': 'offers',
   'new-offer-request-created': 'offers',
   'new-template-created': 'mails',
@@ -83,8 +86,10 @@ async function loadNotifications() {
   clearNotifications()
   for (const id in notifications) {
     const notification = notifications[id];
-    addNotification(notification.title, notification.message,
-                    notification.created_at, `./file/admin/${notification.image_id}`,
+    addNotification(notification.title,
+                    notification.message,
+                    notification.created_at,
+                    notification.image_id != null ? `./file/admin/${notification.image_id}` : './file/public/logo',
                     `readNotification(${id})`);
   }
   countingNofiticaitons()
@@ -145,12 +150,12 @@ function updateTable(values, tableId) {
         </td>`);
       if(tableId == 'all-users') {
         row.push(`<td>${id}</td>`);
-        row.push(`<td><div class="table-img"><img src="./file/admin/${values[id].profile_image_id}?t=${(new Date()).getTime()}"></div></td>`);
+        row.push(`<td><div class="table-img"><img src="./file/admin/${values[id].profile_image_id}"></div></td>`);
         row.push(`<td>${values[id].firstname} ${values[id].lastname}</td>`);
         row.push(`<td>${values[id].email}</td>`);
         row.push(`<td>${values[id].phone}</td>`);
-        row.push(`<td>${values[id].balance == 0 ? '<span class="danger">0 SE</span>':`<span class="success">${values[id].balance} SE</span>`}</td>`);
-        row.push(`<td>${values[id].checking_balance == 0 ? '<span class="danger">0 SE</span>':`<span class="warning">${values[id].checking_balance} SE</span>`}</td>`);
+        row.push(`<td>${values[id].balance == 0 ? '<span class="danger">0 DZD</span>':`<span class="success">${values[id].balance} DZD</span>`}</td>`);
+        row.push(`<td>${values[id].checking_balance == 0 ? '<span class="danger">0 DZD</span>':`<span class="warning">${values[id].checking_balance} DZD</span>`}</td>`);
         row.push(`<td>${values[id].email_verified ? '<span class="success">محقق</span>': '<span class="danger">غير محقق</span>'}</td>`);
         row.push(`<td>${statuses[values[id].identity_status]}</td>`);
         row.push(`<td>${values[id].created_at}</td>`);
@@ -170,7 +175,7 @@ function updateTable(values, tableId) {
             </button>
           </td>`);
       } else if(tableId == 'all-users-recharges') {
-        row.push(`<td><div class="table-img"><img src="./file/admin/${values[id].user.profile_image_id}?t=${(new Date()).getTime()}"></div></td>`);
+        row.push(`<td><div class="table-img"><img src="./file/admin/${values[id].user.profile_image_id}"></div></td>`);
         row.push(`<td>
           ${values[id].user.firstname} ${values[id].user.lastname}<br>
           ${values[id].user.phone}<br>
@@ -190,7 +195,7 @@ function updateTable(values, tableId) {
           </button>
         </td>`);
       } else if(tableId == 'all-users-withdrawes') {
-        row.push(`<td><div class="table-img"><img src="./file/admin/${values[id].user.profile_image_id}?t=${(new Date()).getTime()}"></div></td>`);
+        row.push(`<td><div class="table-img"><img src="./file/admin/${values[id].user.profile_image_id}"></div></td>`);
         row.push(`<td>
           ${values[id].user.firstname} ${values[id].user.lastname}<br>
           ${values[id].user.phone}<br>
@@ -210,14 +215,14 @@ function updateTable(values, tableId) {
         </td>`);
       } else if(tableId == 'all-sellers' || tableId == 'all-new-sellers') {
         row.push(`<td>${id}</td>`);
-        row.push(`<td><div class="table-img"><img src="./file/admin/${values[id].user.profile_image_id}?t=${(new Date()).getTime()}"></div></td>`);
+        row.push(`<td><div class="table-img"><img src="./file/admin/${values[id].user.profile_image_id}"></div></td>`);
         row.push(`<td>${values[id].user.firstname} ${values[id].user.lastname}</td>`);
         row.push(`<td>${values[id].store_name}</td>`);
         row.push(`<td>${values[id].user.email}</td>`);
         row.push(`<td>${values[id].user.phone}</td>`);
         row.push(`<td>${values[id].store_address}</td>`);
-        row.push(`<td>${values[id].user.balance == 0 ? '<span class="danger">0 SE</span>':`<span class="success">${values[id].user.balance} SE</span>`}</td>`);
-        row.push(`<td>${values[id].user.checking_balance == 0 ? '<span class="danger">0 SE</span>':`<span class="warning">${values[id].user.checking_balance} SE</span>`}</td>`);
+        row.push(`<td>${values[id].user.balance == 0 ? '<span class="danger">0 DZD</span>':`<span class="success">${values[id].user.balance} DZD</span>`}</td>`);
+        row.push(`<td>${values[id].user.checking_balance == 0 ? '<span class="danger">0 DZD</span>':`<span class="warning">${values[id].user.checking_balance} DZD</span>`}</td>`);
         row.push(`<td>${statuses[values[id].status]}</td>`);
         row.push(`<td>${values[id].created_at}</td>`);
         row.push(`
@@ -250,14 +255,15 @@ function updateTable(values, tableId) {
         </td>`);
       } else if(tableId == 'all-currencies') {
         row.push(`<td>${values[id].id}</td>`);
-        row.push(`<td><div class="table-img"><img src="./file/admin/currency-${values[id].id}?t=${(new Date()).getTime()}"></div></td>`);
+        row.push(`<td><div class="table-img"><img src="./file/admin/${values[id].image_id}"></div></td>`);
         row.push(`<td>${values[id].name}</td>`);
         row.push(`<td>${values[id].char}</td>`);
         row.push(`<td>
           ${values[id].platform_wallet.balance == 0 ?
           `<span class="danger">0 ${values[id].char}</span>` :
           `<span class="success">${values[id].platform_wallet.balance} ${values[id].char}</span>`
-        }</td>`);
+          }
+        </td>`);
         var pricesHtml = '<select class="form-control" name="prices">';
         var dPrice = null;
         for (const currencyId in values[id].prices) {
@@ -274,8 +280,12 @@ function updateTable(values, tableId) {
           <br>
           <span class="category-name success" name="name">${dPrice}</span>
         `;
-        row.push(`<td>${pricesHtml}</td>`);
-        row.push(`<td>${values[id].wallet}</td>`);
+        if(dPrice) {
+          row.push(`<td>${pricesHtml}</td>`);
+        } else {
+          row.push('<td></td>');
+        }
+        row.push(`<td>${values[id].wallet ?? ''}</td>`);
         row.push(`<td>${values[id].created_at}</td>`);
         row.push(`<td>
           <button class="btn btn-icon btn-warning" action="edit">
@@ -287,7 +297,7 @@ function updateTable(values, tableId) {
         </td>`);
       } else if(tableId == 'all-categories') {
         row.push(`<td>${values[id].id}</td>`);
-        row.push(`<td><div class="table-img"><img src="./file/admin/${values[id].image_id}?t=${(new Date()).getTime()}"></div></td>`);
+        row.push(`<td><div class="table-img"><img src="./file/admin/${values[id].image_id}"></div></td>`);
         var namesHtml = '<select class="form-control" name="names">';
         var dName = null;
         for (const nameId in values[id].name) {
@@ -312,10 +322,10 @@ function updateTable(values, tableId) {
         </td>`);
       } else if(tableId == 'all-products') {
         row.push(`<td>${values[id].id}</td>`);
-        row.push(`<td><div class="table-img"><img src="./file/admin/${values[id].images_ids[0]}?t=${(new Date()).getTime()}"></div></td>`);
+        row.push(`<td><div class="table-img"><img src="./file/admin/${values[id].images_ids[0]}"></div></td>`);
         row.push(`<td>${values[id].name}</td>`);
         row.push(`<td>${values[id].seller.user.firstname} ${values[id].seller.user.lastname}</td>`);
-        row.push(`<td>${values[id].price} SE</td>`);
+        row.push(`<td>${values[id].price} DZD</td>`);
         row.push(`<td>${values[id].category.name.en}</td>`);
         row.push(`<td>${values[id].description.substring(0, 100)}</td>`);
         row.push(`<td>${values[id].created_at}</td>`);
@@ -334,7 +344,7 @@ function updateTable(values, tableId) {
         row.push(`<td>${values[id].product.seller.user.fullname} <br> ${values[id].product.seller.user.phone}</td>`);
         row.push(`<td>${values[id].product.name}</td>`);
         row.push(`<td>${values[id].count}</td>`);
-        row.push(`<td>${values[id].total_price} SE</td>`);
+        row.push(`<td>${values[id].total_price} DZD</td>`);
         row.push(`<td>${values[id].address}</td>`);
         row.push(`<td>${values[id].created_at}</td>`);
         row.push(`
@@ -345,13 +355,13 @@ function updateTable(values, tableId) {
         </td>`);
       } else if(tableId == 'all-offers') {
         row.push(`<td>${values[id].id}</td>`);
-        row.push(`<td><div class="table-img"><img src="./file/admin/offer-${values[id].id}?t=${(new Date()).getTime()}"></div></td>`);
+        row.push(`<td><div class="table-img"><img src="./file/admin/${values[id].image_id}"></div></td>`);
         row.push(`<td>En: "${values[id].title.en}"<br>Ar: "${values[id].title.ar}"</td>`);
         row.push(`<td>En: "${values[id].description.en}"<br>Ar: "${values[id].description.ar}"</td>`);
         var subOffers = [];
         for (const name in values[id].sub_offers) {
           const subOffer = values[id].sub_offers[name];
-          subOffers.push(`${subOffer.name}: ${subOffer.price} SE`)
+          subOffers.push(`${subOffer.name}: ${subOffer.price} DZD`)
         }
         row.push(`<td>${subOffers.join('<br>')}</td>`);
         row.push(`<td>${Object.keys(values[id].fields).join('<br>')}</td>`);
@@ -368,7 +378,7 @@ function updateTable(values, tableId) {
           </td>`);
       } else if(tableId == 'all-offer-requests') {
         row.push(`<td>${values[id].id}</td>`);
-        row.push(`<td><div class="table-img"><img src="./file/admin/offer-${values[id].offer_id}?t=${(new Date()).getTime()}"></div></td>`);
+        row.push(`<td><div class="table-img"><img src="./file/admin/${values[id].offer.image_id}"></div></td>`);
         row.push(`<td>${values[id].offer.title.en}</td>`);
         var fieldsData = [];
         for (const name in values[id].fields) {
@@ -376,7 +386,7 @@ function updateTable(values, tableId) {
         }
         row.push(`<td>${fieldsData.join('<br>')}</td>`);
         row.push(`<td>${values[id].sub_offer}</td>`);
-        row.push(`<td>${values[id].total_price} SE</td>`);
+        row.push(`<td>${values[id].total_price} DZD</td>`);
         row.push(`<td>${statuses[values[id].status]}</td>`);
         row.push(`<td>${values[id].created_at}</td>`);
         row.push(`
@@ -426,6 +436,8 @@ function updateTable(values, tableId) {
       }
       table.row.add(row).node().id = `${tableId}-item-${id}`;
     }
+    $(`#${tableId} .custom-table-header-actions button`).attr('disabled', true);
+    $(`#${tableId} .custom-table-header-actions button[action="create"]`).attr('disabled', false);
   }
   table.draw();
 }
@@ -465,10 +477,25 @@ function viewTransfer(transferValues) {
   $(`#view-transfer .modal-body .form-control[name="received_balance"]`).val(`${transferValues.received_balance} ${transferValues.received_currency.char}`);
   $(`#view-transfer .modal-body .form-control[name="sended_currency"]`).val(`${transferValues.sended_currency.name} (${transferValues.sended_currency.char})`);
   $(`#view-transfer .modal-body .form-control[name="received_currency"]`).val(`${transferValues.received_currency.name} (${transferValues.received_currency.char})`);
-  $(`#view-transfer .modal-body .form-control[name="wallet"]`).val(transferValues.wallet);
+  var data = [];
+  for (const name in transferValues.data) {
+    const value = transferValues.data[name];
+    data.push(`<span style="font-weight: bold">${name}</span>: ${value}`)
+  }
+  $(`#view-transfer .modal-body .form-control[name="data"]`).html(data.join('<br>'));
   $('#view-transfer .modal-body .form-control[name="status"] option').attr('selected', false)
   $(`#view-transfer .modal-body .form-control[name="status"] option[value="${transferValues.status}"]`).attr('selected', true);
   $(`#view-transfer .modal-body .form-control[name="status-description"]`).val(transferValues.answer_description);
+  if(transferValues.status != 'checking') {
+    $('#view-transfer .modal-body .form-control[name="status"] option').attr('disabled', true);
+    $('#view-transfer .modal-body .form-control[name="status-description"]').attr('disabled', true);
+    $('#view-transfer .modal-body button[name="change-status"]').attr('disabled', true);
+  } else {
+    $('#view-transfer .modal-body .form-control[name="status"] option').attr('disabled', false);
+    $(`#view-transfer .modal-body .form-control[name="status-description"]`).prop('disabled', false);
+    $(`#view-transfer .modal-body button[name="change-status"]`).prop('disabled', false);
+  }
+
   $(`#view-transfer .modal-body .form-control[name="answered_at"]`).val(transferValues.answered_at ?? 'لا يوجد');
   $(`#view-transfer .modal-body .form-control[name="created_at"]`).val(transferValues.created_at);
   $(`#view-transfer .modal-body .form-control[name="proof"]`).html(
@@ -478,7 +505,6 @@ function viewTransfer(transferValues) {
   );
 
   $('#view-transfer input').prop('disabled', true);
-  $(`#view-transfer .modal-body .form-control[name="status-description"]`).prop('disabled', false);
   $('#view-transfer textarea').prop('disabled', true);
   $('#view-transfer').modal('show');
 }
@@ -576,7 +602,7 @@ function viewPurchase(purchase) {
         Category: <span style="font-weight: normal"> ${purchase.product.category.name.en}</span>
       </span>
       <span>
-        Price: <span style="font-weight: normal"> ${purchase.product.price} SE</span>
+        Price: <span style="font-weight: normal"> ${purchase.product.price} DZD</span>
       </span>
     </div>
   `);
@@ -610,7 +636,7 @@ function viewOfferRequest(offerRequest) {
   }
   $(`#view-offer-request .modal-body .form-control[name="offer_details"]`).html(`
     <div class="offer-image">
-      <img src="./file/admin/offer-${offerRequest.offer_id}">
+      <img src="./file/admin/${offerRequest.offer.image_id}">
     </div>
     <div class="details">
       <span>
@@ -803,8 +829,9 @@ $(document).ready(function() {
 
   socket.on('notifications', (notification) => {
     loadNotifications();
+    changeTab(window.currentTabName)
     socket.emit('news');
-    alertMessage("new-notification", notification.title, notification.message, 'success', 60000);
+    alertMessage("new-notification", notification.title, notification.message, 'success', 30000);
   });
 });
 
@@ -836,6 +863,22 @@ $on('#all-users .custom-table-header-actions button[action="delete"]', 'click', 
     }
   );
 });
+$on('#all-users .custom-table-header-actions button[action="send-notification"]', 'click', function() {
+  const inputs = $('#all-users').find('table tbody tr input:checked');
+  var usersIds = [];
+  for (let i = 0; i < inputs.length; i++) {
+    usersIds.push(inputs[i].id.replace(`all-users-chb-`, ''));
+  }
+  $('#send-notification-modal').attr('targets', JSON.stringify(usersIds));
+  $(this).html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>يرجى الإنتظار...`);
+  $(this).attr('disabled', true);
+  $('#send-notification-modal textarea.form-control').val('');
+  $('#send-notification-modal .btn-img-picker').html('<span class="material-symbols-sharp pick-icon">add_a_photo</span>');
+  window.ImagePicker['send-notification-image-picker'] = undefined;
+  $('#send-notification-modal .modal-title').html(`إرسال الرسالة للمستخدمين`);
+  $('#send-notification-modal').modal('show');
+
+});
 $on('#all-users table tr td button[action="view"] ', 'click', function () {
   const rowId = getElementparent(this, 2).id.replace(`all-users-item-`, '');
   const user = StorageDatabase.collection('users').doc('users').doc(rowId).get();
@@ -845,17 +888,23 @@ $on('#all-users table tr td button[action="send_notification"] ', 'click', funct
   const rowId = getElementparent(this, 2).id.replace(`all-users-item-`, '');
   const user = StorageDatabase.collection('users').doc('users').doc(rowId).get();
   if(!user) return;
+  $('#send-notification-modal').attr('targets', JSON.stringify([rowId]));
+  $('#send-notification-modal textarea.form-control').val('');
+  $('#send-notification-modal .btn-img-picker').html('<span class="material-symbols-sharp pick-icon">add_a_photo</span>');
+  window.ImagePicker['send-notification-image-picker'] = undefined;
   $('#send-notification-modal .modal-title').html(`إرسال الرسالة للمستخدم #${rowId}`)
   $('#send-notification-modal').modal('show');
 });
 $on('#send-notification-modal .btn[action="send"]', 'click', async function() {
   loadingDialog('إرسال الرسالة', 'يرجى الإنتظار لحين إرسال الرسالة...');
-  const userId = $('#send-notification-modal .modal-title').html().split('#')[1];
+  // const userId = $('#send-notification-modal .modal-title').html().split('#')[1];
+
   const formData = new FormData();
+  formData.append('targets', $('#send-notification-modal').attr('targets'));
   formData.append('message', $('#send-notification-modal textarea[name="message"]').val());
   formData.append('image', window.ImagePicker['send-notification-image-picker']);
   const data = await $.ajax({
-    url: `./admin/user/${userId}/send_notification`,
+    url: `./admin/user/send_notification`,
     type: 'POST',
     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
     contentType: false,
@@ -873,7 +922,9 @@ $on('#send-notification-modal .btn[action="send"]', 'click', async function() {
       alertMessage('send-notification', 'إرسال رسالة', error, 'danger');
     }
   }
-  hideLoadingDialog()
+  hideLoadingDialog();
+  $('#all-users .custom-table-header-actions button[action="send-notification"]').html('<span class="material-symbols-sharp">chat</span> إرسال رسالة')
+  $('#all-users .custom-table-header-actions button[action="send-notification"]').attr('disabled', false);
 });
 $on('#all-users table tr td button[action="delete"]', 'click', function () {
   const rowId = getElementparent(this, 2).id.replace(`all-users-item-`, '');
@@ -939,6 +990,7 @@ $on(`#view-user .modal-body button[name="change-status"]`, 'click', async functi
     data: {status: status, description: description},
     dataType: 'JSON',
   });
+  console.log(data);
   if(data.errors) {
     for (const field in data.errors) {
       data.errors[field].forEach(error => {
@@ -946,10 +998,10 @@ $on(`#view-user .modal-body button[name="change-status"]`, 'click', async functi
       });
     }
   } else {
-    alertMessage('change-user-status-message', 'تغيير حالة الهوية للمستخدم');
+    alertMessage('change-user-status-message', 'تغيير حالة الهوية للمستخدم', data.message);
+    $('#view-user').modal('hide');
+    await loadTab();
   }
-  $('#view-user').modal('hide');
-  await loadTab();
   hideLoadingDialog()
 });
 
@@ -992,6 +1044,7 @@ $on('#all-currencies .custom-table-header-actions button[action="create"]', 'cli
   $('#create-edit-currency .btn-img-picker').html('<span class="material-symbols-sharp pick-icon">add_a_photo</span>');
   $('#create-edit-currency input').val('');
   clearMultiInputValues('#currency-prices');
+  clearMultiInputValues('#currency-data');
   var button = $($('#create-edit-currency .modal-footer button[action="edit"]')[0] ?? $('#create-edit-currency .modal-footer button[action="create"]')[0])
   button.html('إنشاء');
   button.attr('action', 'create');
@@ -1001,26 +1054,36 @@ $on('#all-currencies table tr td button[action="edit"]', 'click', function () {
   const rowId = getElementparent(this, 2).id.replace(`all-currencies-item-`, '');
   const currency = StorageDatabase.collection('currencies').doc(rowId).get();
 
-  $('#create-edit-currency .modal-title').html(`Edit Currnecy #${rowId}`);
+  $('#create-edit-currency .modal-title').html(`Edit Currency #${rowId}`);
   var button = $($('#create-edit-currency .modal-footer button[action="edit"]')[0] ?? $('#create-edit-currency .modal-footer button[action="create"]')[0])
   button.html('Edit');
   button.attr('action', 'edit');
   $('#create-edit-currency .btn-img-picker').html('<span class="material-symbols-sharp pick-icon">add_a_photo</span>');
   $('#create-edit-currency input').val('');
   clearMultiInputValues('#currency-prices');
+  clearMultiInputValues('#currency-data');
 
   $('#create-edit-currency input[name="currency-id"]').val(currency.id);
   $('#create-edit-currency input[name="currency_name"]').val(currency.name);
   $('#create-edit-currency input[name="currency_char"]').val(currency.char);
   $('#create-edit-currency input[name="currency_balance"]').val(currency.platform_wallet.balance);
   $('#create-edit-currency input[name="currency_wallet"]').val(currency.wallet);
-  $('#create-edit-currency .form-group .btn.btn-img-picker').html(`<img src="./file/public/currency-${currency.id}">`);
+  $('#create-edit-currency .form-group .btn.btn-img-picker').html(`<img src="./file/public/${currency.image_id}">`);
   for (const currencyId in currency.prices) {
     const price = currency.prices[currencyId];
     addMultiInputItem('#currency-prices', {
       currency_id: currencyId,
       buy_price: price.buy,
       sell_price: price.sell,
+    });
+  }
+  for (const name in currency.data) {
+    const item = currency.data[name];
+    addMultiInputItem('#currency-data', {
+      name: name,
+      title_en: item.title_en,
+      title_ar: item.title_ar,
+      validate: item.validate,
     });
   }
   $('#create-edit-currency input[name="proof_is_required"]')[0].checked = currency.proof_is_required;
@@ -1073,10 +1136,12 @@ $on('#create-edit-currency .btn[action="create"]', 'click', async function() {
   formData.append('name', $('#create-edit-currency input[name="currency_name"]').val());
   formData.append('char', $('#create-edit-currency input[name="currency_char"]').val());
   formData.append('balance', $('#create-edit-currency input[name="currency_balance"]').val());
-  formData.append('wallet', $('#create-edit-currency input[name="currency_wallet"]').val());
+  const wallet = $('#create-edit-currency input[name="currency_wallet"]').val();
+  if(wallet != '') formData.append('wallet', wallet);
   formData.append('image', window.ImagePicker['currency-image-picker']);
   formData.append('proof_is_required', $('#create-edit-currency input[name="proof_is_required"]')[0].checked);
   formData.append('prices', JSON.stringify(getMultiInputValues('#currency-prices')));
+  formData.append('data', JSON.stringify(getMultiInputValues('#currency-data')));
   const data = await $.ajax({
     url: './admin/currency/create_currency',
     type: 'POST',
@@ -1105,10 +1170,12 @@ $on('#create-edit-currency .btn[action="edit"]', 'click', async function() {
   formData.append('name', $('#create-edit-currency input[name="currency_name"]').val());
   formData.append('char', $('#create-edit-currency input[name="currency_char"]').val());
   formData.append('balance', $('#create-edit-currency input[name="currency_balance"]').val());
-  formData.append('wallet', $('#create-edit-currency input[name="currency_wallet"]').val());
+  const wallet = $('#create-edit-currency input[name="currency_wallet"]').val();
+  if(wallet != '') formData.append('wallet', wallet);
   if(window.ImagePicker['currency-image-picker']) formData.append('image', window.ImagePicker['currency-image-picker']);
   formData.append('proof_is_required', $('#create-edit-currency input[name="proof_is_required"]')[0].checked);
   formData.append('prices', JSON.stringify(getMultiInputValues('#currency-prices')));
+  formData.append('data', JSON.stringify(getMultiInputValues('#currency-data')));
   const data = await $.ajax({
     url: `./admin/currency/${id}/edit`,
     type: 'POST',
@@ -1694,12 +1761,12 @@ $on('#all-mails .custom-table-header-actions button[action="create"]', 'click', 
         </span>
       </td>`);
     row.push(`<td>${user.id}</td>`);
-    row.push(`<td><div class="table-img"><img src="./file/admin/${user.profile_image_id}?t=${(new Date()).getTime()}"></div></td>`);
+    row.push(`<td><div class="table-img"><img src="./file/admin/${user.profile_image_id}"></div></td>`);
     row.push(`<td>${user.firstname} ${user.lastname}</td>`);
     row.push(`<td>${user.email}</td>`);
     row.push(`<td>${user.phone}</td>`);
-    row.push(`<td>${user.balance == 0 ? '<span class="danger">0 SE</span>':`<span class="success">${user.balance} SE</span>`}</td>`);
-    row.push(`<td>${user.checking_balance == 0 ? '<span class="danger">0 SE</span>':`<span class="warning">${user.checking_balance} SE</span>`}</td>`);
+    row.push(`<td>${user.balance == 0 ? '<span class="danger">0 DZD</span>':`<span class="success">${user.balance} DZD</span>`}</td>`);
+    row.push(`<td>${user.checking_balance == 0 ? '<span class="danger">0 DZD</span>':`<span class="warning">${user.checking_balance} DZD</span>`}</td>`);
     row.push(`<td>${user.email_verified ? '<span class="success">محقق</span>': '<span class="danger">غير محقق</span>'}</td>`);
     row.push(`<td>${statuses[user.identity_status]}</td>`);
     row.push(`<td>${user.created_at}</td>`);

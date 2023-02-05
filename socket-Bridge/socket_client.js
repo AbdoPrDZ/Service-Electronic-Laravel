@@ -28,6 +28,7 @@ class SocketClient {
   emitToClient(eventName, ...args) {
     try {
       this.client.emit(eventName, ...args);
+      console.log('emit', ...args);
       return {
         success: true,
         messaage: 'Successfully emiting',

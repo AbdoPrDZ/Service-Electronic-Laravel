@@ -8,7 +8,7 @@
     <meta name="socket-token" content="{{ $socketToken }}" />
     @include('admin.src.headers')
     <link href="{{ asset('resources/css/admin/main.css') }}" rel="stylesheet">
-    <link href="{{ asset('resources/css/admin/dashboard.css') }}" rel="stylesheet">
+    <link href="{{ asset('resources/css/admin/dashboard.css') }}?time={{ now() }}" rel="stylesheet">
     <title>Service Electronic | Admin Panel</title>
   </head>
   <body auto-display="false">
@@ -29,7 +29,7 @@
             <div class="topbar-actions">
               @if (!is_null($admin->balance))
                 <h2 class=" {{ $admin->balance != 0 ? 'success' : 'danger' }}" style="font-size: 14px;font-weight: bold;">
-                  {{ $admin->balance ?? 0 }} SE
+                  {{ $admin->balance ?? 0 }} DZD
                 </h2>
               @endif
               <div class="dropdown dropdown-selecetion" id="person-dropdown">
@@ -204,7 +204,7 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-danger" action="close">Cancel</button>
+              <button type="button" class="btn btn-danger" action="close">إلغاء</button>
             </div>
           </div>
         </div>
@@ -217,10 +217,10 @@
     <script>
       window.rules = [
         ['required|string', 'text'],
-        ['required|number', 'number'],
+        ['required|integer', 'integer'],
         ['required|numeric', 'float'],
         ['required|email', 'email'],
-        ['required|phone', 'phone'],
+        ['required|numeric|digits:10', 'phone'],
       ];
       window.inputTypes = [
         ['text', 'text'],

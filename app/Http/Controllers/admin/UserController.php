@@ -52,12 +52,13 @@ class UserController extends Controller {
   public function changeIdentityStatus(Request $request, User $user) {
     $validator = Validator::make($request->all(), [
       'status' => 'required|in:verifited,refused',
-      'answer_description' => 'string',
+      'description' => $request->status == 'refused' ? 'required|string' : '',
     ]);
 
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
-        'errors' =>$validator->errors()
+        'errors' => $validator->errors(),
+        'all' => $request->all(),
       ]);
     }
 
@@ -67,11 +68,12 @@ class UserController extends Controller {
     $message = '';
     if($request->status == 'verifited') {
       $message = 'Congratulations your identity verify accepted';
-      $user->identity_verifited_at = Carbon::now();
+      $user->identity_verifited_at = now();
     } else {
-      $message = $request->answer_description ?? 'Sorry your identity verify refused';
+      $message = $request->description ?? 'Sorry your identity verify refused';
     }
     $user->identity_status = $request->status;
+    $user->identity_answer_description = $request->description;
     $user->unreades = Admin::unreades($request->user()->id);
     $user->save();
 
@@ -97,7 +99,7 @@ class UserController extends Controller {
       'template_id' => Setting::userIdentityConfirmEmailTemplateId(),
       'data' => [
         '<-answer->' => $request->status,
-        '<-answer_description->' => $request->answer_description,
+        '<-answer_description->' => $request->description,
         '<-datetime->' => date_format(now(),"Y/m/d H:i:s"),
       ],
       'targets' => [$request->user()->id],
@@ -115,10 +117,12 @@ class UserController extends Controller {
     return $id + 1;
   }
 
-  public function sendNotification(Request $request, $user) {
+  public function sendNotification(Request $request) {
+    $request->merge(['targets' => $this->tryDecodeArray($request->targets)]);
     $validator = Validator::make($request->all(), [
       'message' => 'required|string',
-      'image' => 'file|mimes:jpg,png,jpeg',
+      'image' => !is_null($request->file('image')) ? 'file|mimes:jpg,png,jpeg' : '',
+      'targets' => 'required|array',
     ]);
 
     if ($validator->fails()) {
@@ -127,14 +131,10 @@ class UserController extends Controller {
       ]);
     }
 
-    $notificationId = $this->getNextNotificationId();
-
     $values = [
-      'id' => $notificationId,
       'name' => 'admin-message',
       'from_id' => $request->user()->id,
-      'from_model' => User::class,
-      'to_id' => $user->id,
+      'from_model' => Admin::class,
       'to_model' => User::class,
       'title' => 'Admin message',
       'message' => $request->message,
@@ -142,33 +142,44 @@ class UserController extends Controller {
       'type' => 'emitAndNotify',
     ];
 
-    if(!is_null($request->file('image'))) {
-      if(!Storage::disk('api')->exists('users_data')) {
+    if (!is_null($request->file('image'))) {
+      if (!Storage::disk('api')->exists('users_data')) {
         Storage::disk('api')->makeDirectory('users_data');
       }
-      $userFilesPath = "users_data/$user->id";
-      if(!Storage::disk('api')->exists($userFilesPath)) {
-        Storage::disk('api')->makeDirectory($userFilesPath);
-      }
-      $notificationFilesPath = "users_data/$user->id/notifications";
-      if(!Storage::disk('api')->exists($notificationFilesPath)) {
-        Storage::disk('api')->makeDirectory($notificationFilesPath);
-      }
-      $allpath = Storage::disk('api')->path("users_data/$user->id/notifications");
-      $shortPath = "$userFilesPath/n-$notificationId.png";
-      $request->file('image')->move($allpath, "n-$notificationId.png");
-      File::create([
-        'name' => "u-$user->id-n-$notificationId",
-        'disk' => 'api',
-        'type' => 'image',
-        'path' => $shortPath,
-      ]);
-      $values['data'] = [
-        'attachment_image' => "u-$user->id-n-$notificationId",
-      ];
     }
-
-    Notification::create($values);
+    foreach ($request->targets as $id) {
+      if(User::find($id)) {
+        $notificationId = $this->getNextNotificationId();
+        $values['id'] = $notificationId;
+        $values['to_id'] = $id;
+        if(!is_null($request->file('image'))) {
+          if(!Storage::disk('api')->exists('users_data')) {
+            Storage::disk('api')->makeDirectory('users_data');
+          }
+          $userFilesPath = "users_data/$id";
+          if(!Storage::disk('api')->exists($userFilesPath)) {
+            Storage::disk('api')->makeDirectory($userFilesPath);
+          }
+          $notificationFilesPath = "users_data/$id/notifications";
+          if(!Storage::disk('api')->exists($notificationFilesPath)) {
+            Storage::disk('api')->makeDirectory($notificationFilesPath);
+          }
+          $allpath = Storage::disk('api')->path("users_data/$id/notifications");
+          $shortPath = "$userFilesPath/notifications/n-$notificationId.png";
+          $request->file('image')->move($allpath, "n-$notificationId.png");
+          File::create([
+            'name' => "u-$id-n-$notificationId",
+            'disk' => 'api',
+            'type' => 'image',
+            'path' => $shortPath,
+          ]);
+          $values['data'] = [
+            'attachment_image' => "u-$id-n-$notificationId",
+          ];
+        }
+        Notification::create($values);
+      }
+    }
     return $this->apiSuccessResponse('Successfully sending message');
   }
 

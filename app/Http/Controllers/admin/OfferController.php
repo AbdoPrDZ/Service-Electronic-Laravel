@@ -67,12 +67,13 @@ class OfferController extends Controller {
     if(!Storage::disk('public')->exists("offers")) {
       Storage::disk('public')->makeDirectory("offers");
     }
-    $request->file('image')->move(Storage::disk('public')->path("offers"), "$offerId.png");
+    $time = now()->timestamp;
+    $request->file('image')->move(Storage::disk('public')->path("offers"), "$offerId-$time.png");
     $imageFile = File::create([
-      'name' => "offer-$offerId",
+      'name' => "offer-$offerId-$time",
       'disk' => 'public',
       'type' => 'image',
-      'path' => "offers/$offerId.png",
+      'path' => "offers/$offerId-$time.png",
     ]);
 
     Offer::create([
@@ -119,13 +120,15 @@ class OfferController extends Controller {
       if(!Storage::disk('public')->exists("offers")) {
         Storage::disk('public')->makeDirectory("offers");
       }
-      $request->file('image')->move(Storage::disk('public')->path("offers"), "$offer->id.png");
-      $imageFile = File::updateOrCreate([
-        'name' => "offer-$offer->id",
+      $time = now()->timestamp;
+      $request->file('image')->move(Storage::disk('public')->path("offers"), "offer-$offer->id-$time.png");
+      $imageFile = File::create([
+        'name' => "offer-$offer->id-$time",
         'disk' => 'public',
         'type' => 'image',
-        'path' => "offers/$offer->id.png",
+        'path' => "offers/offer-$offer->id-$time.png",
       ]);
+      $offer->image_id = $imageFile->name;
     }
 
     $title = $offer->title;

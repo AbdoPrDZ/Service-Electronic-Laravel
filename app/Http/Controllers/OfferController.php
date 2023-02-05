@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Offer;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 
 class OfferController extends Controller {
@@ -12,6 +13,10 @@ class OfferController extends Controller {
   }
 
   public function all(Request $request) {
+    if(!Setting::serviceIsActive('offers')) {
+      return $this->apiErrorResponse('This service has been deactivated');
+    }
+
     $items = Offer::where('is_deleted', '=', 0)->get();
     $offers = [];
     foreach ($items as $offer) {

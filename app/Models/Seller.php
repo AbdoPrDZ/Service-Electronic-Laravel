@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use App\Events\SellerCreatedEvent;
+use App\Events\Seller\SellerCreatedEvent;
+use App\Events\Seller\SellerUpdatedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -61,6 +62,7 @@ class Seller extends Model {
 
   protected $dispatchesEvents = [
     'created' => SellerCreatedEvent::class,
+    'updated' => SellerUpdatedEvent::class,
   ];
 
   static function news($admin_id) {

@@ -20,6 +20,7 @@ return new class extends Migration {
       $table->integer('received_currency_id');
       $table->string('proof_id')->nullable();
       $table->string('wallet')->nullable();
+      $table->json('data')->default('{}');
       $table->integer('exchange_id')->nullable();
       $table->enum('for_what', ['transfer', 'withdraw', 'recharge'])->default('transfer');
       $table->enum('status', ['accepted', 'refused', 'checking'])->default('checking');

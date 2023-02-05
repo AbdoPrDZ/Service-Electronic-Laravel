@@ -21,7 +21,7 @@ return new class extends Migration {
       $table->string('name');
       $table->string('title');
       $table->string('message');
-      $table->json('data');
+      $table->json('data')->default('{}');
       $table->string('image_id')->nullable();
       $table->boolean('is_readed')->default(false);
       $table->enum('type', ['emit', 'notify', 'emitOrNotify', 'emitAndNotify']);

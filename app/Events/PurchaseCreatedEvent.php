@@ -33,7 +33,7 @@ class PurchaseCreatedEvent {
         'event_name' => 'new-product-solded',
         'data' => json_encode([
           'product_id' => $purchase->product->id,
-          'count' => $purchase->request->count,
+          'count' => $purchase->count,
           'purchase_id' => $purchase->id,
         ]),
       ],

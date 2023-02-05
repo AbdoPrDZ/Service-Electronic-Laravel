@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Currency;
+use App\Models\Notification;
 use App\Models\Setting;
 use App\Models\Template;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -33,6 +35,7 @@ class SettingsController extends Controller {
       'userWithdrawTemplateId' => Setting::userWithdrawEmailTemplateId(),
       'userCreditReceiveTemplateId' => Setting::userCreditReceiveEmailTemplateId(),
       'userIdentityConfirmTemplateId' => Setting::userIdentityConfirmEmailTemplateId(),
+      'servicesStatus' => Setting::servicesStatus(),
       'currencies' => $currencies,
       'templates' => $templates,
     ]);
@@ -40,7 +43,15 @@ class SettingsController extends Controller {
 
   public function edit(Request $request) {
     $validator = Validator::make($request->all(), [
-      'name' => 'required|in:platform_currency,display_currency,email_verification_template,user_recharge_template,user_withdraw_template,user_credit_receive_template,user_identity_confirm_template,commission',
+      'name' => 'required|in:platform_currency,'.
+                'display_currency,'.
+                'email_verification_template,'.
+                'user_recharge_template,'.
+                'user_withdraw_template,'.
+                'user_credit_receive_template,'.
+                'user_identity_confirm_template,'.
+                'commission,'.
+                'services_status',
       'value' => 'required',
     ]);
     if ($validator->fails()) {
@@ -110,8 +121,31 @@ class SettingsController extends Controller {
         $setting->value = [floatVal($request->value)];
         $setting->save();
         return $this->apiSuccessResponse('Successfully edditing commission');
+      case 'services_status':
+        try {
+          $statuses = json_decode($request->value);
+        } catch (\Throwable $th) {
+          return $this->apiErrorResponse('Invalid commission value');
+        }
+        $setting = Setting::find('services_status');
+        $setting->value = $statuses;
+        $setting->save();
+        User::notify([
+          'name' => 'notifications',
+          'title' => 'Serives status updated',
+          'message' => "App services has been updated",
+          'data' => [
+            'event_name' => 'service-status-updated',
+            'data' => json_encode([
+              'services_status' => $statuses,
+            ])
+          ],
+          'image_id' => 'logo',
+          'type' => 'emitOrNotify',
+        ]);
+        return $this->apiSuccessResponse('Successfully edditing services status');
       default:
-        return $this->apiErrorResponse('Some things worng');
+        return $this->apiErrorResponse('Some things worng', ['all' => $request->all()]);
     }
 
   }

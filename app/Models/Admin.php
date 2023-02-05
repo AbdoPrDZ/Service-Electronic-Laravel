@@ -73,5 +73,19 @@ class Admin extends Authenticatable{
     return $ids;
   }
 
+  static function notify($notification, $admins = '*') {
+    return async(function () use ($notification, $admins) {
+      if ($admins == '*')
+        $admins = Admin::all();
+      foreach ($admins as $admin) {
+        Notification::create([
+          'to_id' => $admin->id,
+          'to_model' => Admin::class,
+          ...$notification,
+        ]);
+      }
+    })->start();
+  }
+
 }
 

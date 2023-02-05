@@ -49,9 +49,7 @@ class VerifyToken extends Model {
   protected $primaryKey = 'token';
 
   public function linking() {
-    $this->user = (app($this->model))::find($this->user_id);
+    $this->user = app($this->model)::find($this->user_id);
   }
 
 }
-
-

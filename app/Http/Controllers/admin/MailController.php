@@ -69,22 +69,12 @@ class MailController extends Controller {
         'errors' => ['template_id' => 'Invalid Template id']
       ]);
     }
-    $emails = [];
-    foreach ($request->targets as $target) {
-      $user = User::find($target);
-      if(!$user) {
-        return $this->apiErrorResponse('Invalid target id', [
-          'errors' => ['targets' => "Invalid target id ($target)"],
-        ]);
-      }
-      $emails[] = $user->email;
-    }
 
     Mail::create([
       'title' => $request->title,
       'template_id' => $template->id,
       'data' => $request->data,
-      'targets' => $emails,
+      'targets' => $request->targets,
       'unreads' => Admin::unreades($request->user()->id),
     ]);
 

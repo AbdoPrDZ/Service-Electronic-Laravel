@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\SettingUpdatedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -36,6 +37,10 @@ class Setting extends Model {
 
   protected $casts = [
     'value' => 'array',
+  ];
+
+  protected $dispatchesEvents = [
+    'updated' => SettingUpdatedEvent::class,
   ];
 
   /**
@@ -87,4 +92,14 @@ class Setting extends Model {
   static function userIdentityConfirmEmailTemplateId() {
     return Setting::find('user_identity_confirm_template_id')->value[0];
   }
+
+  static function servicesStatus() {
+    return Setting::find('services_status')->value;
+  }
+
+  static function serviceIsActive($service) {
+    $servicesStatus = Setting::servicesStatus();
+    return $servicesStatus[$service] == 'active';
+  }
+
 }

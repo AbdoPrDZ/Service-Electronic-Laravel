@@ -47,12 +47,13 @@ class CategoryController extends Controller {
     if(!Storage::disk('public')->exists("categories")) {
       Storage::disk('public')->makeDirectory("categories");
     }
-    $request->file('image')->move(Storage::disk('public')->path("categories"), "$categoryId.png");
+    $time = now()->timestamp;
+    $request->file('image')->move(Storage::disk('public')->path("categories"), "category-$categoryId-$time.png");
     $imageFile = File::create([
-      'name' => "category-$categoryId",
+      'name' => "category-$categoryId-$time",
       'disk' => 'public',
       'type' => 'image',
-      'path' => "categories/$categoryId.png",
+      'path' => "categories/category-$categoryId-$time.png",
     ]);
 
     Category::create([
@@ -89,14 +90,23 @@ class CategoryController extends Controller {
       }
     }
     $category->unreades = Admin::unreades($request->user()->id);
-    $category->save();
 
     if($request->file('image')) {
+      File::find($category->image_id)?->delete();
       if(!Storage::disk('public')->exists("categories")) {
         Storage::disk('public')->makeDirectory("categories");
       }
-      $request->file('image')->move(Storage::disk('public')->path("categories"), "$category->id.png");
+      $time = now()->timestamp;
+      $request->file('image')->move(Storage::disk('public')->path("categories"), "$category->id-$time.png");
+      $imageFile = File::create([
+        'name' => "category-$category->id-$time",
+        'disk' => 'public',
+        'type' => 'image',
+        'path' => "categories/$category->id-$time.png",
+      ]);
+      $category->image_id = $imageFile->name;
     }
+    $category->save();
 
     return $this->apiSuccessResponse('Succesfully editing category');
   }

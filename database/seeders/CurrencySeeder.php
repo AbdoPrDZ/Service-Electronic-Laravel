@@ -6,7 +6,6 @@ use App\Models\Admin;
 use App\Models\Currency;
 use App\Models\File;
 use App\Models\Wallet;
-use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -19,7 +18,7 @@ class CurrencySeeder extends Seeder {
       'user_model' => Admin::class,
       'balance' => 0,
       'status' => 'active',
-      'answored_at' => Carbon::now(),
+      'answored_at' => now(),
     ]);
   }
 
@@ -29,7 +28,7 @@ class CurrencySeeder extends Seeder {
    * @return void
    */
   public function run() {
-    $wallet_id = bin2hex('w-' . date_format(Carbon::now(), 'yyyy-MM-dd') . "-c-1");
+    $wallet_id = bin2hex('w-' . date_format(now(), 'yyyy-MM-dd') . "-c-1");
     Currency::create([
       'id' => 1,
       'name' => 'Payssera',
@@ -46,7 +45,7 @@ class CurrencySeeder extends Seeder {
     ]);
     $this->createCurrencyWallet($wallet_id);
 
-    $wallet_id = bin2hex('w-' . date_format(Carbon::now(), 'yyyy-MM-dd') . "-c-2");
+    $wallet_id = bin2hex('w-' . date_format(now(), 'yyyy-MM-dd') . "-c-2");
     Currency::create([
       'id' => 2,
       'name' => 'Wise',
@@ -63,7 +62,7 @@ class CurrencySeeder extends Seeder {
     ]);
     $this->createCurrencyWallet($wallet_id);
 
-    $wallet_id = bin2hex('w-' . date_format(Carbon::now(), 'yyyy-MM-dd') . "-c-3");
+    $wallet_id = bin2hex('w-' . date_format(now(), 'yyyy-MM-dd') . "-c-3");
     Currency::create([
       'id' => 3,
       'name' => 'CCP',
@@ -80,11 +79,11 @@ class CurrencySeeder extends Seeder {
     ]);
     $this->createCurrencyWallet($wallet_id);
 
-    $wallet_id = bin2hex('w-' . date_format(Carbon::now(), 'yyyy-MM-dd') . "-c-4");
+    $wallet_id = bin2hex('w-' . date_format(now(), 'yyyy-MM-dd') . "-c-4");
     Currency::create([
       'id' => 4,
       'name' => 'Service Electronic',
-      'char' => 'SE',
+      'char' => 'DZD',
       'proof_is_required' => false,
       'image_pick_type' => 'camera',
       'wallet' => '0023528701 cle 33, Walid Rebbouh, ourgla',
@@ -97,7 +96,7 @@ class CurrencySeeder extends Seeder {
     ]);
     $this->createCurrencyWallet($wallet_id);
 
-    $wallet_id = bin2hex('w-' . date_format(Carbon::now(), 'yyyy-MM-dd') . "-c-5");
+    $wallet_id = bin2hex('w-' . date_format(now(), 'yyyy-MM-dd') . "-c-5");
     Currency::create([
       'id' => 5,
       'name' => 'Perfect Money',
@@ -115,7 +114,7 @@ class CurrencySeeder extends Seeder {
     ]);
     $this->createCurrencyWallet($wallet_id);
 
-    $wallet_id = bin2hex('w-' . date_format(Carbon::now(), 'yyyy-MM-dd') . "-c-6");
+    $wallet_id = bin2hex('w-' . date_format(now(), 'yyyy-MM-dd') . "-c-6");
     Currency::create([
       'id' => 6,
       'name' => 'Baridi Mob',

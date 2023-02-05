@@ -39,21 +39,21 @@ class SocketClient {
   }
 
   public function emit(string $routeName, array $args) {
-      return json_decode($this->guzzleClient->post(
-        config('socket_bridge.bridge.protocol').'://'
-        .config('socket_bridge.bridge.host').':'
-        .config('socket_bridge.bridge.port')
-        .config('socket_bridge.bridge.path')
-        .str_replace(
-          [':room', ':clientId', ':routeName'],
-          [$this->room, $this->clientId, $routeName],
-          config('socket_bridge.bridge.from_manager')
-        ),
-        [
-          'form_params' => $args,
-        ]
-      )->getBody()
-       ->getContents());
+    return json_decode($this->guzzleClient->post(
+      config('socket_bridge.bridge.protocol').'://'
+      .config('socket_bridge.bridge.host').':'
+      .config('socket_bridge.bridge.port')
+      .config('socket_bridge.bridge.path')
+      .str_replace(
+        [':room', ':clientId', ':routeName'],
+        [$this->room, $this->clientId, $routeName],
+        config('socket_bridge.bridge.from_manager')
+      ),
+      [
+        'form_params' => ['args' => json_encode($args)],
+      ]
+    )->getBody()
+      ->getContents());
   }
 
   public function emitNotification(Notification $notification) {
@@ -64,7 +64,7 @@ class SocketClient {
         .config('socket_bridge.bridge.port')
         .config('socket_bridge.bridge.path')
         .str_replace([':room', ':clientId'], [$this->room, $this->clientId], config('socket_bridge.bridge.emit_notification')),
-        ['form_params' => [json_encode($notification)]]
+        ['form_params' => ['args' => json_encode($notification)]]
       )->getBody()->getContents());
     } catch (\Throwable $th) {
       Log::error('notify to client', ['throw' => $th, 'room' => $this->room, 'clientId' => $this->clientId, 'notification' => $notification]);
@@ -80,7 +80,7 @@ class SocketClient {
         .config('socket_bridge.bridge.port')
         .config('socket_bridge.bridge.path')
         .str_replace([':room', ':clientId'], [$this->room, $this->clientId], config('socket_bridge.bridge.push_notification')),
-        ['form_params' => [json_encode($notification)]]
+        ['form_params' => ['args' => json_encode($notification)]]
       )->getBody()->getContents());
     } catch (\Throwable $th) {
       Log::error('notify to client', ['throw' => $th, 'room' => $this->room, 'clientId' => $this->clientId, 'notification' => $notification]);

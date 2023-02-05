@@ -28,9 +28,8 @@ class Controller extends BaseController {
 
   public function tryDecodeArray(string|null $text) {
     try {
-      return json_decode($text);
+      return (array) json_decode($text);
     } catch (\Throwable $th) {
-      echo $th;
       return $text;
     }
   }

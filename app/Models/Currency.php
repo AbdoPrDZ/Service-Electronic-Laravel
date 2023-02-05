@@ -43,6 +43,7 @@ class Currency extends Model {
   protected $fillable = [
     'name',
     'char',
+    'image_id',
     'proof_is_required',
     'image_pick_type',
     'wallet',
@@ -88,19 +89,16 @@ class Currency extends Model {
   public function linking() {
     $this->platform_wallet = Wallet::find($this->platform_wallet_id);
     // $this->platform_wallet->linking();
-    $rendred_prices = [];
-    foreach ($this->prices as $currencyId => $price) {
-      $rendred_prices[$currencyId] = [
-        'currency' => Currency::find($currencyId),
-        'price' => $price
-      ];
+    $avaliable_currencies = [];
+    foreach (array_keys($this->prices) as $currencyId) {
+      $avaliable_currencies[$currencyId] = Currency::find($currencyId);
     }
-    $this->rendred_prices = $rendred_prices;
+    $this->avaliable_currencies = $avaliable_currencies;
   }
 
   public function unlinking() {
     unset($this->platform_wallet);
-    unset($this->rendred_prices);
+    unset($this->avaliable_currencies);
   }
 
   public function unlinkingAndSave() {

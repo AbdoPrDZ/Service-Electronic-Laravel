@@ -92,6 +92,8 @@ class Product extends Model {
     if($linkingSeller) $this->seller->linking();
     $this->category = Category::find($this->category_id);
     $totalRate = 0;
+    if (!$this->rates) $this->rates = [];
+    if (!$this->likes) $this->likes = [];
     foreach ($this->rates as $rate) {
       $totalRate += $rate;
     }

@@ -17,7 +17,7 @@ class TemplateSeeder extends Seeder {
     $appUrl = env('APP_URL');
     $emailVerificationContent = <<<HTML
       <div style="
-        font: 15px cursive;
+        font: 15px;
         background-image: linear-gradient(315deg, #12a5ff, #51d456);
         width: 100%;
         height: -webkit-fill-available;
@@ -121,7 +121,7 @@ class TemplateSeeder extends Seeder {
     ]);
     $userRechargeContent = <<<HTML
       <div style="
-          font: 15px cursive;
+          font: 15px;
           background-image: linear-gradient(315deg, #12a5ff, #51d456);
           width: 100%;
           height: -webkit-fill-available;
@@ -231,7 +231,7 @@ class TemplateSeeder extends Seeder {
     ]);
     $userWithdrawContent = <<<HTML
       <div style="
-          font: 15px cursive;
+          font: 15px;
           background-image: linear-gradient(315deg, #12a5ff, #51d456);
           width: 100%;
           height: -webkit-fill-available;
@@ -341,7 +341,7 @@ class TemplateSeeder extends Seeder {
     ]);
     $creditReceiveContent = <<<HTML
       <div style="
-          font: 15px cursive;
+          font: 15px;
           background-image: linear-gradient(315deg, #12a5ff, #51d456);
           width: 100%;
           height: -webkit-fill-available;
@@ -444,7 +444,7 @@ class TemplateSeeder extends Seeder {
     ]);
     $identityConfirmContent = <<<HTML
       <div style="
-          font: 15px cursive;
+          font: 15px;
           background-image: linear-gradient(315deg, #12a5ff, #51d456);
           width: 100%;
           height: -webkit-fill-available;

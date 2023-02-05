@@ -7,7 +7,6 @@ use App\Models\Admin;
 use App\Models\Currency;
 use App\Models\File;
 use App\Models\Wallet;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Validator;
@@ -42,15 +41,16 @@ class CurrencyController extends Controller {
       $request->merge(['balance' => null]);
     }
     $request->merge(['data' => $this->tryDecodeArray($request->data)]);
+    $request->merge(['prices' => $this->tryDecodeArray($request->prices)]);
     $validator = Validator::make($request->all(), [
       'name' => 'required|string',
       'char' => 'required|string',
       'balance' => 'numeric',
-      'wallet' => 'required|string',
-      'data' => 'required|array',
+      'wallet' => 'string',
+      'data' => 'array',
       'image' => 'required|file|mimes:jpg,png,jpeg',
       'proof_is_required' => 'required|boolean',
-      'prices' => 'required|string',
+      'prices' => 'array',
     ]);
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
@@ -62,13 +62,12 @@ class CurrencyController extends Controller {
     if(!is_null($oldCurrency)) return $this->apiErrorResponse('This currency name already exists');
 
     try {
-      $rPrices = json_decode($request->prices);
       $prices = [];
-      foreach ($rPrices as $price) {
+      foreach ($request->prices as $price) {
         if($price->currency_id != -1) {
           $currency = Currency::find($price->currency_id);
           if(is_null($currency)) {
-            return $this->apiErrorResponse("Invalid currnecy id #$price->currency_id");
+            return $this->apiErrorResponse("Invalid currency id #$price->currency_id");
           }
         }
         $prices[$price->currency_id] = [
@@ -85,32 +84,34 @@ class CurrencyController extends Controller {
     if(!Storage::disk('public')->exists("currencies")) {
       Storage::disk('public')->makeDirectory("currencies");
     }
-    $request->file('image')->move(Storage::disk('public')->path("currencies"), "$currencyId.png");
-    File::create([
-      'name' => "currency-$currencyId",
+    $time = now()->timestamp;
+    $request->file('image')->move(Storage::disk('public')->path("currencies"), "currency-$currencyId-$time.png");
+    $imageFile = File::create([
+      'name' => "currency-$currencyId-$time",
       'disk' => 'public',
       'type' => 'image',
-      'path' => "currencies/$currencyId.png",
+      'path' => "currencies/currency-$currencyId-$time.png",
     ]);
 
-    $walletId = bin2hex('w-' . date_format(Carbon::now(), 'yyyy-MM-dd') . "-c-$currencyId");
+    $walletId = bin2hex('w-' . date_format(now(), 'yyyy-MM-dd') . "-c-$currencyId");
     Wallet::create([
       'id' => $walletId,
       'user_id' => 1,
       'user_model' => Admin::class,
       'balance' => $request->balance,
       'status' => 'active',
-      'answored_at' => Carbon::now(),
+      'answored_at' => now(),
     ]);
 
     Currency::create([
       'id' => $currencyId,
       'name' => $request->name,
       'char' => $request->char,
+      'image_id' => $imageFile->name,
       'prices' => $prices,
       'platform_wallet_id' => $walletId,
       'wallet' => $request->wallet,
-      'data' => $this->listMap2Map($request->data),
+      'data' => $request->data ? $this->listMap2Map($request->data) : [],
       'proof_is_required' => $request->proof_is_required,
       'unreades' => Admin::unreades($request->user()->id)
     ]);
@@ -119,6 +120,11 @@ class CurrencyController extends Controller {
 
   public function edit(Request $request, Currency $currency) {
     $request->merge(['proof_is_required' => !is_null($request->proof_is_required) ? $request->proof_is_required == 'true' : null]);
+    try {
+      $request->merge(['balance' => floatval($request->balance)]);
+    } catch (\Throwable $th) {
+      $request->merge(['balance' => null]);
+    }
     $request->merge(['data' => $this->tryDecodeArray($request->data)]);
     $validator = Validator::make($request->all(), [
       'name' => 'string',
@@ -148,9 +154,8 @@ class CurrencyController extends Controller {
         $rPrices = json_decode($request->prices);
         foreach ($rPrices as $price) {
           if(is_null(Currency::find($price->currency_id))) {
-            return $this->apiErrorResponse("Invalid currnecy id #$price->currency_id");
+            return $this->apiErrorResponse("Invalid currency id #$price->currency_id");
           }
-          // $prices[$price->currency_id] = floatval($price->price);
           $prices[$price->currency_id] = [
             'buy' => floatVal($price->buy_price),
             'sell' => floatVal($price->sell_price),
@@ -163,21 +168,30 @@ class CurrencyController extends Controller {
     }
 
     $currency->char = $request->char ?? $currency->char;
-    $currency->wallet = $request->wallet ?? $currency->wallet;
-    $currency->data = $this->listMap2Map($request->data) ?? $currency->wallet;
+    $currency->wallet = $request->wallet;
+    $currency->data = $this->listMap2Map($request->data) ?? $currency->data;
     $currency->proof_is_required = $request->proof_is_required ?? $currency->proof_is_required;
+
+    if($request->file('image')) {
+      File::find($currency->image_id)?->delete();
+      if(!Storage::disk('public')->exists("currencies")) {
+        Storage::disk('public')->makeDirectory("currencies");
+      }
+      $time = now()->timestamp;
+      $request->file('image')->move(Storage::disk('public')->path("currencies"), "currency-$currency->id-$time.png");
+      $imageFile = File::create([
+        'name' => "currency-$currency->id-$time",
+        'disk' => 'public',
+        'type' => 'image',
+        'path' => "currencies/currency-$currency->id-$time.png",
+      ]);
+      $currency->image_id = $imageFile->name;
+    }
     $currency->save();
     $currency->linking();
     $currency->platform_wallet->balance = $request->balance ?? $currency->platform_wallet->balance;
     $currency->unreades = Admin::unreades($request->user()->id);
     $currency->platform_wallet->save();
-
-    if($request->file('image')) {
-      if(!Storage::disk('public')->exists("currencies")) {
-        Storage::disk('public')->makeDirectory("currencies");
-      }
-      $request->file('image')->move(Storage::disk('public')->path("currencies"), "$currency->id.png");
-    }
 
     return $this->apiSuccessResponse('Succesfully editing currency');
   }

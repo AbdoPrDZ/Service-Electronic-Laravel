@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\User;
 
 use App\Models\Admin;
 use App\Models\Notification;
-use App\Models\Product;
+use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -13,7 +13,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ProductCreatedEvent {
+class UserCreatedEvent {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
   /**
@@ -21,22 +21,22 @@ class ProductCreatedEvent {
    *
    * @return void
    */
-  public function __construct(Product $product) {
-    $product->linking();
-    foreach ($product->unreades ?? [] as $admin_id) {
+  public function __construct(User $user) {
+    $user->linking();
+    foreach (($user->unreades ?? []) as $admin_id) {
       Notification::create([
         'to_id' => $admin_id,
         'to_model' => Admin::class,
-        'name' => 'new-product-created',
-        'title' => 'A new product created',
-        'message' => 'product created (Name: ' .
-                      $product->name . ', Price: ' .
-                      $product->price . ' DZD, Seller: ' .
-                      $product->seller->user->fullname . ')',
+        'name' => 'new-user-created',
+        'title' => 'A new user created',
+        'message' => 'user created (Name: ' . $user->fullname .
+        ', Phone: ' . $user->phone .
+        ', Email: ' . $user->email .
+        ')',
         'data' => [
-          'product_id' => $product->id,
+          'user_id' => $user->id,
         ],
-        'image_id' => $product->images_ids[0],
+        'image_id' => $user->profile_image_id ?? 'api_profile_default',
         'type' => 'emit',
       ]);
     }

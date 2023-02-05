@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Setting;
 
 class CategoryController extends Controller {
   public function __construct() {
@@ -10,6 +11,10 @@ class CategoryController extends Controller {
   }
 
   public function all() {
+    if(!Setting::serviceIsActive('store')) {
+      return $this->apiErrorResponse('This service has been deactivated');
+    }
+
     $data = Category::where('is_deleted', '=', 0)->get();
     $items = [];
     foreach ($data as $item) {

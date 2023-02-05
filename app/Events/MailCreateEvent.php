@@ -22,7 +22,7 @@ class MailCreateEvent {
   public function __construct(Mail $mail) {
     $mail->linking();
     \Illuminate\Support\Facades\Mail::raw($mail->title, function (Message $message) use($mail) {
-      foreach ($mail->targets as $email) {
+      foreach ($mail->targetsMails as $email) {
        $message->to($email)
                ->subject($mail->title)
                ->html($mail->rendredContent);

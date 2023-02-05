@@ -49,6 +49,12 @@ class Mail extends Model {
   public function linking() {
     $this->template = Template::find($this->template_id);
     if(is_string($this->data)) $this->data = json_decode($this->data);
+    $targetsMails = [];
+    foreach ($this->targets as $userId) {
+      $user = User::find($userId);
+      if($user) $targetsMails[] = $user->email;
+    }
+    $this->targetsMails = $targetsMails;
     $this->rendredContent = str_replace(
       array_keys($this->data),
       array_values($this->data),

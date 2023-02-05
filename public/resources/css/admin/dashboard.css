@@ -266,9 +266,18 @@ body>div {
   padding: 0 10px;
 }
 
+#images-preivew-carousel {
+  height: 100%;
+}
+#images-preivew-carousel .carousel-inner {
+  height: 100%;
+}
+#images-preivew-carousel .carousel-item {
+  height: 100%;
+}
 #images-preivew-carousel img {
   max-height: 72vh;
-  height: fit-content;
+  height: 100%;
   width: fit-content;
   margin: auto;
 }

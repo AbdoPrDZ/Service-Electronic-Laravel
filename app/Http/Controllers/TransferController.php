@@ -15,6 +15,10 @@ use Validator;
 class TransferController extends Controller {
 
   public function all(Request $request, $target) {
+    if(!Setting::serviceIsActive('transfers')) {
+      return $this->apiErrorResponse('This service has been deactivated');
+    }
+
     $data = Transfer::where([['user_id', '=', $request->user()->id], ['for_what', '=', $target]])->get();
     $items = [];
     foreach ($data as $item) {
@@ -25,6 +29,10 @@ class TransferController extends Controller {
   }
 
   public function create(Request $request) {
+    if(!Setting::serviceIsActive('transfers')) {
+      return $this->apiErrorResponse('This service has been deactivated');
+    }
+
     $request->merge(['data' => $this->tryDecodeArray($request->data)]);
     $validator = Validator::make($request->all(), [
       'received_balance' => 'required|numeric',
@@ -35,7 +43,9 @@ class TransferController extends Controller {
     ]);
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
-        'messages' => $validator->errors(),
+        'errors' => $validator->errors(),
+        'data' => $request->data,
+        'data_is_array' => is_array($request->data),
       ]);
     }
     $received_balance = floatVal($request->received_balance);
@@ -44,10 +54,14 @@ class TransferController extends Controller {
     if(is_null($sended_currency)) return $this->apiErrorResponse('Invalid sended currency', [
       'errors' => ['sended_currency_id' => 'Invalid sended currency'],
     ]);
-    $validator = Validator::make($request->data, $sended_currency->data);
+    $rules = [];
+    foreach ($sended_currency->data as $name => $item) {
+      $rules[$name] = $item['validate'];
+    }
+    $validator = Validator::make($request->data, $rules);
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
-        'messages' => $validator->errors(),
+        'errors' => $validator->errors(),
       ]);
     }
 
@@ -62,12 +76,6 @@ class TransferController extends Controller {
     if($sended_currency->proof_is_required && is_null($request->file('proof'))) {
       return $this->apiErrorResponse('Proof image has been required', [
         'errors' => ['proof' => 'Proof image has been required'],
-      ]);
-    }
-
-    if($request->received_currency_id != $platformCurrency->id && is_null($request->wallet)) {
-      return $this->apiErrorResponse('The wallet has been required', [
-        'errors' => ['wallet' => 'The wallet has been required'],
       ]);
     }
 
@@ -109,13 +117,13 @@ class TransferController extends Controller {
       $allpath = Storage::disk('api')->path("$userFilesPath/transfers");
       $shortPath = "$userFilesPath/transfers/t-$transferId";
       $request->file('proof')->move($allpath, "t-$transferId");
-      File::create([
+      $imageFile = File::create([
         'name' => "u-" . $request->user()->id . "-t-$transferId",
         'disk' => 'api',
         'type' => 'image',
         'path' => $shortPath,
       ]);
-      $values['proof_id'] = "u-".$request->user()->id . "-t-$transferId";
+      $values['proof_id'] = $imageFile->name;
     }
 
     Transfer::create($values);
@@ -124,6 +132,10 @@ class TransferController extends Controller {
   }
 
   public function createRecharge(Request $request) {
+    if(!Setting::serviceIsActive('transfers')) {
+      return $this->apiErrorResponse('This service has been deactivated');
+    }
+
     $validator = Validator::make($request->all(), [
       'sended_balance' => 'required|numeric',
       'received_currency_id' => 'required|string',
@@ -132,7 +144,7 @@ class TransferController extends Controller {
     ]);
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
-        'messages' => $validator->errors(),
+        'errors' => $validator->errors(),
       ]);
     }
     $sended_balance = floatVal($request->sended_balance);
@@ -210,13 +222,13 @@ class TransferController extends Controller {
       $allpath = Storage::disk('api')->path("$userFilesPath/transfers");
       $shortPath = "$userFilesPath/transfers/t-$transferId";
       $request->file('proof')->move($allpath, "t-$transferId");
-      File::create([
+      $imageFile = File::create([
         'name' => "u-" . $request->user()->id . "-t-$transferId",
         'disk' => 'api',
         'type' => 'image',
         'path' => $shortPath,
       ]);
-      $values['proof_id'] = "u-".$request->user()->id . "-t-$transferId";
+      $values['proof_id'] = $imageFile->name;
     }
 
     Transfer::create($values);
@@ -225,6 +237,10 @@ class TransferController extends Controller {
   }
 
   public function createWithdraw(Request $request) {
+    if(!Setting::serviceIsActive('transfers')) {
+      return $this->apiErrorResponse('This service has been deactivated');
+    }
+
     $validator = Validator::make($request->all(), [
       'received_balance' => 'required|numeric',
       'received_currency_id' => 'required|string',
@@ -232,7 +248,7 @@ class TransferController extends Controller {
     ]);
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
-        'messages' => $validator->errors(),
+        'errors' => $validator->errors(),
       ]);
     }
     $received_balance = floatVal($request->received_balance);

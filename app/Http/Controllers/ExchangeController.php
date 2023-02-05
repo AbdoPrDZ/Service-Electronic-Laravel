@@ -19,6 +19,10 @@ class ExchangeController extends Controller {
   }
 
   public function all(Request $request) {
+    if(!Setting::serviceIsActive('transfers')) {
+      return $this->apiErrorResponse('This service has been deactivated');
+    }
+
     $items = Exchange::where([
       ['name', '=', 'users-transfer'],
       ['from_wallet_id', '=', $request->user()->wallet_id],
@@ -40,8 +44,12 @@ class ExchangeController extends Controller {
     ]);
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
-        'messages' => $validator->errors(),
+        'errors' => $validator->errors(),
       ]);
+    }
+
+    if(!Setting::serviceIsActive('transfers')) {
+      return $this->apiErrorResponse('This service has been deactivated');
     }
 
     $user = $request->user();

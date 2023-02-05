@@ -12,6 +12,10 @@ use Validator;
 class OfferRequestController extends Controller {
 
   public function all(Request $request) {
+    if(!Setting::serviceIsActive('offers')) {
+      return $this->apiErrorResponse('This service has been deactivated');
+    }
+
     $items = OfferRequest::where('user_id', '=', $request->user()->id)->get();
     $offerRequests = [];
     foreach ($items as $offer) {
@@ -35,6 +39,10 @@ class OfferRequestController extends Controller {
       return $this->apiErrorResponse(null, [
         'errors' => $validator->errors(),
       ]);
+    }
+
+    if(!Setting::serviceIsActive('offers')) {
+      return $this->apiErrorResponse('This service has been deactivated');
     }
 
     $fieldsData = [];

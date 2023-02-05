@@ -16,9 +16,10 @@ return new class extends Migration
       $table->id();
       $table->string('name')->unique();
       $table->string('char', 10);
+      $table->string('image_id');
       $table->boolean('proof_is_required')->default(true);
       $table->enum('image_pick_type', ['gallery', 'camera'])->default('gallery');
-      $table->string('wallet');
+      $table->string('wallet')->nullable();
       $table->json('data')->default('{}');
       $table->string('platform_wallet_id');
       $table->json('prices')->default('{}');

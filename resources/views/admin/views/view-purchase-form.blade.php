@@ -25,6 +25,7 @@
   }
   #view-purchase .product-details .product-image img {
     width: auto;
+    max-width: 100%;
     height: 100%;
   }
   #view-purchase .product-details .details {
@@ -78,7 +79,7 @@
           <select class="form-control" name="answer">
             <option value="accept_all">قبول الكل</option>
             <option value="refuse_all">رفض الكل</option>
-            <option value="accept_delivery_cost">قبول الشخن</option>
+            <option value="accept_delivery_cost">إقتطاع الشخن</option>
           </select>
           <button class="btn btn-success" style="width: 100%;" name="answer">إجابة</button>
         </div>

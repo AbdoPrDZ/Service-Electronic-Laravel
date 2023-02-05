@@ -14,7 +14,6 @@ class FileController extends Controller {
       return response()->download(
         Storage::disk($file->disk)->path($file->path),
         $file->name,
-        []
       );
     } else {
       return abort(404);

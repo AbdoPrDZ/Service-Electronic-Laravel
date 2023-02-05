@@ -41,8 +41,21 @@
         <div class="form-group">
           <h5>الأسعار:</h5>
           <div id="currency-prices" class="multi-input"
-               inputs='[{"name": "currency_id", "text": "رقم العملة", "type": "number"}, {"name": "buy_price", "text": "سعر الشراء", "type": "number"}, {"name": "sell_price", "text": "سعر البيع", "type": "number"}]'
-               {{-- inputs='[{"name": "currency_id", "text": "رقم العملة", "type": "number"}, {"name": "price", "text": "السعر", "type": "number"}]' --}}
+               inputs='[{"name": "currency_id", "text": "رقم العملة", "type": "number"}, {"name": "buy_price", "text": "سعر البيع", "type": "number"}, {"name": "sell_price", "text": "سعر الشراء", "type": "number"}]'
+               add-btn-text="إضافة">
+            <div class="multi-input-header"></div>
+            <div class="multi-input-body"></div>
+          </div>
+        </div>
+        <hr>
+
+        <div class="form-group">
+          <h5>المعلومات المطلوبة:</h5>
+          <div id="currency-data" class="multi-input"
+               inputs='[{"name": "name", "text": "الاسم", "type": "string"},
+                        {"name": "title_en", "text": "عنوان (En)", "type": "string"},
+                        {"name": "title_ar", "text": "عنوان (Ar)", "type": "string"},
+                        {"name": "validate", "text": "القواعد", "type": "select", "options": "rules"}]'
                add-btn-text="إضافة">
             <div class="multi-input-header"></div>
             <div class="multi-input-body"></div>

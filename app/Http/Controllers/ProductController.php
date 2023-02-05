@@ -15,6 +15,10 @@ use Validator;
 class ProductController extends Controller {
 
   public function all(Request $request) {
+    if(!Setting::serviceIsActive('store')) {
+      return $this->apiErrorResponse('This service has been deactivated');
+    }
+
     $query = $request->query();
     $items = Product::where('is_deleted', '=', 0)->get();
     $from = key_exists('from', $query) && intVal($query['from']) < count($items) && intVal($query['from']) >= 0 ? intVal($query['from']) : 0;
@@ -31,6 +35,9 @@ class ProductController extends Controller {
   }
 
   public function create(Request $request) {
+    if(!Setting::serviceIsActive('store')) {
+      return $this->apiErrorResponse('This service has been deactivated');
+    }
     $validator = Validator::make($request->all(), [
       'name' => 'required|string',
       'description' => 'required|string',
@@ -89,19 +96,19 @@ class ProductController extends Controller {
     }
 
     $i = 1;
+    $time = now()->timestamp;
     foreach ($request->files as $file) {
-      $file->move(Storage::disk('api')->path($userProductPath), "i-$i");
-      $name = "u-" . $user->id . "-p-$productId-i-$i";
+      $file->move(Storage::disk('api')->path($userProductPath), "i-$i-$time");
+      $name = "u-" . $user->id . "-p-$productId-i-$i-$time";
       File::create([
         'name' => $name,
         'disk' => 'api',
         'type' => 'image',
-        'path' => "$userProductPath/i-$i",
+        'path' => "$userProductPath/i-$i-$time",
       ]);
       $values['images_ids'][] = $name;
       $i++;
     }
-    $values['images_ids'] = $values['images_ids'];
 
     Product::create($values);
 
@@ -113,6 +120,10 @@ class ProductController extends Controller {
   }
 
   public function edit(Request $request, Product $product) {
+    if(!Setting::serviceIsActive('store')) {
+      return $this->apiErrorResponse('This service has been deactivated');
+    }
+
     $validator = Validator::make($request->all(), [
       'name' => 'string',
       'description' => 'string',
@@ -122,7 +133,7 @@ class ProductController extends Controller {
     ]);
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
-        'messages' => $validator->errors(),
+        'errors' => $validator->errors(),
       ]);
     }
 
@@ -157,15 +168,22 @@ class ProductController extends Controller {
         Storage::disk('api')->makeDirectory($userProductPath);
       }
 
+      async(function () use ($product) {
+        foreach ($product->images_ids as $id) {
+          File::find($id)?->delete();
+        }
+      })->start();
+
       $i = 1;
+      $time = now()->timestamp;
       foreach ($request->files as $file) {
-        $file->move(Storage::disk('api')->path($userProductPath), "i-$i");
-        $name = "u-" . $user->id . "-p-$product->id-i-$i";
+        $file->move(Storage::disk('api')->path($userProductPath), "i-$i-$time");
+        $name = "u-" . $user->id . "-p-$product->id-i-$i-$time";
         File::create([
           'name' => $name,
           'disk' => 'api',
           'type' => 'image',
-          'path' => "$userProductPath/i-$i",
+          'path' => "$userProductPath/i-$i-$time",
         ]);
         $imagesIds[] = $name;
         $i++;
@@ -186,11 +204,19 @@ class ProductController extends Controller {
   }
 
   public function delete(Request $request, Product $product) {
+    if(!Setting::serviceIsActive('store')) {
+      return $this->apiErrorResponse('This service has been deactivated');
+    }
+
     $product->preDelete();
     return $this->apiSuccessResponse('Successfully deleting product');
   }
 
   public function like(Request $request, $product) {
+    if(!Setting::serviceIsActive('store')) {
+      return $this->apiErrorResponse('This service has been deactivated');
+    }
+
     $user = $request->user();
     $product->linking($user);
     if($product->is_liked) {
@@ -202,6 +228,10 @@ class ProductController extends Controller {
   }
 
   public function unLike(Request $request, $product) {
+    if(!Setting::serviceIsActive('store')) {
+      return $this->apiErrorResponse('This service has been deactivated');
+    }
+
     $user = $request->user();
     $product->linking($user);
     if(!$product->is_liked) {
@@ -213,6 +243,10 @@ class ProductController extends Controller {
   }
 
   public function rate(Request $request, $product) {
+    if(!Setting::serviceIsActive('store')) {
+      return $this->apiErrorResponse('This service has been deactivated');
+    }
+
     $validator = Validator::make($request->all(), [
       'value' => 'required|numeric',
     ]);

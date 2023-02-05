@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Events\Transfer\TransferCreatedEvent;
 use App\Events\Transfer\TransferDeletedEvent;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -127,7 +126,7 @@ class Transfer extends Model  {
       'message' => 'This Transfer Already ansowred',
     ];
     $this->status = $status;
-    $this->answered_at = Carbon::now();
+    $this->answered_at = now();
     $this->answer_description = $answer_description;
     $exchange = Exchange::find($this->exchange_id);
     if(!is_null($exchange)) $exchange->linking();
@@ -139,7 +138,6 @@ class Transfer extends Model  {
       'accepted' => 'Congratulations, your transfer request has been accepted',
       'refused' => 'Unfortunately your transfer request has been refused, for more information please contact support.'
     ];
-    $eventName = 'transfer-answer';
     if($this->for_what == 'recharge') {
       if($this->status == 'accepted') $exchangeRes = $exchange->accept();
       else $exchangeRes = $exchange->refuse($answer_description);
@@ -148,7 +146,6 @@ class Transfer extends Model  {
         'accepted' => 'Congratulations, your recharge request has been accepted',
         'refused' => 'Unfortunately your recharge request has been refused, for more information please contact support.'
       ];
-      $eventName = 'transfer-answer';
     } else if($this->for_what == 'withdraw') {
       $user = User::find($this->user_id);
       $user->linking();
@@ -161,7 +158,7 @@ class Transfer extends Model  {
       $sended_currency->platform_wallet->balance += $this->sended_balance;
       $sended_currency->platform_wallet->unlinkingAndSave();
     }
-    $notification = Notification::create([
+    Notification::create([
       'name' => 'notifications',
       'title' => "Transfer (#$this->id) Status Changed",
       'message' => $answers[$this->status],
@@ -170,7 +167,7 @@ class Transfer extends Model  {
       'to_id' => $this->user_id,
       'to_model' => User::class,
       'data' => [
-        'event_name' => $eventName,
+        'event_name' => 'transfer-answer',
         'data' => json_encode([
           'id' => "$this->id",
           'status' => $this->status,

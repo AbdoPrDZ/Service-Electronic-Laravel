@@ -44,7 +44,9 @@ async function main() {
     if(Environment.clients[request.params.room]) {
       const client = Environment.clients[request.params.room][request.params.clientId];
       if(client) {
-        const response = client.emitToClient(request.params.routeName, request.body);
+        const args = JSON.parse(request.body.args ?? '{}');
+        console.log('emit to client', request.params.routeName, args)
+        const response = client.emitToClient(request.params.routeName, args);
         success = response.success
         message = response.message;
       } else {
@@ -61,7 +63,7 @@ async function main() {
 
   // emit notification to client
   Environment.app.post(`${Environment.configures.bridge.path}${Environment.configures.bridge.emit_notification}`, (request, response) => {
-    const notification = JSON.parse(request.body[0]);
+    const notification = JSON.parse(request.body.args ?? '{}');
     var success = false;
     var message = '';
     if(notification) {
@@ -86,7 +88,7 @@ async function main() {
 
   // push notification to client
   Environment.app.post(`${Environment.configures.bridge.path}${Environment.configures.bridge.push_notification}`, async (request, response) => {
-    const notification = JSON.parse(request.body[0]);
+    const notification = JSON.parse(request.body.args ?? '{}');
     var success = false;
     var message = '';
     if(notification) {
@@ -110,7 +112,8 @@ async function main() {
             ...notification.data
           }
         }
-        const messagingResponse =  await admin.messaging().send(message);
+        console.log('send message', message);
+        console.log(await admin.messaging().send(message));
         success =  true,
         message = 'Successfully sending message'
       } catch (error) {

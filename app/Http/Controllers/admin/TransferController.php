@@ -34,6 +34,7 @@ class TransferController extends Controller {
   }
 
   public function changeStatus(Request $request, Transfer $transfer) {
+    $transfer->linking();
     $validator = Validator::make($request->all(), [
       'status' => 'required|in:accepted,refused',
       'description' => '',

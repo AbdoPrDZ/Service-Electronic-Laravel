@@ -31,8 +31,8 @@ class OfferRequestCreatedEvent {
         'title' => 'A new offer request created',
         'message' => 'Offer request created (title: ' .
                     $offerRequest->offer->title['en'] . ', Offer: ' .
-                    $offerRequest->offer->sub_offers[$offerRequest->sub_offer] . ', Price: ' .
-                    $offerRequest->total_price . ' SE)',
+                    $offerRequest->offer->sub_offers[$offerRequest->sub_offer]['title_en'] . ', Price: ' .
+                    $offerRequest->total_price . ' DZD)',
         'data' => [
           'offer_id' => $offerRequest->id,
         ],

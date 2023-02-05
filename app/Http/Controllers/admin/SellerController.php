@@ -7,7 +7,6 @@ use App\Models\Admin;
 use App\Models\Notification;
 use App\Models\Seller;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -65,18 +64,18 @@ class SellerController extends Controller {
       }
       $seller->status = $request->status;
       $seller->anower_description = $request->description;
-      $seller->answered_at = Carbon::now();
+      $seller->answered_at = now();
       $seller->unreades = Admin::unreades($request->user()->id);
       $seller->unlinkingAndSave();
       $messages = [ 'accepted' => 'Congratulations, your request has been accepted' ];
       Notification::create([
-        'name' => 'notifications',
-        'title' => 'Seller register result',
-        'message' => $request->description ?? $messages[$request->status] ?? '',
         'from_id' => $request->user()->id,
         'from_model' => Admin::class,
         'to_id' => $seller->user_id,
         'to_model' => User::class,
+        'name' => 'notifications',
+        'title' => 'Seller register result',
+        'message' => $request->description ?? $messages[$request->status] ?? '',
         'data' => [
           'event_name' => 'seller-register-status-change',
           'data' => json_encode([

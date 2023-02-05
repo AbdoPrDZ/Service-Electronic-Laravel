@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use App\Events\UserCreatedEvent;
+use App\Events\User\UserCreatedEvent;
+use App\Events\User\UserUpdatedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -92,6 +93,7 @@ class User extends Authenticatable {
 
   protected $dispatchesEvents = [
     'created' => UserCreatedEvent::class,
+    'updated' => UserUpdatedEvent::class,
   ];
 
   static function news($admin_id) {
@@ -139,8 +141,10 @@ class User extends Authenticatable {
       'platform_currency' => $platform_currency,
       'display_currency' => $display_currency,
       'commission' => Setting::find('commission')?->value[0],
+      'services_status' => Setting::servicesStatus(),
     ];
   }
+
   public function unlinking($linkSeller = true) {
     unset($this->fullname);
     unset($this->email_verified);
@@ -168,5 +172,18 @@ class User extends Authenticatable {
       $purchases[$purchase->id] = $purchase;
     }
     return $purchases;
+  }
+
+  static function notify($notification, $users = '*') {
+    return async(function () use ($notification, $users) {
+      if ($users == '*') $users = User::all();
+      foreach ($users as $user) {
+        Notification::create([
+          'to_id' => $user->id,
+          'to_model' => User::class,
+          ...$notification,
+        ]);
+      }
+    })->start();
   }
 }

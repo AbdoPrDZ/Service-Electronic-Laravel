@@ -2,9 +2,10 @@
 
 namespace App\Events;
 
-use App\Models\Admin;
-use App\Models\Notification;
+use App\Http\SocketBridge\SocketClient;
+use App\Models\Setting;
 use App\Models\User;
+use Cache;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -13,7 +14,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UserCreatedEvent {
+class SettingUpdatedEvent{
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
   /**
@@ -21,24 +22,18 @@ class UserCreatedEvent {
    *
    * @return void
    */
-  public function __construct(User $user) {
-    $user->linking();
-    foreach (($user->unreades ?? []) as $admin_id) {
-      Notification::create([
-        'to_id' => $admin_id,
-        'to_model' => Admin::class,
-        'name' => 'new-user-created',
-        'title' => 'A new user created',
-        'message' => 'user created (Name: ' . $user->fullname .
-        ', Phone: ' . $user->phone .
-        ', Email: ' . $user->email .
-        ')',
-        'data' => [
-          'user_id' => $user->id,
-        ],
-        'image_id' => $user->profile_image_id,
-        'type' => 'emit',
-      ]);
+  public function __construct(Setting $setting) {
+    if(!Cache::store('file')->has('api/users-listens')) {
+      Cache::store('file')->set('api/users-listens', []);
+    }
+    $ids = Cache::store('file')->get('api/users-listens');
+    foreach ($ids as $id) {
+      $user = User::find($id);
+      if($user) {
+        $user->linking();
+        $client = new SocketClient($id, 'api', User::class);
+        $client->emit('user-update', ['user' => $user]);
+      }
     }
   }
 

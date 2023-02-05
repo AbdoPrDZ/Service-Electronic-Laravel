@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\User;
 
 use App\Http\SocketBridge\SocketClient;
-use App\Models\Admin;
-use App\Models\Notification;
 use App\Models\User;
+use Cache;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -14,7 +13,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class NotificationCreatedEvent {
+class UserUpdatedEvent {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
   /**
@@ -22,17 +21,15 @@ class NotificationCreatedEvent {
    *
    * @return void
    */
-  public function __construct(Notification $notification) {
-    $notification->linking();
-    $room = [User::class => 'api', Admin::class => 'admin'][$notification->to_model];
-    $client = new SocketClient($notification->to_id, $room);
-    if($notification->type == 'emit') {
-      $client->emitNotification($notification);
-    } else {
-      if($notification->type == 'notify') $client->pushNotification($notification);
-      else if($notification->type == 'emitOrNotify') $client->emitOrPushNotification($notification);
-      else if($notification->type == 'emitAndNotify') $client->emitAndPushNotification($notification);
+  public function __construct(User $user) {
+    if(!Cache::store('file')->has('api/users-listens')) {
+      Cache::store('file')->set('api/users-listens', []);
     }
+    $ids = Cache::store('file')->get('api/users-listens');
+    if (!in_array($user->id, $ids)) return;
+    $user->linking();
+    $client = new SocketClient($user->id, 'api', User::class);
+    $client->emit('user-update', ['user' => $user]);
   }
 
   /**

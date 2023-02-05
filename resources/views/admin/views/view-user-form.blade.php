@@ -50,9 +50,7 @@
               <div class="form-group">
                 <h5>وضعية الهوية:</h5>
                 <select class="form-control" name="status">
-                  <option value="checking">غير محقق</option>
-                  <option value="checking">فيد التحقق</option>
-                  <option value="verifited">تم التحقق</option>
+                  <option value="verifited">قبول</option>
                   <option value="refused">رفض</option>
                 </select>
                 <input type="text" class="form-control" placeholder="السبب" name="status-description">
@@ -69,7 +67,7 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-danger" action="close">Cancel</button>
+              <button type="button" class="btn btn-danger" action="close">إلغاء</button>
             </div>
           </div>
         </div>

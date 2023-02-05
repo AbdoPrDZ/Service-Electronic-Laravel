@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Currency;
+use App\Models\Setting;
 
 class CurrencyController extends Controller {
 
@@ -11,6 +12,10 @@ class CurrencyController extends Controller {
   }
 
   public function all() {
+    if(!Setting::serviceIsActive('transfers')) {
+      return $this->apiErrorResponse('This service has been deactivated');
+    }
+
     $data = Currency::where('is_deleted', '=', 0)->get();
     $items = [];
     foreach ($data as $item) {

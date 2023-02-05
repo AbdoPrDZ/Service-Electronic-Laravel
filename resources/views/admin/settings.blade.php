@@ -19,7 +19,7 @@
       <div class="topbar-actions">
         @if (!is_null($admin->balance))
           <h2 class=" {{ $admin->balance != 0 ? 'success' : 'danger' }}" style="font-size: 14px;font-weight: bold;">
-            {{ $admin->balance ?? 0 }} SE
+            {{ $admin->balance ?? 0 }} DZD
           </h2>
         @endif
         <div class="dropdown dropdown-selecetion" id="person-dropdown">
@@ -140,6 +140,24 @@
         </div>
         <hr>
 
+        <div class="form-group">
+          <h5>حالة الخدمات:</h5>
+          <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="transfers-service" name="transfers_servince_is_active" {{ $servicesStatus['transfers'] == 'active' ? 'checked' : '' }}>
+            <label class="custom-control-label" for="transfers-service">خدمة التحويلات مفعلة</label>
+          </div>
+          <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="offers-service" name="offers_servince_is_active" {{ $servicesStatus['offers'] == 'active' ? 'checked' : '' }}>
+            <label class="custom-control-label" for="offers-service">خدمة العروض مفعلة</label>
+          </div>
+          <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="store-service" name="store_servince_is_active" {{ $servicesStatus['store'] == 'active' ? 'checked' : '' }}>
+            <label class="custom-control-label" for="store-service">خدمة المتجر مفعلة</label>
+          </div>
+          <br>
+          <button class="btn btn-success" action="save" onclick="saveSetting(this, 'services_status')" style="width: 100%;">حفظ</button>
+        </div>
+
       </div>
 
       <div id="alerts" class="noties topright"></div>
@@ -204,8 +222,17 @@
             message: 'هل أنت متأكد من تغيير قيمة العمولة',
             defualtValue: {{ $commission }}
           },
+          services_status: {
+            title: 'تغيير حالة الخدمات',
+            message: 'عل أنت متأكد من تغيير حالة الخدمات',
+            defualtValue: <?php echo json_encode($servicesStatus) ?>
+          }
         }
-        const value = $(`.form-group[name="${name}"] .form-control`).val();
+        const value = name == 'services_status' ? JSON.stringify({
+          transfers: $('input[name="transfers_servince_is_active"]').prop('checked') ? 'active' : 'deactivate',
+          offers: $('input[name="offers_servince_is_active"]').prop('checked') ? 'active' : 'deactivate',
+          store: $('input[name="store_servince_is_active"]').prop('checked') ? 'active' : 'deactivate',
+        }) : $(`.form-group[name="${name}"] .form-control`).val();
         console.log(value);
         if(value == actions[name].defualtValue) return;
         const btnHtml = $(button).html();
@@ -233,9 +260,13 @@
               if(data.success) {
                 alertMessage('save-setting-message', actions[name].title, data.message, 'success');
               } else {
-                for (const key in data.errors) {
-                  const error = data.errors[key];
-                  alertMessage('save-setting-message', actions[name].title, error, 'danger');
+                if(data.message) {
+                  alertMessage('save-setting-message', actions[name].title, data.message, 'danger');
+                } else {
+                  for (const key in data.errors) {
+                    const error = data.errors[key];
+                    alertMessage('save-setting-message', actions[name].title, error, 'danger');
+                  }
                 }
               }
             } else {

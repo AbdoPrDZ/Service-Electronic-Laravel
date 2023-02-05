@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Purchase;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -91,7 +90,7 @@ class PurchaseController extends Controller {
         return $this->apiErrorResponse($res['message']);
       }
     }
-    $steps['admin_answer'] = [$request->answer, Carbon::now()];
+    $steps['admin_answer'] = [$request->answer, now()];
     $purchase->delivery_steps = $steps;
     $purchase->status = 'admin_ansowred';
     $purchase->unreades = Admin::unreades($request->user()->id);

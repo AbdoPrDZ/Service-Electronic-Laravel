@@ -38,12 +38,12 @@ Route::get('/notifications/{id}/read', [NotificationController::class, 'markAsRe
 
 Route::group([
   'prefix' => 'user',
-  'middleware' => ['multi.auth:admin', 'valid_id:' . User::class],
+  'middleware' => ['multi.auth:admin'],
 ], function ($router) {
-  Route::delete('/{id}/delete', [UserController::class, 'delete']);
-  Route::post('/{id}/change_identity_status', [UserController::class, 'changeIdentityStatus']);
-  Route::post('/{id}/send_notification', [UserController::class, 'sendNotification']);
-  Route::get('/{id}/details', [UserController::class, 'details']);
+  Route::delete('/{id}/delete', [UserController::class, 'delete'])->middleware('valid_id:' . User::class);
+  Route::post('/{id}/change_identity_status', [UserController::class, 'changeIdentityStatus'])->middleware('valid_id:' . User::class);
+  Route::post('/send_notification', [UserController::class, 'sendNotification']);
+  Route::get('/{id}/details', [UserController::class, 'details'])->middleware('valid_id:' . User::class);
 });
 
 Route::group([

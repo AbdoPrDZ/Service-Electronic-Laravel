@@ -31,7 +31,7 @@
       <div class="topbar-actions">
         @if (!is_null($admin->balance))
           <h2 class=" {{ $admin->balance != 0 ? 'success' : 'danger' }}" style="font-size: 14px;font-weight: bold;">
-            {{ $admin->balance ?? 0 }} SE
+            {{ $admin->balance ?? 0 }} DZD
           </h2>
         @endif
         <div class="dropdown dropdown-selecetion" id="person-dropdown">
@@ -100,7 +100,7 @@
               <span>is Seller: </span><?php echo !is_null($user->seller)? '<span class="success">نعم</span>': '<span class="danger">لا</span>' ?><br>
             </span>
             <span class="detail-item">
-              <span>Balance: </span><span class="success">{{ $user->wallet->balance }} SE</span><br>
+              <span>Balance: </span><span class="success">{{ $user->wallet->balance }} DZD</span><br>
             </span>
             <span class="detail-item">
               <span>Joined at: </span>{{ $user->created_at }}<br>
@@ -282,9 +282,9 @@
                 <td>{{ $product->id }}</td>
                 <td><div class="table-img"><img src="../../../file/admin/{{ $product->images_ids[0].'?'.time() }}"></div></td>
                 <td>{{ $product->name }}</td>
-                <td>{{ $product->price }} SE</td>
+                <td>{{ $product->price }} DZD</td>
                 <td>{{ $product->category->name['en']}}</td>
-                <td>{{ $product->description }} SE</td>
+                <td>{{ $product->description }} DZD</td>
                 <td>{{ $product->created_at }}</td>
               </tr>
               @endforeach

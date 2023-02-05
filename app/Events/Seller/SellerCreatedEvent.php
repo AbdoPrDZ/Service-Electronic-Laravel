@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Seller;
 
+use App\Http\SocketBridge\SocketClient;
 use App\Models\Admin;
 use App\Models\Notification;
 use App\Models\Seller;
+use Cache;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -13,8 +15,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class SellerCreatedEvent
-{
+class SellerCreatedEvent {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
   /**
@@ -24,6 +25,15 @@ class SellerCreatedEvent
    */
   public function __construct(Seller $seller) {
     $seller->linking();
+    if(!Cache::store('file')->has('api/users-listens')) {
+      Cache::store('file')->set('api/users-listens', []);
+    }
+    $ids = Cache::store('file')->get('api/users-listens');
+    if (!in_array($seller->user->id, $ids)) return;
+    $seller->user->linking();
+    $client = new SocketClient($seller->user->id, 'api', User::class);
+    $client->emit('user-update', ['user' => $seller->user]);
+
     foreach ($seller->unreades ?? [] as $admin_id) {
       Notification::create([
         'to_id' => $admin_id,

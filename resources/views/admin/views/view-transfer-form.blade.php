@@ -37,8 +37,8 @@
               <hr>
 
               <div class="form-group">
-                <h5>المحفظة:</h5>
-                <input type="text" class="form-control" name="wallet">
+                <h5>المعلومات:</h5>
+                <div class="form-control" style="height: fit-content; text-align: start;" name="data">
               </div>
               <hr>
 

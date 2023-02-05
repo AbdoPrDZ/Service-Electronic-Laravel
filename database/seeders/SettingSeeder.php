@@ -45,5 +45,9 @@ class SettingSeeder extends Seeder {
       'name' => 'user_identity_confirm_template_id',
       'value' => ['identity-confirm'],
     ]);
+    Setting::create([
+      'name' => 'services_status',
+      'value' => ['transfers' => 'active', 'offers' => 'active', 'store' => 'active'],
+    ]);
   }
 }

@@ -24,7 +24,7 @@ class CurrencyDeletedEvent {
   public function __construct(Currency $currency) {
     $currency->linking();
     $currency->platform_wallet->delete();
-    File::find("currency-$currency->id")->delete();
+    File::find($currency->image_id)->delete();
   }
 
   /**

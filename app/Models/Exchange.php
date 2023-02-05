@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Events\ExchangeCreatedEvent;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -121,7 +120,7 @@ class Exchange extends Model {
       $this->from_wallet->checking_withdraw_balance -= $this->sended_balance;
       $this->from_wallet->unlinkingAndSave();
     }
-    $this->answered_at = Carbon::now();
+    $this->answered_at = now();
     $this->status = 'received';
     $this->unlinkingAndSave();
     return [
@@ -138,7 +137,7 @@ class Exchange extends Model {
       ];
     }
     $this->anower_description = $message;
-    $this->answered_at = Carbon::now();
+    $this->answered_at = now();
     $this->status = 'blocked';
     if($this->from_wallet) {
       $this->from_wallet->checking_withdraw_balance -= $this->sended_balance;

@@ -96,6 +96,9 @@
               <div class="custom-table-header">
                 <h2 class="custom-table-title">المستخدمون</h2>
                 <div class="custom-table-header-actions">
+                  <button class="btn btn-success need-select" action="send-notification" disabled>
+                    <span class="material-symbols-sharp">chat</span> إرسال رسالة
+                  </button>
                   <button class="btn btn-danger need-select" action="delete" disabled>
                     <span class="material-symbols-sharp">delete</span> حذف
                   </button>

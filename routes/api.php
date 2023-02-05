@@ -36,9 +36,12 @@ Route::group([
   Route::post('/login', [UserController::class, 'login']);
   Route::post('/signup', [UserController::class, 'signup']);
   Route::post('/email_verify', [UserController::class, 'emailVerify']);
+  Route::post('/resend_verifiy_email', [UserController::class, 'resendEmailVerifiy']);
+
   Route::get('/logout', [UserController::class, 'logout']);
   Route::post('/refresh', [UserController::class, 'refresh']);
   Route::get('/user', [UserController::class, 'index']);
+  Route::post('/update_messaging_token', [UserController::class, 'updateMessagingToken']);
   Route::post('/edit', [UserController::class, 'editProfile']);
   Route::post('/change_email', [UserController::class, 'changeEmail']);
   Route::post('/rp_check_password', [UserController::class, 'rp_check_password']);
@@ -115,5 +118,3 @@ Route::group([
   Route::get('/all', [OfferRequestController::class, 'all']);
   Route::post('/{offer_id}/create', [OfferRequestController::class, 'create'])->middleware('valid_id:' . Offer::class . ',offer_id');
 });
-
-Route::get('test', [ProductController::class, 'all']);

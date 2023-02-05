@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -45,6 +46,25 @@ class OfferRequestController extends Controller {
       $offerRequest->exchange->refuse($request->description);
       $offerRequest->status = 'admin_refuse';
     }
+    $answer = ['accept' => 'accepted', 'refuse' => 'refused'][$request->answer];
+    Notification::create([
+      'from_id' => $request->user()->id,
+      'from_model' => Admin::class,
+      'to_id' => $offerRequest->user_id,
+      'to_model' => User::class,
+      'name' => 'notifications',
+      'title' => 'Your Offer request has been answerd ',
+      'message' => "Your Offer Request (#$offerRequest->id) has been $answer from admin",
+      'data' => [
+        'event_name' => 'offer-request-answred',
+          'data' => json_encode([
+            'offerRequest_id' => $offerRequest->id,
+          ]),
+      ],
+      'image_id' => 'logo',
+      'type' => 'emitOrNotify',
+    ]);
+
     $offerRequest->unreades = Admin::unreades($request->user()->id);
     $offerRequest->unlinkingAndSave();
 
