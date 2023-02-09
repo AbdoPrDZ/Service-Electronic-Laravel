@@ -36,7 +36,7 @@ class OfferRequestCreatedEvent {
         'data' => [
           'offer_id' => $offerRequest->id,
         ],
-        'image_id' => $offerRequest->offer->image_id,
+        'image_id' => 'offers',
         'type' => 'emit',
       ]);
     }

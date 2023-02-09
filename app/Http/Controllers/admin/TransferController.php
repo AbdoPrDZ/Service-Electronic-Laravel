@@ -46,6 +46,7 @@ class TransferController extends Controller {
     if(!$answerRes['success']) {
       return $this->apiErrorResponse($answerRes['message']);
     }
+    $transfer->linking();
     if(in_array($transfer->for_what, ['recharge', 'withdraw'])) {
       $titles = [
         'recharge' => [
@@ -57,7 +58,7 @@ class TransferController extends Controller {
             '<-received_currency->' => $transfer->received_currency->name,
             '<-sended_currency->' => $transfer->sended_currency->name,
             '<-wallet->' => $transfer->wallet,
-            '<-recharge_date->' => $transfer->exchange->answered_at,
+            '<-recharge_date->' => $transfer->exchange?->answered_at ?? '',
             '<-answer->' => $request->status,
             '<-answer_description->' => $request->description ?? $request->status,
           ]
@@ -71,16 +72,16 @@ class TransferController extends Controller {
             '<-received_currency->' => $transfer->received_currency->name,
             '<-sended_currency->' => $transfer->sended_currency->name,
             '<-to_wallet->' => $transfer->wallet,
-            '<-withdraw_date->' => $transfer->exchange->answered_at,
+            '<-withdraw_date->' => $transfer->exchange?->answered_at ?? '',
             '<-answer->' => $request->status,
             '<-answer_description->' => $request->description ?? $request->status,
           ]
         ],
       ];
       Mail::create([
-        'title' => $titles[$transfer->for_whet][0],
-        'template_id' => $titles[$transfer->for_whet][1],
-        'data' => $titles[$transfer->for_whet][2],
+        'title' => $titles[$transfer->for_what][0],
+        'template_id' => $titles[$transfer->for_what][1],
+        'data' => $titles[$transfer->for_what][2],
         'targets' => [$transfer->user_id],
         'unreades' => Admin::unreades(),
       ]);

@@ -26,8 +26,11 @@ class ExchangeCreatedEvent {
       $exchange->from_wallet->balance -= $exchange->sended_balance;
       $exchange->from_wallet->unlinkingAndSave();
     }
-    $exchange->to_wallet->checking_recharge_balance += $exchange->received_balance;
-    $exchange->to_wallet->unlinkingAndSave();
+    if($exchange->to_wallet) {
+      $exchange->to_wallet->checking_recharge_balance += $exchange->received_balance;
+      $exchange->to_wallet->unlinkingAndSave();
+    }
+    $exchange->linking();
   }
 
   /**
@@ -35,8 +38,7 @@ class ExchangeCreatedEvent {
    *
    * @return \Illuminate\Broadcasting\Channel|array
    */
-  public function broadcastOn()
-  {
+  public function broadcastOn() {
     return new PrivateChannel('channel-name');
   }
 }

@@ -87,7 +87,7 @@ class Exchange extends Model {
     $this->from_wallet = Wallet::find($this->from_wallet_id);
     if($this->from_wallet) $this->from_wallet->linking();
     $this->to_wallet = Wallet::find($this->to_wallet_id);
-    $this->to_wallet->linking();
+    if($this->to_wallet) $this->to_wallet->linking();
     if ($gettingTargetUser) $this->target_user = User::where('wallet_id', '=', $this->to_wallet_id)->first();
   }
 
@@ -113,10 +113,12 @@ class Exchange extends Model {
       'success' => false,
       'message' => 'The sender balance is insufficient',
     ];
-    $this->to_wallet->balance += $this->received_balance;
-    $this->to_wallet->checking_recharge_balance -= $this->received_balance;
-    $this->to_wallet->unlinkingAndSave();
-    if(!is_null($this->from_wallet)) {
+    if($this->to_wallet) {
+      $this->to_wallet->balance += $this->received_balance;
+      $this->to_wallet->checking_recharge_balance -= $this->received_balance;
+      $this->to_wallet->unlinkingAndSave();
+    }
+    if($this->from_wallet) {
       $this->from_wallet->checking_withdraw_balance -= $this->sended_balance;
       $this->from_wallet->unlinkingAndSave();
     }
@@ -144,8 +146,10 @@ class Exchange extends Model {
       $this->from_wallet->balance += $this->sended_balance;
       $this->from_wallet->unlinkingAndSave();
     }
-    $this->to_wallet->checking_recharge_balance -= $this->received_balance;
-    $this->to_wallet->unlinkingAndSave();
+    if($this->to_wallet) {
+      $this->to_wallet->checking_recharge_balance -= $this->received_balance;
+      $this->to_wallet->unlinkingAndSave();
+    }
     $this->unlinkingAndSave();
     return [
       'success' => true,

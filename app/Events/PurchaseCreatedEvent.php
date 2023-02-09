@@ -5,6 +5,7 @@ namespace App\Events;
 use App\Models\Admin;
 use App\Models\Notification;
 use App\Models\Purchase;
+use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -37,7 +38,7 @@ class PurchaseCreatedEvent {
           'purchase_id' => $purchase->id,
         ]),
       ],
-      'image_id' => $purchase->product->images_ids[0],
+      'image_id' => 'store',
       'type' => 'emitAndNotify',
     ]);
     foreach ($purchase->unreades ?? [] as $admin_id) {
@@ -54,7 +55,7 @@ class PurchaseCreatedEvent {
         'data' => [
           'purchase_id' => $purchase->id,
         ],
-        'image_id' => $purchase->product->images_ids[0],
+        'image_id' => 'store',
         'type' => 'emit',
       ]);
     }

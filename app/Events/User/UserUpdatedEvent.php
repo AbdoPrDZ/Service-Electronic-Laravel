@@ -2,9 +2,7 @@
 
 namespace App\Events\User;
 
-use App\Http\SocketBridge\SocketClient;
 use App\Models\User;
-use Cache;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -22,14 +20,7 @@ class UserUpdatedEvent {
    * @return void
    */
   public function __construct(User $user) {
-    if(!Cache::store('file')->has('api/users-listens')) {
-      Cache::store('file')->set('api/users-listens', []);
-    }
-    $ids = Cache::store('file')->get('api/users-listens');
-    if (!in_array($user->id, $ids)) return;
-    $user->linking();
-    $client = new SocketClient($user->id, 'api', User::class);
-    $client->emit('user-update', ['user' => $user]);
+    $user->emitUpdates();
   }
 
   /**

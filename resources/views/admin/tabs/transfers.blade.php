@@ -26,7 +26,7 @@
                   <th style="min-width: 90px; max-width: 90px;">الرصيد المرسل</th>
                   <th style="min-width: 80px; max-width: 80px;">العملة المستقبلة</th>
                   <th style="min-width: 80px; max-width: 80px;">العملة المرسلة</th>
-                  <th style="min-width: 90px;">المحفظة</th>
+                  <th style="min-width: 90px;">المعلومات</th>
                   <th style="min-width: 80px; max-width: 80px;">الوضعية</th>
                   <th style="min-width: 80px; max-width: 80px;">تم الرد في</th>
                   <th style="min-width: 80px; max-width: 80px;">أنشئ في</th>
@@ -43,7 +43,7 @@
                     <th search="true">الرصيد المرسل</th>
                     <th search="true">العملة المرسلة</th>
                     <th search="true">العملة المرسلة</th>
-                    <th search="true">المحفظة</th>
+                    <th search="true">المعلومات</th>
                     <th search="true">الوضعية</th>
                     <th search="true">تم الرد في</th>
                     <th search="true">أنشئ في</th>

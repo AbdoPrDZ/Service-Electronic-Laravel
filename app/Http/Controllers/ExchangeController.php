@@ -82,7 +82,7 @@ class ExchangeController extends Controller {
     $platformCurrency = Currency::find(Setting::find('platform_currency_id')->value[0]);
 
     Notification::create([
-      'name' => 'notifications',
+      'name' => 'balance-received',
       'title' => 'Balance received',
       'message' => "$user->firstname $user->lastname sent you balance ($request->balance $platformCurrency->char)",
       'from_id' => $user->id,
@@ -96,7 +96,7 @@ class ExchangeController extends Controller {
           'balance' => $request->balance,
         ])
       ],
-      'image_id' => 'logo',
+      'image_id' => 'transfers',
       'type' => 'emitOrNotify',
     ]);
     Mail::create([

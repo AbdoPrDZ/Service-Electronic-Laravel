@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Events\Currency\CurrencyCreatedEvent;
+use App\Events\Currency\CurrencyUpdatedEvent;
 use App\Events\Currency\CurrencyDeletedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -65,6 +66,7 @@ class Currency extends Model {
 
   protected $dispatchesEvents = [
     'created' => CurrencyCreatedEvent::class,
+    'updated' => CurrencyUpdatedEvent::class,
     'deleted' => CurrencyDeletedEvent::class,
   ];
 

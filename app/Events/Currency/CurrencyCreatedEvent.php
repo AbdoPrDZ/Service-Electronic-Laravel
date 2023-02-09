@@ -35,7 +35,7 @@ class CurrencyCreatedEvent {
         'data' => [
           'currency_id' => $currency->id,
         ],
-        'image_id' => $currency->image_id,
+        'image_id' => 'transfers',
         'type' => 'emit',
       ]);
     }

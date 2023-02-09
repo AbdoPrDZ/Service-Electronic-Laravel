@@ -73,7 +73,7 @@ class SellerController extends Controller {
         'from_model' => Admin::class,
         'to_id' => $seller->user_id,
         'to_model' => User::class,
-        'name' => 'notifications',
+        'name' => 'seller-register-status-change',
         'title' => 'Seller register result',
         'message' => $request->description ?? $messages[$request->status] ?? '',
         'data' => [
@@ -82,7 +82,7 @@ class SellerController extends Controller {
             'status' => $request->status,
           ]),
         ],
-        'image_id' => 'logo',
+        'image_id' => 'store',
         'type' => 'emitOrNotify',
       ]);
       return $this->apiSuccessResponse('Successfully changing status');

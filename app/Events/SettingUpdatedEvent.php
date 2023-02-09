@@ -23,18 +23,15 @@ class SettingUpdatedEvent{
    * @return void
    */
   public function __construct(Setting $setting) {
-    if(!Cache::store('file')->has('api/users-listens')) {
-      Cache::store('file')->set('api/users-listens', []);
-    }
-    $ids = Cache::store('file')->get('api/users-listens');
-    foreach ($ids as $id) {
-      $user = User::find($id);
-      if($user) {
-        $user->linking();
-        $client = new SocketClient($id, 'api', User::class);
-        $client->emit('user-update', ['user' => $user]);
+    async(function () {
+      if (!Cache::store('file')->has('api/users-listens')) {
+        Cache::store('file')->set('api/users-listens', []);
       }
-    }
+      $ids = Cache::store('file')->get('api/users-listens');
+      foreach ($ids as $id) {
+        User::find($id)?->emitUpdates();
+      }
+    })->start();
   }
 
   /**

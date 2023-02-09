@@ -131,7 +131,7 @@ class SettingsController extends Controller {
         $setting->value = $statuses;
         $setting->save();
         User::notify([
-          'name' => 'notifications',
+          'name' => 'service-status-updated',
           'title' => 'Serives status updated',
           'message' => "App services has been updated",
           'data' => [

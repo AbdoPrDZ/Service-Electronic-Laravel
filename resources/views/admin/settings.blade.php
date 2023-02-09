@@ -12,7 +12,7 @@
   </head>
   <body>
     <div class="topbar">
-      <a class="topbar-logo" href="./">
+      <a class="topbar-logo" href="../admin">
         <img src="{{ asset('resources/media/logo.png') }}">
         <h3><span class="danger">Service|</span><span class="success">Electronic</span> </h3>
       </a>

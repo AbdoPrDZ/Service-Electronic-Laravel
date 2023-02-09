@@ -16,7 +16,7 @@ return new class extends Migration {
       $table->id();
       $table->string('name');
       $table->string('from_wallet_id')->nullable();
-      $table->string('to_wallet_id');
+      $table->string('to_wallet_id')->nullable();
       $table->double('sended_balance');
       $table->double('received_balance');
       $table->enum('status', ['waiting', 'received', 'blocked'])->default('waiting');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -52,7 +53,7 @@ class OfferRequestController extends Controller {
       'from_model' => Admin::class,
       'to_id' => $offerRequest->user_id,
       'to_model' => User::class,
-      'name' => 'notifications',
+      'name' => 'offer-request-answred',
       'title' => 'Your Offer request has been answerd ',
       'message' => "Your Offer Request (#$offerRequest->id) has been $answer from admin",
       'data' => [
@@ -61,7 +62,7 @@ class OfferRequestController extends Controller {
             'offerRequest_id' => $offerRequest->id,
           ]),
       ],
-      'image_id' => 'logo',
+      'image_id' => 'offers',
       'type' => 'emitOrNotify',
     ]);
 

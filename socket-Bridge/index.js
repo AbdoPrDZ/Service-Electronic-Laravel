@@ -93,7 +93,7 @@ async function main() {
     var message = '';
     if(notification) {
       try {
-        const message  = {
+        const notifyMessage  = {
           'token': notification.client.messaging_token,
           'notification': {
             'title': notification.title,
@@ -112,8 +112,8 @@ async function main() {
             ...notification.data
           }
         }
-        console.log('send message', message);
-        console.log(await admin.messaging().send(message));
+        console.log('send message', notifyMessage);
+        console.log(await admin.messaging().send(notifyMessage));
         success =  true,
         message = 'Successfully sending message'
       } catch (error) {

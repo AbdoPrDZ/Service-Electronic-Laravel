@@ -217,7 +217,6 @@ class UserController extends Controller {
         'errors' => ['token' => 'Invalid Token']
       ]);
     }
-    Log::info('Email Verification', [$token, $token->code, $request->code]);
     if($token->code == $request->code) {
       if($user->email_verified_at != null) {
         return $this->apiErrorResponse('This email already verifited', [
@@ -429,7 +428,7 @@ class UserController extends Controller {
       'data' => [
         'user_id' => $user->id,
       ],
-      'image_id' => $user->profile_image_id ?? 'logo',
+      'image_id' => 'api_profile_default',
       'type' => 'emit',
     ]);
 
@@ -599,11 +598,11 @@ class UserController extends Controller {
       ]);
     }
 
-    $user = $requst->user();
+    $user = $request->user();
     $user->messaging_token = $request->token;
     $user->save();
 
-    return $this->apiSuccessResponse('Successfully updating messaging token');
+    return $this->apiSuccessResponse('Successfully updating messaging token', ['user' => $user->messaging_token]);
   }
 
   public function logout(Request $request) {

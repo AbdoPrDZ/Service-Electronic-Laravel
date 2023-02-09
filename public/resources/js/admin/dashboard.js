@@ -43,6 +43,7 @@ const notificationsNames = {
   'new-seller-created': 'sellers',
   'new-transfer-created': 'transfers',
   'new-currency-created': 'currencies',
+  'currency-updated': 'currencies',
   'new-category-created': 'products',
   'new-product-created': 'products',
   'new-product-solded': 'purchases',
@@ -241,7 +242,11 @@ function updateTable(values, tableId) {
         row.push(`<td>${values[id].received_balance} ${values[id].received_currency.char}</td>`);
         row.push(`<td>${values[id].sended_currency.name} (${values[id].sended_currency.char})</td>`);
         row.push(`<td>${values[id].received_currency.name} (${values[id].received_currency.char})</td>`);
-        row.push(`<td>${values[id].wallet ?? '<span class="danger">لا يوجد</span>'}</td>`);
+        var data = [];
+        for (const name in values[id].data) {
+          data.push(`<span style="font-weight:bold;">${name}:</span> ${values[id].data[name]}`);
+        }
+        row.push(`<td>${data.join('<br>')}</td>`);
         row.push(`<td>${statuses[values[id].status]}</td>`);
         row.push(`<td>${values[id].answered_at ?? '<span class="danger">لا يوجد</span>'}</td>`);
         row.push(`<td>${values[id].created_at}</td>`);
@@ -610,12 +615,19 @@ function viewPurchase(purchase) {
     $(`#view-purchase .modal-body .form-group[name="problem_report"]`).css('display', 'block');
     $(`#view-purchase .modal-body
       .form-group[name="problem_report"]
-      .form-control[name="${purchase.status == 'client_refuse' ? 'client_report' : 'seller_report'}"]`
-      ).html(purchase.delivery_steps.receive[1]);
+      .form-control[name="client_report"]`
+      ).html(purchase.delivery_steps.receive.client ? purchase.delivery_steps.receive.client[1] : '');
+    $(`#view-purchase .modal-body
+      .form-group[name="problem_report"]
+      .form-control[name="seller_report"]`
+      ).html(purchase.delivery_steps.receive.seller ? purchase.delivery_steps.receive.seller[1] : '');
   } else {
     $(`#view-purchase .modal-body .form-group[name="problem_report"]`).css('display', 'none');
   }
-  $(`#view-purchase .modal-body .form-control[name="status"]`).html(statuses[purchase.status]);
+  var status = statuses[purchase.status];
+  const answers = {accept_all: 'قبول الكل', refuse_all: 'رفض الكل', accept_delivery_cost: 'اقتطاع الشحن'}
+  if(purchase.status == 'admin_ansowred' && purchase.delivery_steps.admin_answer) status += ` (${answers[purchase.delivery_steps.admin_answer[0]]})`
+  $(`#view-purchase .modal-body .form-control[name="status"]`).html(status);
   $(`#view-purchase .modal-body .form-control[name="created_at"]`).html(purchase.created_at);
 
   $('#view-purchase').modal('show');
@@ -1397,6 +1409,7 @@ $on('#view-purchase .modal-body button[name="answer"]', 'click', async function(
     data: {answer: $('#view-purchase .modal-body .form-control[name="answer"]').val()},
     dataType: 'JSON',
   });
+  console.log(data);
   alertMessage('answer-purchase-message', 'إجابة المدير', data.message, data.success ? 'success' : 'danger');
   $('#view-purchase').modal('hide');
   await loadTab();

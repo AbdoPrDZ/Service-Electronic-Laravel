@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\WalletUpdatedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -55,6 +56,10 @@ class Wallet extends Model {
 
   protected $casts = [
     'id' => 'string',
+  ];
+
+  protected $dispatchesEvents = [
+    'updated' => WalletUpdatedEvent::class,
   ];
 
   public function linking() {

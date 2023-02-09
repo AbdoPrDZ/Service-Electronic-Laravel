@@ -2,11 +2,9 @@
 
 namespace App\Events\Seller;
 
-use App\Http\SocketBridge\SocketClient;
 use App\Models\Admin;
 use App\Models\Notification;
 use App\Models\Seller;
-use Cache;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -25,14 +23,7 @@ class SellerCreatedEvent {
    */
   public function __construct(Seller $seller) {
     $seller->linking();
-    if(!Cache::store('file')->has('api/users-listens')) {
-      Cache::store('file')->set('api/users-listens', []);
-    }
-    $ids = Cache::store('file')->get('api/users-listens');
-    if (!in_array($seller->user->id, $ids)) return;
-    $seller->user->linking();
-    $client = new SocketClient($seller->user->id, 'api', User::class);
-    $client->emit('user-update', ['user' => $seller->user]);
+    $seller->user->emitUpdates();
 
     foreach ($seller->unreades ?? [] as $admin_id) {
       Notification::create([
@@ -47,7 +38,7 @@ class SellerCreatedEvent {
         'data' => [
           'seller_id' => $seller->id,
         ],
-        'image_id' => $seller->store_image_id,
+        'image_id' => 'store',
         'type' => 'emit',
       ]);
     }

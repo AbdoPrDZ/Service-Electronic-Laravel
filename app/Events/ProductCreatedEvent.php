@@ -36,7 +36,7 @@ class ProductCreatedEvent {
         'data' => [
           'product_id' => $product->id,
         ],
-        'image_id' => $product->images_ids[0],
+        'image_id' => 'store',
         'type' => 'emit',
       ]);
     }

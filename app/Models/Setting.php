@@ -49,7 +49,7 @@ class Setting extends Model {
    */
   static function platformCurrency() {
     $currency = Currency::find(Setting::find('platform_currency_id')->value[0]);
-    $currency->linking();
+    $currency?->linking();
     return $currency;
   }
 

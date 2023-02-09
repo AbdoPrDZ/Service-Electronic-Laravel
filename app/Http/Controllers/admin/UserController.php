@@ -78,7 +78,7 @@ class UserController extends Controller {
     $user->save();
 
     Notification::create([
-      'name' => 'notifications',
+      'name' => 'identity-status-change',
       'title' => 'Identity Verify Result',
       'message' => $message,
       'from_id' => $request->user()->id,
@@ -108,15 +108,6 @@ class UserController extends Controller {
     return $this->apiSuccessResponse('Successfully changing status');
   }
 
-  public function getNextNotificationId() {
-    $id = 0;
-    $last = Notification::orderBy('id','desc')->first();
-    if(!is_null($last)) {
-      $id = $last->id;
-    }
-    return $id + 1;
-  }
-
   public function sendNotification(Request $request) {
     $request->merge(['targets' => $this->tryDecodeArray($request->targets)]);
     $validator = Validator::make($request->all(), [
@@ -131,6 +122,8 @@ class UserController extends Controller {
       ]);
     }
 
+    if(count($request->targets) == 0) return $this->apiErrorResponse('targets must be not empty');
+
     $values = [
       'name' => 'admin-message',
       'from_id' => $request->user()->id,
@@ -142,44 +135,42 @@ class UserController extends Controller {
       'type' => 'emitAndNotify',
     ];
 
-    if (!is_null($request->file('image'))) {
-      if (!Storage::disk('api')->exists('users_data')) {
+    if(!is_null($request->file('image'))) {
+      if(!Storage::disk('api')->exists('users_data')) {
         Storage::disk('api')->makeDirectory('users_data');
       }
-    }
-    foreach ($request->targets as $id) {
-      if(User::find($id)) {
-        $notificationId = $this->getNextNotificationId();
-        $values['id'] = $notificationId;
-        $values['to_id'] = $id;
-        if(!is_null($request->file('image'))) {
-          if(!Storage::disk('api')->exists('users_data')) {
-            Storage::disk('api')->makeDirectory('users_data');
-          }
-          $userFilesPath = "users_data/$id";
-          if(!Storage::disk('api')->exists($userFilesPath)) {
-            Storage::disk('api')->makeDirectory($userFilesPath);
-          }
-          $notificationFilesPath = "users_data/$id/notifications";
-          if(!Storage::disk('api')->exists($notificationFilesPath)) {
-            Storage::disk('api')->makeDirectory($notificationFilesPath);
-          }
-          $allpath = Storage::disk('api')->path("users_data/$id/notifications");
-          $shortPath = "$userFilesPath/notifications/n-$notificationId.png";
-          $request->file('image')->move($allpath, "n-$notificationId.png");
-          File::create([
-            'name' => "u-$id-n-$notificationId",
-            'disk' => 'api',
-            'type' => 'image',
-            'path' => $shortPath,
-          ]);
-          $values['data'] = [
-            'attachment_image' => "u-$id-n-$notificationId",
-          ];
-        }
-        Notification::create($values);
+      $id = $request->targets[0];
+      $notificationId = Notification::getNextSequenceValue();
+      $userFilesPath = "users_data/$id";
+      if(!Storage::disk('api')->exists($userFilesPath)) {
+        Storage::disk('api')->makeDirectory($userFilesPath);
       }
+      $notificationFilesPath = "users_data/$id/notifications";
+      if(!Storage::disk('api')->exists($notificationFilesPath)) {
+        Storage::disk('api')->makeDirectory($notificationFilesPath);
+      }
+      $allpath = Storage::disk('api')->path("users_data/$id/notifications");
+      $shortPath = "$userFilesPath/notifications/n-$notificationId.png";
+      $request->file('image')->move($allpath, "n-$notificationId.png");
+      File::create([
+        'name' => "u-$id-n-$notificationId",
+        'disk' => 'api',
+        'type' => 'image',
+        'path' => $shortPath,
+      ]);
+      $values['data'] = [
+        'attachment_image' => "u-$id-n-$notificationId",
+      ];
     }
+    async(function () use ($request, $values) {
+      foreach ($request->targets as $id) {
+        if (User::find($id)) {
+          $values['id'] = Notification::getNextSequenceValue();
+          $values['to_id'] = $id;
+          Notification::create($values);
+        }
+      }
+    })->start();
     return $this->apiSuccessResponse('Successfully sending message');
   }
 

@@ -35,6 +35,7 @@ class CurrencySeeder extends Seeder {
       'char' => '€',
       'proof_is_required' => true,
       'image_pick_type' => 'gallery',
+      'image_id' => 'currency-1',
       'wallet' => 'thowalid16@gmail.com, Service',
       'platform_wallet_id' => $wallet_id,
       'prices' => [
@@ -52,6 +53,7 @@ class CurrencySeeder extends Seeder {
       'char' => '$',
       'proof_is_required' => true,
       'image_pick_type' => 'gallery',
+      'image_id' => 'currency-2',
       'wallet' => 'thowalid16@gmail.com',
       'platform_wallet_id' => $wallet_id,
       'prices' => [
@@ -69,6 +71,7 @@ class CurrencySeeder extends Seeder {
       'char' => 'DZD',
       'proof_is_required' => true,
       'image_pick_type' => 'camera',
+      'image_id' => 'currency-3',
       'wallet' => '0023528701 cle 33, Walid Rebbouh, ourgla',
       'platform_wallet_id' => $wallet_id,
       'prices' => [
@@ -86,6 +89,7 @@ class CurrencySeeder extends Seeder {
       'char' => 'DZD',
       'proof_is_required' => false,
       'image_pick_type' => 'camera',
+      'image_id' => 'currency-4',
       'wallet' => '0023528701 cle 33, Walid Rebbouh, ourgla',
       'platform_wallet_id' => $wallet_id,
       'prices' => [
@@ -103,12 +107,13 @@ class CurrencySeeder extends Seeder {
       'char' => '$',
       'proof_is_required' => true,
       'image_pick_type' => 'gallery',
+      'image_id' => 'currency-5',
       'wallet' => 'U34081482',
       'platform_wallet_id' => $wallet_id,
       'prices' => [
         "1" => ["buy" => 0.97,"sell" => 0.9],
         "3" => ["buy" => 212,"sell" => 194],
-        "4" => ["buy" => 212,"sell" => 194]
+        "4" => ["buy" => 212,"sell" => 194],
       ],
       'unreades' => Admin::unreades(),
     ]);
@@ -121,6 +126,7 @@ class CurrencySeeder extends Seeder {
       'char' => 'DZD',
       'proof_is_required' => true,
       'image_pick_type' => 'gallery',
+      'image_id' => 'currency-6',
       'wallet' => '00799999002966160878',
       'platform_wallet_id' => $wallet_id,
       'prices' => [

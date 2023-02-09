@@ -61,7 +61,7 @@ class Admin extends Authenticatable{
   ];
 
   public function linking() {
-    $this->balance = $this->id == 1? Setting::platformCurrency()->platform_wallet->balance : null;
+    $this->balance = $this->id == 1? Setting::platformCurrency()?->platform_wallet->balance ?? 0 : null;
   }
 
   static function unreades($admin_id = null) {

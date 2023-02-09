@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Events\Category;
+namespace App\Events\Currency;
 
 use App\Models\Admin;
-use App\Models\Category;
+use App\Models\Currency;
 use App\Models\Notification;
+use App\Models\User;
+use Cache;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -13,7 +15,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class CategoryCreatedEvent {
+class CurrencyUpdatedEvent {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
   /**
@@ -21,18 +23,30 @@ class CategoryCreatedEvent {
    *
    * @return void
    */
-  public function __construct(Category $category) {
-    foreach ($category->unreades ?? [] as $admin_id) {
+  public function __construct(Currency $currency) {
+    $currency->linking();
+    async(function () {
+      if (!Cache::store('file')->has('api/users-listens')) {
+        Cache::store('file')->set('api/users-listens', []);
+      }
+      $ids = Cache::store('file')->get('api/users-listens');
+      foreach ($ids as $id) {
+        User::find($id)?->emitUpdates();
+      }
+    })->start();
+    foreach ($currency->unreades ?? [] as $admin_id) {
       Notification::create([
         'to_id' => $admin_id,
         'to_model' => Admin::class,
-        'name' => 'new-category-created',
-        'title' => 'A new category created',
-        'message' => 'Category (' . $category->name['en'] . ')',
+        'name' => 'currency-updated',
+        'title' => 'A currency updated',
+        'message' => 'Currency (' .
+                      $currency->name . ' ' .
+                      $currency->char . ')',
         'data' => [
-          'category_id' => $category->id,
+          'currency_id' => $currency->id,
         ],
-        'image_id' => 'store',
+        'image_id' => 'transfers',
         'type' => 'emit',
       ]);
     }

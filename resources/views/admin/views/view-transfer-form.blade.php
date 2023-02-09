@@ -38,7 +38,7 @@
 
               <div class="form-group">
                 <h5>المعلومات:</h5>
-                <div class="form-control" style="height: fit-content; text-align: start;" name="data">
+                <div class="form-control" style="height: fit-content; text-align: start;" name="data"></div>
               </div>
               <hr>
 

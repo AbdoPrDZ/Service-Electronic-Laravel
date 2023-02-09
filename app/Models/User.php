@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Events\User\UserCreatedEvent;
 use App\Events\User\UserUpdatedEvent;
+use App\Http\SocketBridge\SocketClient;
+use Cache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -117,15 +119,14 @@ class User extends Authenticatable {
   public function linking($linkSeller = true) {
     $this->fullname = $this->firstname . ' ' . $this->lastname;
     $this->email_verified = !is_null($this->email_verified_at);
-    $seller = Seller::where('user_id', '=', $this->id)->first();
-    if(!is_null($seller)) {
-      $this->seller = $seller;
-      if($linkSeller) $this->seller->linking(false);
-    }
+
+    $this->seller = Seller::where('user_id', '=', $this->id)->first();
+    if($this->seller && $linkSeller) $this->seller->linking(false);
+
     $this->wallet = Wallet::find($this->wallet_id);
     $balance = 0;
     $checking_balance = 0;
-    if(!is_null($this->wallet)) {
+    if($this->wallet) {
       $this->wallet->linking();
       $balance = $this->wallet->balance;
       $checking_balance = $this->wallet->checking_recharge_balance + $this->wallet->checking_withdraw_balance;
@@ -135,8 +136,8 @@ class User extends Authenticatable {
 
     $platform_currency = Currency::find(Setting::find('platform_currency_id')?->value[0]);
     $display_currency = Currency::find(Setting::find('display_currency_id')?->value[0]);
-    $platform_currency->linking();
-    $display_currency->linking();
+    $platform_currency?->linking();
+    $display_currency?->linking();
     $this->platform_settings = [
       'platform_currency' => $platform_currency,
       'display_currency' => $display_currency,
@@ -186,4 +187,16 @@ class User extends Authenticatable {
       }
     })->start();
   }
+
+  function emitUpdates() {
+    $this->linking();
+    if(!Cache::store('file')->has('api/users-listens')) {
+      Cache::store('file')->set('api/users-listens', []);
+    }
+    $ids = Cache::store('file')->get('api/users-listens');
+    if (!in_array($this->id, $ids)) return;
+    $client = new SocketClient($this->id, 'api', User::class);
+    $client->emit('user-update', ['user' => $this]);
+  }
+
 }

@@ -10,6 +10,7 @@ use App\Models\Purchase;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Log;
 use Validator;
 
 class PurchaseController extends Controller {
@@ -159,6 +160,22 @@ class PurchaseController extends Controller {
     $steps['seller_accept']['readed_at'] = now();
     $purchase->delivery_steps = $steps;
     $purchase->unlinkingAndSave();
+    $purchase->linking();
+
+    Notification::create([
+      'name' => 'purchase-request-readed',
+      'from_id' => $user->id,
+      'from_model' => User::class,
+      'to_id' => $purchase->user_id,
+      'to_model' => User::class,
+      'title' => 'Purchase request readed',
+      'message' => 'Your purchase request has been readed',
+      'data' => [
+        'purchase_id' => $purchase->id,
+      ],
+      'image_id' => 'store',
+      'type' => 'emit',
+    ]);
 
     return $this->apiSuccessResponse('Successfully reading purchase');
   }
@@ -219,7 +236,7 @@ class PurchaseController extends Controller {
       'from_model' => User::class,
       'to_id' => $purchase->user_id,
       'to_model' => User::class,
-      'name' => 'notifications',
+      'name' => 'purchase-seller-answer',
       'title' => [
         'accept' => 'Purchase request accepted',
         'refuse' => 'Purchase request refused',
@@ -236,7 +253,7 @@ class PurchaseController extends Controller {
           'description' => $request->description,
         ]),
       ],
-      'image_id' => 'logo',
+      'image_id' => 'store',
       'type' => 'emitAndNotify',
     ]);
     Admin::notify([
@@ -254,7 +271,7 @@ class PurchaseController extends Controller {
         'answer' => $request->answer,
         'description' => $request->description,
       ],
-      'image_id' => 'logo',
+      'image_id' => 'store',
       'type' => 'emitAndNotify',
     ]);
 
@@ -292,6 +309,22 @@ class PurchaseController extends Controller {
     }
     $purchase->unreades = Admin::unreades();
     $purchase->unlinkingAndSave();
+    $purchase->linking();
+
+    Notification::create([
+      'name' => 'purchase-step-updated',
+      'from_id' => $user->id,
+      'from_model' => User::class,
+      'to_id' => $purchase->user_id,
+      'to_model' => User::class,
+      'title' => 'Purchase request deliery step updated',
+      'message' => 'Your purchase request delivery has updated new step',
+      'data' => [
+        'purchase_id' => $purchase->id,
+      ],
+      'image_id' => 'store',
+      'type' => 'emit',
+    ]);
 
     return $this->apiSuccessResponse('Successfully changing step');
   }
@@ -322,7 +355,8 @@ class PurchaseController extends Controller {
 
     $steps = $purchase->delivery_steps;
 
-    if(!is_null($steps['receive']['client'])) {
+    if (is_null($steps['receive'])) $steps['receive'] = [];
+    if(key_exists('client', $steps['receive']) && !is_null($steps['receive']['client'])) {
       return $this->apiErrorResponse('You already answerd');
     }
 
@@ -346,14 +380,15 @@ class PurchaseController extends Controller {
     $purchase->status = ['accept' => 'client_accept', 'refuse' => 'client_refuse'][$request->answer];
     $purchase->unreades = Admin::unreades();
     $purchase->unlinkingAndSave();
+    $purchase->linking();
 
     $answer = ['refuse' => 'refused', 'accept' => 'accepted'][$request->answer];
     Notification::create([
       'from_id' => $user->id,
       'from_model' => User::class,
-      'to_id' => $purchase->product->seller_id,
+      'to_id' => $purchase->product->seller->user_id,
       'to_model' => User::class,
-      'name' => 'notifications',
+      'name' => 'purchase-client-answer',
       'title' => "Your delivery has been $answer",
       'message' => "A client $answer your delivery, you can contact to support for more information",
       'data' => [
@@ -363,7 +398,7 @@ class PurchaseController extends Controller {
           'answer' => $request->answer,
           'description' => $request->description,
         ]),
-        'image_id' => 'logo',
+        'image_id' => 'store',
         'type' => 'emitAndNotify',
       ]
     ]);
@@ -383,7 +418,7 @@ class PurchaseController extends Controller {
         'answer' => $request->answer,
         'description' => $request->description,
       ],
-      'image_id' => 'logo',
+      'image_id' => 'store',
       'type' => 'emitAndNotify',
     ]);
 
@@ -419,12 +454,15 @@ class PurchaseController extends Controller {
 
     $steps = $purchase->delivery_steps;
 
-    if(!is_null($steps['receive']['seller'])) return $this->apiErrorResponse('You already repported');
-
-    $time = $purchase->status == 'waiting_client_answer' ? $steps['location_steps']['delivering_to_client'] : $steps['receive']['client'][0];
-    if(now()->diffInDays($time) < 1) {
-      return $this->apiErrorResponse('Please wait until the waiting time has expired (24h)');
+    if (is_null($steps['receive']))$steps['receive'] = [];
+    if(key_exists('seller', $steps['receive']) &&!is_null($steps['receive']['seller'])) {
+      return $this->apiErrorResponse('You already repported');
     }
+
+    // $time = $purchase->status == 'waiting_client_answer' ? $steps['location_steps']['delivering_to_client'] : $steps['receive']['client'][0];
+    // if(now()->diffInDays($time) < 1) {
+    //   return $this->apiErrorResponse('Please wait until the waiting time has expired (24h)');
+    // }
 
     $steps['receive']['seller'] = ['seller_report', $request->report, now()];
     $purchase->delivery_steps = $steps;
@@ -436,7 +474,7 @@ class PurchaseController extends Controller {
       'from_model' => User::class,
       'to_id' => $purchase->user_id,
       'to_model' => User::class,
-      'name' => 'notifications',
+      'name' => 'purchase-seller-repport',
       'title' => "A seller sended repport",
       'message' => "A seller sended repport for your purchase request",
       'data' => [
@@ -446,7 +484,7 @@ class PurchaseController extends Controller {
           'answer' => $request->answer,
           'description' => $request->description,
         ]),
-        'image_id' => 'logo',
+        'image_id' => 'store',
         'type' => 'emitAndNotify',
       ]
     ]);
@@ -460,7 +498,7 @@ class PurchaseController extends Controller {
         'answer' => $request->answer,
         'description' => $request->description,
       ],
-      'image_id' => 'logo',
+      'image_id' => 'store',
       'type' => 'emitAndNotify',
     ]);
 

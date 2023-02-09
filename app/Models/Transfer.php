@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Events\Transfer\TransferCreatedEvent;
+use App\Events\Transfer\TransferUpdatedEvent;
 use App\Events\Transfer\TransferDeletedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -72,6 +73,7 @@ class Transfer extends Model  {
 
   protected $dispatchesEvents = [
     'created' => TransferCreatedEvent::class,
+    'updated' => TransferUpdatedEvent::class,
     'deleted' => TransferDeletedEvent::class,
   ];
 
@@ -155,11 +157,16 @@ class Transfer extends Model  {
       $user->wallet->checking_withdraw_balance -= $this->sended_balance;
       $user->wallet->unlinkingAndSave();
     } else {
-      $sended_currency->platform_wallet->balance += $this->sended_balance;
-      $sended_currency->platform_wallet->unlinkingAndSave();
+      if($exchange) {
+        if($this->status == 'accepted') $exchangeRes = $exchange->accept();
+        else $exchangeRes = $exchange->refuse($answer_description);
+        if(!$exchangeRes['success']) return $exchangeRes;
+      }
+      // $sended_currency->platform_wallet->balance += $this->sended_balance;
+      // $sended_currency->platform_wallet->unlinkingAndSave();
     }
     Notification::create([
-      'name' => 'notifications',
+      'name' => 'transfer-answer',
       'title' => "Transfer (#$this->id) Status Changed",
       'message' => $answers[$this->status],
       'from_id' => $admin_id,
@@ -173,7 +180,7 @@ class Transfer extends Model  {
           'status' => $this->status,
         ]),
       ],
-      'image_id' => 'logo',
+      'image_id' => 'transfers',
       'type' => 'emitOrNotify',
     ]);
 

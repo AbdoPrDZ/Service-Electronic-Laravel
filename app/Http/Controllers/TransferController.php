@@ -54,8 +54,14 @@ class TransferController extends Controller {
     if(is_null($sended_currency)) return $this->apiErrorResponse('Invalid sended currency', [
       'errors' => ['sended_currency_id' => 'Invalid sended currency'],
     ]);
+
+    $received_currency = Currency::find($request->received_currency_id);
+    if(is_null($received_currency)) return $this->apiErrorResponse('Invalid received currency', [
+      'errors' => ['received_currency_id' => 'Invalid received currency'],
+    ]);
+
     $rules = [];
-    foreach ($sended_currency->data as $name => $item) {
+    foreach ($received_currency->data as $name => $item) {
       $rules[$name] = $item['validate'];
     }
     $validator = Validator::make($request->data, $rules);
@@ -64,11 +70,6 @@ class TransferController extends Controller {
         'errors' => $validator->errors(),
       ]);
     }
-
-    $received_currency = Currency::find($request->received_currency_id);
-    if(is_null($received_currency)) return $this->apiErrorResponse('Invalid received currency', [
-      'errors' => ['received_currency_id' => 'Invalid received currency'],
-    ]);
 
     $platformCurrency = Currency::find(Setting::find('platform_currency_id')->value[0]);
     $platformCurrency->linking();
@@ -104,6 +105,14 @@ class TransferController extends Controller {
       'for_what' => 'transfer',
       'unreades' => Admin::unreades()
     ];
+
+    $exchange = Exchange::create([
+      'name' => 'user-recharge',
+      'from_wallet_id' => $received_currency->platform_wallet_id,
+      'sended_balance' => $received_balance,
+      'received_balance' => $sended_balance,
+    ]);
+    $values['exchange_id'] = $exchange->id;
 
     if(!is_null($request->file('proof'))) {
       if(!Storage::disk('api')->exists('users_data')) {
@@ -241,16 +250,19 @@ class TransferController extends Controller {
       return $this->apiErrorResponse('This service has been deactivated');
     }
 
+    $request->merge(['data' => $this->tryDecodeArray($request->data)]);
     $validator = Validator::make($request->all(), [
       'received_balance' => 'required|numeric',
       'received_currency_id' => 'required|string',
       'sended_currency_id' => 'required|string',
+      'data' => 'required|array',
     ]);
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
         'errors' => $validator->errors(),
       ]);
     }
+
     $received_balance = floatVal($request->received_balance);
     if($received_balance == 0) {
       return $this->apiErrorResponse('Received balance can\'t be zero');
@@ -264,6 +276,17 @@ class TransferController extends Controller {
 
     $platformCurrency = Currency::find(Setting::find('platform_currency_id')->value[0]);
     $platformCurrency->linking();
+
+    $rules = [];
+    foreach ($received_currency->data as $name => $item) {
+      $rules[$name] = $item['validate'];
+    }
+    $validator = Validator::make($request->data, $rules);
+    if ($validator->fails()) {
+      return $this->apiErrorResponse(null, [
+        'errors' => $validator->errors(),
+      ]);
+    }
 
     if(!in_array($request->sended_currency_id, array_keys($received_currency->prices)) ||
        $request->sended_currency_id != $platformCurrency->id) {
@@ -286,7 +309,7 @@ class TransferController extends Controller {
       'received_balance' => $received_balance,
       'sended_currency_id' => $request->sended_currency_id,
       'received_currency_id' => $request->received_currency_id,
-      'data' => [],
+      'data' => $request->data,
       'for_what' => 'withdraw',
       'unreades' => Admin::unreades()
     ];
@@ -297,6 +320,14 @@ class TransferController extends Controller {
     $user->wallet->balance -= $sended_balance;
     $user->wallet->checking_withdraw_balance += $sended_balance;
     $user->wallet->unlinkingAndSave();
+
+    $exchange = Exchange::create([
+      'name' => 'user-recharge',
+      'from_wallet_id' => $received_currency->platform_wallet_id,
+      'sended_balance' => $received_balance,
+      'received_balance' => $sended_balance,
+    ]);
+    $values['exchange_id'] = $exchange->id;
 
     Transfer::create($values);
 

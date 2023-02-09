@@ -32,8 +32,7 @@ class SocketController extends Controller {
       Cache::store('file')->set('api/users-listens', $ids);
     }
     $user = $client->user;
-    $user->linking();
-    $client->emit('user-update', ['user' => $user]);
+    $user->emitUpdates();
   }
 
 }

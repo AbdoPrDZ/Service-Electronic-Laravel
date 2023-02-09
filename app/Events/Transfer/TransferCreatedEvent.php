@@ -30,45 +30,45 @@ class TransferCreatedEvent {
         'data' => [
           'transfer_id' => $transfer->id,
         ],
-        'image_id' => 'logo',
+        'image_id' => 'transfers',
         'type' => 'emit',
       ];
       if($transfer->for_what == 'transfer') {
         $values['name'] = 'new-transfer-created';
         $values['title'] = 'New Transfer Add from user (#' . $transfer->user->id . ')';
         $values['message'] = 'User (' .
-          $transfer->user->id . ' - ' . $transfer->user->firstname . ' ' . $transfer->user->lastname .
-          ') added new transfer with (send: ' .
-          $transfer->received_balance .
-          $transfer->received_currency->char .
-          ', receive: ' .
-          $transfer->sended_balance .
-          $transfer->sended_currency->char .
-          ')';
+        $transfer->user->id . ' - ' . $transfer->user->firstname . ' ' . $transfer->user->lastname .
+        ') added new transfer with (send: ' .
+        $transfer->received_balance .
+        $transfer->received_currency->char .
+        ', receive: ' .
+        $transfer->sended_balance .
+        $transfer->sended_currency->char .
+        ')';
       } else if($transfer->for_what == 'withdraw') {
         $values['name'] = 'new-withdraw-created';
         $values['title'] = 'User (#' . $transfer->user->id . ') wants to withdraw his balance';
         $values['message'] = 'User (' .
-          $transfer->user->id . ' - ' . $transfer->user->firstname . ' ' . $transfer->user->lastname .
-          ') wants to withdraw his balance to (' .
-          $transfer->received_balance .
-          $transfer->received_currency->char .
-          ') with balance ( ' .
-          $transfer->sended_balance .
-          $transfer->sended_currency->char .
-          ')';
+        $transfer->user->id . ' - ' . $transfer->user->firstname . ' ' . $transfer->user->lastname .
+        ') wants to withdraw his balance to (' .
+        $transfer->received_balance .
+        $transfer->received_currency->char .
+        ') with balance ( ' .
+        $transfer->sended_balance .
+        $transfer->sended_currency->char .
+        ')';
       } else if($transfer->for_what == 'recharge') {
         $values['name'] = 'new-recharge-created';
         $values['title'] = 'User (#' . $transfer->user->id . ') wants to recharge his account';
         $values['message'] = 'User (' .
-          $transfer->user->id . ' - ' . $transfer->user->firstname . ' ' . $transfer->user->lastname .
-          ') wants to recharge his account (balance: ' .
-          $transfer->received_balance .
-          $transfer->received_currency->char .
-          ', sended ( ' .
-          $transfer->sended_balance .
-          $transfer->sended_currency->char .
-          ')';
+        $transfer->user->id . ' - ' . $transfer->user->firstname . ' ' . $transfer->user->lastname .
+        ') wants to recharge his account (balance: ' .
+        $transfer->received_balance .
+        $transfer->received_currency->char .
+        ', sended ( ' .
+        $transfer->sended_balance .
+        $transfer->sended_currency->char .
+        ')';
       }
       Notification::create($values);
     }
