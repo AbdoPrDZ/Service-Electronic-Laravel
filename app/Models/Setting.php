@@ -48,9 +48,26 @@ class Setting extends Model {
    * @return Currency
    */
   static function platformCurrency() {
-    $currency = Currency::find(Setting::find('platform_currency_id')->value[0]);
+    $currency = Currency::find(Setting::find('platform_currency_id')?->value[0]);
     $currency?->linking();
     return $currency;
+  }
+
+  /**
+   * Getting displayCurrency
+   * @return Currency
+   */
+  static function displayCurrency() {
+    $currency = Currency::find(Setting::find('display_currency_id')?->value[0]);
+    $currency?->linking();
+    return $currency;
+  }
+  /**
+   * Getting commission
+   * @return Currency
+   */
+  static function commission() {
+    return Setting::find('commission')?->value[0];
   }
 
   /**

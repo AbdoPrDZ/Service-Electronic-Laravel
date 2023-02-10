@@ -134,14 +134,14 @@ class User extends Authenticatable {
     $this->balance = $balance;
     $this->checking_balance = $checking_balance;
 
-    $platform_currency = Currency::find(Setting::find('platform_currency_id')?->value[0]);
-    $display_currency = Currency::find(Setting::find('display_currency_id')?->value[0]);
+    $platform_currency = Setting::platformCurrency();
+    $display_currency = Setting::displayCurrency();
     $platform_currency?->linking();
     $display_currency?->linking();
     $this->platform_settings = [
       'platform_currency' => $platform_currency,
       'display_currency' => $display_currency,
-      'commission' => Setting::find('commission')?->value[0],
+      'commission' => Setting::commission(),
       'services_status' => Setting::servicesStatus(),
     ];
   }

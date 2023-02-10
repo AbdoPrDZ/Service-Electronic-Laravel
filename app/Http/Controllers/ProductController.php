@@ -66,7 +66,7 @@ class ProductController extends Controller {
       ]);
     }
 
-    $commission = Setting::find('commission')?->value[0];
+    $commission = Setting::commission();
 
     $productId = Product::getNextSequenceValue();
     $values = [

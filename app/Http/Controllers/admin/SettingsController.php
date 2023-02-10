@@ -27,9 +27,9 @@ class SettingsController extends Controller {
     }
     return view('admin.settings', [
       'admin' => $request->user(),
-      'platformCurrencyId' => Setting::find('platform_currency_id')->value[0],
-      'displayCurrencyId' => Setting::find('display_currency_id')->value[0],
-      'commission' => Setting::find('commission')->value[0],
+      'platformCurrencyId' => Setting::platformCurrency()?->id,
+      'displayCurrencyId' => Setting::displayCurrency()?->id,
+      'commission' => Setting::commission(),
       'emailVerificationTemplateId' => Setting::emailVerificationTemplateId(),
       'userRechargeTemplateId' => Setting::userRechargeEmailTemplateId(),
       'userWithdrawTemplateId' => Setting::userWithdrawEmailTemplateId(),

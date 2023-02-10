@@ -79,7 +79,7 @@ class ExchangeController extends Controller {
       return $this->apiErrorResponse($res['message']);
     }
 
-    $platformCurrency = Currency::find(Setting::find('platform_currency_id')->value[0]);
+    $platformCurrency = Setting::platformCurrency();
 
     Notification::create([
       'name' => 'balance-received',

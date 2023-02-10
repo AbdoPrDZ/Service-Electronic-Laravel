@@ -71,7 +71,7 @@ class TransferController extends Controller {
       ]);
     }
 
-    $platformCurrency = Currency::find(Setting::find('platform_currency_id')->value[0]);
+    $platformCurrency = Setting::platformCurrency();
     $platformCurrency->linking();
 
     if($sended_currency->proof_is_required && is_null($request->file('proof'))) {
@@ -173,7 +173,7 @@ class TransferController extends Controller {
       'errors' => ['received_currency_id' => 'Invalid received currency']
     ]);
 
-    $platformCurrency = Currency::find(Setting::find('platform_currency_id')->value[0]);
+    $platformCurrency = Setting::platformCurrency();
     $platformCurrency->linking();
 
     if($sended_currency->proof_is_required && is_null($request->file('proof'))) {
@@ -274,7 +274,7 @@ class TransferController extends Controller {
     $received_currency = Currency::find($request->received_currency_id);
     if(is_null($received_currency)) return $this->apiErrorResponse('Invalid received currency');
 
-    $platformCurrency = Currency::find(Setting::find('platform_currency_id')->value[0]);
+    $platformCurrency = Setting::platformCurrency();
     $platformCurrency->linking();
 
     $rules = [];
