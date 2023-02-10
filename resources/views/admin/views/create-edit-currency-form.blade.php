@@ -41,7 +41,9 @@
         <div class="form-group">
           <h5>الأسعار:</h5>
           <div id="currency-prices" class="multi-input"
-               inputs='[{"name": "currency_id", "text": "رقم العملة", "type": "number"}, {"name": "buy_price", "text": "سعر البيع", "type": "number"}, {"name": "sell_price", "text": "سعر الشراء", "type": "number"}]'
+               inputs='[{"name": "currency_id", "text": "العملة", "type": "select", "options": "$currencies"},
+                        {"name": "buy_price", "text": "سعر البيع", "type": "number"},
+                        {"name": "sell_price", "text": "سعر الشراء", "type": "number"}]'
                add-btn-text="إضافة">
             <div class="multi-input-header"></div>
             <div class="multi-input-body"></div>
@@ -55,7 +57,7 @@
                inputs='[{"name": "name", "text": "الاسم", "type": "string"},
                         {"name": "title_en", "text": "عنوان (En)", "type": "string"},
                         {"name": "title_ar", "text": "عنوان (Ar)", "type": "string"},
-                        {"name": "validate", "text": "القواعد", "type": "select", "options": "rules"}]'
+                        {"name": "validate", "text": "القواعد", "type": "select", "options": "$rules"}]'
                add-btn-text="إضافة">
             <div class="multi-input-header"></div>
             <div class="multi-input-body"></div>
@@ -68,6 +70,14 @@
             <input type="checkbox" class="custom-control-input" id="proof-required" name="proof_is_required">
             <label class="custom-control-label" for="proof-required">صورة الوصل مطلوبة</label>
           </div>
+        </div>
+        <hr>
+
+        <div class="form-group">
+          <select class="form-control" name="image_pick_type">
+            <option value="camera">Camera</option>
+            <option value="gallery">Gallery</option>
+          </select>
         </div>
         <hr>
 

@@ -68,12 +68,12 @@ class OfferController extends Controller {
       Storage::disk('public')->makeDirectory("offers");
     }
     $time = now()->timestamp;
-    $request->file('image')->move(Storage::disk('public')->path("offers"), "$offerId-$time.png");
+    $request->file('image')->move(Storage::disk('public')->path("offers"), "$offerId-$time");
     $imageFile = File::create([
       'name' => "offer-$offerId-$time",
       'disk' => 'public',
       'type' => 'image',
-      'path' => "offers/$offerId-$time.png",
+      'path' => "offers/$offerId-$time",
     ]);
 
     Offer::create([
@@ -121,12 +121,12 @@ class OfferController extends Controller {
         Storage::disk('public')->makeDirectory("offers");
       }
       $time = now()->timestamp;
-      $request->file('image')->move(Storage::disk('public')->path("offers"), "offer-$offer->id-$time.png");
+      $request->file('image')->move(Storage::disk('public')->path("offers"), "$offer->id-$time");
       $imageFile = File::create([
         'name' => "offer-$offer->id-$time",
         'disk' => 'public',
         'type' => 'image',
-        'path' => "offers/offer-$offer->id-$time.png",
+        'path' => "offers/$offer->id-$time",
       ]);
       $offer->image_id = $imageFile->name;
     }

@@ -19,7 +19,7 @@ return new class extends Migration {
       $table->double('balance')->default(0);
       $table->double('checking_recharge_balance')->default(0);
       $table->double('checking_withdraw_balance')->default(0);
-      $table->enum('status', ['active', 'banned', 'blocked', 'checking', 'stopped'])->default('checking');
+      $table->enum('status', ['active', 'blocked', 'checking'])->default('checking');
       $table->timestamp('answored_at')->nullable();
       $table->string('answer_description')->nullable();
       $table->timestamps();

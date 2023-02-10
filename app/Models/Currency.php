@@ -111,5 +111,12 @@ class Currency extends Model {
   public function preDelete() {
     $this->is_deleted = true;
     $this->unlinkingAndSave();
+    $all = Currency::all();
+    foreach($all as $currency){
+      if(key_exists("$this->id", $currency->prices)) {
+        unset($currency["$this->id"]);
+        $currency->save();
+      }
+    }
   }
 }

@@ -22,8 +22,9 @@ class CategoryController extends Controller {
   }
 
   public function create(Request $request) {
+    $request->merge(['names' => $this->tryDecodeArray($request->names)]);
     $validator = Validator::make($request->all(), [
-      'names' => 'required|string',
+      'names' => 'required|array',
       'image' => 'required|file|mimes:jpg,png,jpeg',
     ]);
     if ($validator->fails()) {
@@ -32,33 +33,23 @@ class CategoryController extends Controller {
       ]);
     }
 
-    try {
-      $rNames = json_decode($request->names);
-      $names = [];
-      foreach ($rNames as $name) {
-        $names[$name->lang_code] = $name->text;
-      }
-    } catch (\Throwable $th) {
-      return $this->apiErrorResponse('Invalid Names');
-    }
-
     $categoryId = Category::getNextSequenceValue();
 
     if(!Storage::disk('public')->exists("categories")) {
       Storage::disk('public')->makeDirectory("categories");
     }
     $time = now()->timestamp;
-    $request->file('image')->move(Storage::disk('public')->path("categories"), "category-$categoryId-$time.png");
+    $request->file('image')->move(Storage::disk('public')->path("categories"), "$categoryId-$time");
     $imageFile = File::create([
       'name' => "category-$categoryId-$time",
       'disk' => 'public',
       'type' => 'image',
-      'path' => "categories/category-$categoryId-$time.png",
+      'path' => "categories/$categoryId-$time",
     ]);
 
     Category::create([
       'id' => $categoryId,
-      'name' => $names,
+      'name' => $request->names,
       'image_id' => $imageFile->name,
       'unreades' => Admin::unreades($request->user()->id),
     ]);
@@ -66,8 +57,9 @@ class CategoryController extends Controller {
   }
 
   public function edit(Request $request, Category $category) {
+    $request->merge(['names' => $this->tryDecodeArray($request->names)]);
     $validator = Validator::make($request->all(), [
-      'names' => 'string',
+      'names' => 'array',
       'image' => 'file|mimes:jpg,png,jpeg',
     ]);
     if ($validator->fails()) {
@@ -76,18 +68,8 @@ class CategoryController extends Controller {
       ]);
     }
 
-    $names = [];
     if(!is_null($request->names)) {
-      try {
-        $rNames = json_decode($request->names);
-        $names = [];
-        foreach ($rNames as $name) {
-          $names[$name->lang_code] = $name->text;
-        }
-        $category->name = $names;
-      } catch (\Throwable $th) {
-        return $this->apiErrorResponse('Invalid Names');
-      }
+        $category->name = $request->names;
     }
     $category->unreades = Admin::unreades($request->user()->id);
 
@@ -97,12 +79,12 @@ class CategoryController extends Controller {
         Storage::disk('public')->makeDirectory("categories");
       }
       $time = now()->timestamp;
-      $request->file('image')->move(Storage::disk('public')->path("categories"), "$category->id-$time.png");
+      $request->file('image')->move(Storage::disk('public')->path("categories"), "$category->id-$time");
       $imageFile = File::create([
         'name' => "category-$category->id-$time",
         'disk' => 'public',
         'type' => 'image',
-        'path' => "categories/$category->id-$time.png",
+        'path' => "categories/$category->id-$time",
       ]);
       $category->image_id = $imageFile->name;
     }

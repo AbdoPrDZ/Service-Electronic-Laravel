@@ -50,6 +50,7 @@ class CurrencyController extends Controller {
       'data' => 'array',
       'image' => 'required|file|mimes:jpg,png,jpeg',
       'proof_is_required' => 'required|boolean',
+      'image_pick_type' => 'required|in:camera,gallery',
       'prices' => 'array',
     ]);
     if ($validator->fails()) {
@@ -85,12 +86,12 @@ class CurrencyController extends Controller {
       Storage::disk('public')->makeDirectory("currencies");
     }
     $time = now()->timestamp;
-    $request->file('image')->move(Storage::disk('public')->path("currencies"), "currency-$currencyId-$time.png");
+    $request->file('image')->move(Storage::disk('public')->path("currencies"), "$currencyId-$time");
     $imageFile = File::create([
       'name' => "currency-$currencyId-$time",
       'disk' => 'public',
       'type' => 'image',
-      'path' => "currencies/currency-$currencyId-$time.png",
+      'path' => "currencies/$currencyId-$time",
     ]);
 
     $walletId = bin2hex('w-' . date_format(now(), 'yyyy-MM-dd') . "-c-$currencyId");
@@ -113,6 +114,7 @@ class CurrencyController extends Controller {
       'wallet' => $request->wallet,
       'data' => $request->data ? $this->listMap2Map($request->data) : [],
       'proof_is_required' => $request->proof_is_required,
+      'image_pick_type' => $request->image_pick_type,
       'unreades' => Admin::unreades($request->user()->id)
     ]);
     return $this->apiSuccessResponse('Succesfully creating currency');
@@ -133,6 +135,7 @@ class CurrencyController extends Controller {
       'data' => 'array',
       'image' => 'file|mimes:jpg,png,jpeg',
       'proof_is_required' => 'boolean',
+      'image_pick_type' => 'in:camera,gallery',
       'prices' => 'string',
     ]);
     if ($validator->fails()) {
@@ -171,6 +174,7 @@ class CurrencyController extends Controller {
     $currency->wallet = $request->wallet;
     $currency->data = $this->listMap2Map($request->data) ?? $currency->data;
     $currency->proof_is_required = $request->proof_is_required ?? $currency->proof_is_required;
+    $currency->image_pick_type = $request->image_pick_type ?? $currency->image_pick_type;
 
     if($request->file('image')) {
       File::find($currency->image_id)?->delete();
@@ -178,12 +182,12 @@ class CurrencyController extends Controller {
         Storage::disk('public')->makeDirectory("currencies");
       }
       $time = now()->timestamp;
-      $request->file('image')->move(Storage::disk('public')->path("currencies"), "currency-$currency->id-$time.png");
+      $request->file('image')->move(Storage::disk('public')->path("currencies"), "$currency->id-$time");
       $imageFile = File::create([
         'name' => "currency-$currency->id-$time",
         'disk' => 'public',
         'type' => 'image',
-        'path' => "currencies/currency-$currency->id-$time.png",
+        'path' => "currencies/$currency->id-$time",
       ]);
       $currency->image_id = $imageFile->name;
     }
@@ -196,8 +200,8 @@ class CurrencyController extends Controller {
     return $this->apiSuccessResponse('Succesfully editing currency');
   }
 
-  public function delete(Request $request, $currency) {
-    $currency->delete();
+  public function delete(Request $request, Currency $currency) {
+    $currency->preDelete();
     return $this->apiSuccessResponse('Successflully deleting currency');
   }
 

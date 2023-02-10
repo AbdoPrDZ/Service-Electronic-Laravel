@@ -149,6 +149,7 @@ class User extends Authenticatable {
   public function unlinking($linkSeller = true) {
     unset($this->fullname);
     unset($this->email_verified);
+    unset($this->seller);
     unset($this->wallet);
     unset($this->balance);
     unset($this->checking_balance);
@@ -162,6 +163,9 @@ class User extends Authenticatable {
 
   public function preDelete() {
     $this->is_deleted = true;
+    $this->linking();
+    $this->wallet->status = 'blocked';
+    $this->wallet->unlinkingAndSave();
     $this->unlinkingAndSave();
   }
 

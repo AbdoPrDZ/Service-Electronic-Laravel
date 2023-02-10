@@ -70,6 +70,13 @@ async function loadData(tabName) {
   var response = await $.get(`./admin/load/${tabName}`);
   if(response.data) {
     StorageDatabase.collection(tabName).set(response.data);
+    if(tabName == 'currencies') {
+      window.currencies = [];
+      for (const id in response.data) {
+        const currency = response.data[id];
+        window.currencies.push([id, currency.name])
+      }
+    }
     return response.data;
   }
 }
@@ -230,9 +237,6 @@ function updateTable(values, tableId) {
           <td>
             <button class="btn btn-icon btn-secondary" action="view">
               <span class="material-symbols-sharp">open_in_new</span>
-            </button>
-            <button class="btn btn-icon btn-danger" action="delete">
-              <span class="material-symbols-sharp">delete</span>
             </button>
           </td>`);
       } else if(tableId == 'all-transfers') {
@@ -541,8 +545,15 @@ function viewSeller(sellerValues) {
   $(`#view-seller .modal-body .form-control[name="delivery_states"]`).html(statesHtml);
   $('#view-seller .modal-body .form-control[name="delivery_state_price"]').html(dPrice)
 
+
+  if(sellerValues.status != 'checking') {
+    $('#view-seller .modal-body .form-control[name="status"] option').prop('disabled', true);
+    $('#view-seller .modal-body .form-control[name="status-description"]').prop('disabled', true);
+    $('#view-seller .modal-body button[name="change-status"]').prop('disabled', true);
+  } else {
+    $(`#view-seller .modal-body .form-control[name="status-description"]`).prop('disabled', false);
+  }
   $('#view-seller input').prop('disabled', true);
-  $(`#view-seller .modal-body .form-control[name="status-description"]`).prop('disabled', false);
   $('#view-seller textarea').prop('disabled', true);
   $('#view-seller').modal('show');
 }
@@ -806,8 +817,9 @@ $(document).ready(function() {
   socket.on('connect_failed', (err) => {
     socket.disconnect();
   });
-  socket.on('connect', (_) => {
-    if(!window.connected) socket.emit('auth', `${$('meta[name="socket-token"]').attr('content')}`)
+  socket.on('connect', async (_) => {
+    if(!window.connected) socket.emit('auth', `${$('meta[name="socket-token"]').attr('content')}`);
+    await loadData('currencies');
   });
   socket.on('auth-resualt', (args) => {
     if(args.success) {
@@ -1022,7 +1034,12 @@ $on('#all-new-sellers table tr td button[action="view"]', 'click', function () {
   const seller = StorageDatabase.collection('sellers').doc('new_sellers').doc(rowId).get();
   if(seller) viewSeller(seller);
 });
-$on(`#view-seller .modal-body button[name="change-status"]`, 'click', async function() {
+$on('#all-sellers table tr td button[action="view"]', 'click', function () {
+  const rowId = getElementparent(this, 2).id.replace(`all-sellers-item-`, '');
+  const seller = StorageDatabase.collection('sellers').doc('sellers').doc(rowId).get();
+  if(seller) viewSeller(seller);
+});
+$on('#view-seller .modal-body button[name="change-status"]', 'click', async function() {
   loadingDialog('تغيير حالة البائع', 'يرجى الإنتظار لحين تغيير حالة البائع ...');
   const id = $('#view-seller .modal-title #view-seller-id').html();
   const data = await $.ajax({
@@ -1055,6 +1072,8 @@ $on('#view-seller .modal-body .form-control[name="delivery_states"]', 'change', 
 $on('#all-currencies .custom-table-header-actions button[action="create"]', 'click', function() {
   $('#create-edit-currency .btn-img-picker').html('<span class="material-symbols-sharp pick-icon">add_a_photo</span>');
   $('#create-edit-currency input').val('');
+  initMultiInputWidget('#currency-prices');
+  initMultiInputWidget('#currency-data');
   clearMultiInputValues('#currency-prices');
   clearMultiInputValues('#currency-data');
   var button = $($('#create-edit-currency .modal-footer button[action="edit"]')[0] ?? $('#create-edit-currency .modal-footer button[action="create"]')[0])
@@ -1072,6 +1091,8 @@ $on('#all-currencies table tr td button[action="edit"]', 'click', function () {
   button.attr('action', 'edit');
   $('#create-edit-currency .btn-img-picker').html('<span class="material-symbols-sharp pick-icon">add_a_photo</span>');
   $('#create-edit-currency input').val('');
+  initMultiInputWidget('#currency-prices');
+  initMultiInputWidget('#currency-data');
   clearMultiInputValues('#currency-prices');
   clearMultiInputValues('#currency-data');
 
@@ -1099,6 +1120,8 @@ $on('#all-currencies table tr td button[action="edit"]', 'click', function () {
     });
   }
   $('#create-edit-currency input[name="proof_is_required"]')[0].checked = currency.proof_is_required;
+  $('#create-edit-currency select[name="image_pick_type"] option').attr('selected', false);
+  $(`#create-edit-currency select[name="image_pick_type"] option[value="${currency.image_pick_type}"]`).attr('selected', true);
   $('#create-edit-currency').modal('show');
 });
 $on('#all-currencies table tr td button[action="delete"]', 'click', function () {
@@ -1152,6 +1175,7 @@ $on('#create-edit-currency .btn[action="create"]', 'click', async function() {
   if(wallet != '') formData.append('wallet', wallet);
   formData.append('image', window.ImagePicker['currency-image-picker']);
   formData.append('proof_is_required', $('#create-edit-currency input[name="proof_is_required"]')[0].checked);
+  formData.append('image_pick_type', $('#create-edit-currency select[name="image_pick_type"]').val());
   formData.append('prices', JSON.stringify(getMultiInputValues('#currency-prices')));
   formData.append('data', JSON.stringify(getMultiInputValues('#currency-data')));
   const data = await $.ajax({
@@ -1186,6 +1210,7 @@ $on('#create-edit-currency .btn[action="edit"]', 'click', async function() {
   if(wallet != '') formData.append('wallet', wallet);
   if(window.ImagePicker['currency-image-picker']) formData.append('image', window.ImagePicker['currency-image-picker']);
   formData.append('proof_is_required', $('#create-edit-currency input[name="proof_is_required"]')[0].checked);
+  formData.append('image_pick_type', $('#create-edit-currency select[name="image_pick_type"]').val());
   formData.append('prices', JSON.stringify(getMultiInputValues('#currency-prices')));
   formData.append('data', JSON.stringify(getMultiInputValues('#currency-data')));
   const data = await $.ajax({
@@ -1419,6 +1444,9 @@ $on('#view-purchase .modal-body button[name="answer"]', 'click', async function(
 $on('#all-offers .custom-table-header-actions button[action="create"]', 'click', function() {
   $('#create-edit-offer .btn-img-picker').html('<span class="material-symbols-sharp pick-icon">add_a_photo</span>');
   $('#create-edit-offer .form-control').val('');
+  initMultiInputWidget('#offer-sub-offers');
+  initMultiInputWidget('#offer-fields');
+  initMultiInputWidget('#offer-data');
   clearMultiInputValues('#offer-sub-offers');
   clearMultiInputValues('#offer-fields');
   clearMultiInputValues('#offer-data');
@@ -1442,14 +1470,17 @@ $on('#all-offers table tr td button[action="edit"]', 'click', function () {
   $('#create-edit-offer .form-control[name="offer_description_en"]').val(offer.description.en);
   $('#create-edit-offer .form-control[name="offer_description_ar"]').val(offer.description.ar);
   $('#create-edit-offer .form-group .btn.btn-img-picker').html(`<img src="./file/admin/${offer.image_id}">`);
+  initMultiInputWidget('#offer-sub-offers');
   clearMultiInputValues('#offer-sub-offers');
   for (const name in offer.sub_offers) {
     addMultiInputItem('#offer-sub-offers', offer.sub_offers[name]);
   }
+  initMultiInputWidget('#offer-fields');
   clearMultiInputValues('#offer-fields');
   for (const name in offer.fields) {
     addMultiInputItem('#offer-fields', offer.fields[name]);
   }
+  initMultiInputWidget('#offer-data');
   clearMultiInputValues('#offer-data');
   for (const name in offer.data) {
     addMultiInputItem('#offer-data', offer.data[name]);
@@ -1610,7 +1641,7 @@ $on('#all-templates .custom-table-header-actions button[action="create"]', 'clic
   $('#create-edit-template .modal-body input').val('');
   $('#create-edit-template .modal-body #template-editor textarea[name="template-content"]').val('');
   $('#create-edit-template .modal-body #template-editor .preview').html('');
-  // templateEditor.html.set('');
+  initMultiInputWidget('#template-args');
   clearMultiInputValues('#template-args');
   $('#create-edit-template .modal-title').html(`إنشاء القالب`);
   var button = $($('#create-edit-template .modal-footer button[action="edit"]')[0] ??
@@ -1629,9 +1660,9 @@ $on('#all-templates tr td button[action="edit"]', 'click', function () {
   button.attr('action', 'edit');
   $('#create-edit-template input[name="template_name"]').val(template.name);
   $('#create-edit-template select[name="template_type"]').val(template.type);
-  // templateEditor.html.set(template.content);
   $('#create-edit-template .modal-body #template-editor textarea[name="template-content"]').val(template.content);
   $('#create-edit-template .modal-body #template-editor .preview').html(template.content);
+  initMultiInputWidget('#template-args');
   clearMultiInputValues('#template-args');
   template.args.forEach(arg => {
     addMultiInputItem('#template-args', arg);

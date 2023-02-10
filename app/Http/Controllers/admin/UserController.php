@@ -18,7 +18,7 @@ use Validator;
 class UserController extends Controller {
 
   static function all(Request $request) {
-    $items = User::all();
+    $items = User::where('is_deleted', '=', 0)->get();
     $users = [];
     foreach ($items as $value) {
       $value->linking();
@@ -150,8 +150,8 @@ class UserController extends Controller {
         Storage::disk('api')->makeDirectory($notificationFilesPath);
       }
       $allpath = Storage::disk('api')->path("users_data/$id/notifications");
-      $shortPath = "$userFilesPath/notifications/n-$notificationId.png";
-      $request->file('image')->move($allpath, "n-$notificationId.png");
+      $shortPath = "$userFilesPath/notifications/n-$notificationId";
+      $request->file('image')->move($allpath, "n-$notificationId");
       File::create([
         'name' => "u-$id-n-$notificationId",
         'disk' => 'api',

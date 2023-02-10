@@ -55,8 +55,8 @@ class SellerController extends Controller {
         'errors' =>$validator->errors()
       ]);
     }
-    if(in_array($request->status, ['accepted', 'banned', 'refused'])) {
-      if(($request->status == 'banned' || $request->status == 'refused') && $request->description) {
+    if(in_array($request->status, ['accepted', 'refused'])) {
+      if($request->status == 'refused' && $request->description) {
         return $this->apiErrorResponse('description required');
       }
       if($request->status == 'accepted' && $seller->answered_at != null) {

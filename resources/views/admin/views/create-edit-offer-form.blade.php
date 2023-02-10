@@ -50,7 +50,7 @@
                inputs='[{"name": "name", "text": "الاسم", "type": "string"},
                         {"name": "title_en", "text": "عنوان (En)", "type": "string"},
                         {"name": "title_ar", "text": "عنوان (Ar)", "type": "string"},
-                        {"name": "validate", "text": "القواعد", "type": "select", "options": "rules"}]'
+                        {"name": "validate", "text": "القواعد", "type": "select", "options": "$rules"}]'
                add-btn-text="إضافة">
             <div class="multi-input-header"></div>
             <div class="multi-input-body"></div>
@@ -64,8 +64,8 @@
                inputs='[{"name": "name", "text": "الاسم", "type": "string"},
                         {"name": "title_en", "text": "العنوان(En)", "type": "string"},
                         {"name": "title_ar", "text": "العنوان(Ar)", "type": "string"},
-                        {"name": "type", "text": "النوع", "type": "select", "options": "inputTypes"},
-                        {"name": "validate", "text": "القواعد", "type": "select", "options": "rules"}]'
+                        {{-- {"name": "type", "text": "النوع", "type": "select", "options": "$inputTypes"}, --}}
+                        {"name": "validate", "text": "القواعد", "type": "select", "options": "$rules"}]'
                add-btn-text="إضافة">
             <div class="multi-input-header"></div>
             <div class="multi-input-body"></div>

@@ -222,12 +222,14 @@ async function alertMessage(alertId, title, message, type = 'success', dismissin
 }
 
 function initMultiInputWidget(element) {
-  var inputs = JSON.parse($(element).attr('inputs'));
+  const inputsJson = $(element).attr('inputs');
+  if(!inputsJson) return;
+  const inputs = JSON.parse(inputsJson);
   var inputsHtml = '';
   inputs.forEach((input) => {
     if(input.type == 'select') {
       inputsHtml += `<select class="form-control" name="${input.name}">`;
-      var options = input.options == 'rules' ? window.rules : input.options == 'inputTypes' ? window.inputTypes : (input.options ?? []);
+      var options = input.options.indexOf('$') != -1 ? window[input.options.replace('$', '')] : (input.options ?? []);
       inputsHtml += `<option value="" selected>${input.text}</option>`;
       options.forEach(option => {
         inputsHtml += `<option value="${option[0]}">${option[1]}</option>`;
@@ -273,6 +275,8 @@ function getMultiInputValues(element) {
 }
 
 function clearMultiInputValues(element) {
+  $(element).find('input').val('');
+  $(element).find('select option').attr('selected', false)
   $(element).find('.multi-input-body').html('');
 }
 
@@ -321,10 +325,10 @@ $(document).ready(function() {
   if ($('body').attr('auto-display') != 'false') {
     displayBodyContent();
   }
-  var multiInputs = $('.multi-input');
-  for (let i = 0; i < multiInputs.length; i++) {
-    initMultiInputWidget(multiInputs[i]);
-  }
+  // var multiInputs = $('.multi-input');
+  // for (let i = 0; i < multiInputs.length; i++) {
+  //   initMultiInputWidget(multiInputs[i]);
+  // }
 });
 
 $on('.multi-input-header button[action="add"]', 'click', function() {

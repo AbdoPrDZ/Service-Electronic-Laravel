@@ -18,7 +18,7 @@ return new class extends Migration {
       $table->string('store_address');
       $table->string('store_image_id')->nullable();
       $table->json('delivery_prices');
-      $table->enum('status', ['checking', 'accepted', 'refused', 'banned'])->default('checking');
+      $table->enum('status', ['checking', 'accepted', 'refused'])->default('checking');
       $table->string('anower_description')->nullable();
       $table->timestamp('answered_at')->nullable();
       $table->json('unreades')->default('[]');

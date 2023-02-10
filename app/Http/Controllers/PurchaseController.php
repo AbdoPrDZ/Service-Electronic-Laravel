@@ -459,10 +459,10 @@ class PurchaseController extends Controller {
       return $this->apiErrorResponse('You already repported');
     }
 
-    // $time = $purchase->status == 'waiting_client_answer' ? $steps['location_steps']['delivering_to_client'] : $steps['receive']['client'][0];
-    // if(now()->diffInDays($time) < 1) {
-    //   return $this->apiErrorResponse('Please wait until the waiting time has expired (24h)');
-    // }
+    $time = $purchase->status == 'waiting_client_answer' ? $steps['location_steps']['delivering_to_client'] : $steps['receive']['client'][0];
+    if(now()->diffInDays($time) < 1) {
+      return $this->apiErrorResponse('Please wait until the waiting time has expired (24h)');
+    }
 
     $steps['receive']['seller'] = ['seller_report', $request->report, now()];
     $purchase->delivery_steps = $steps;

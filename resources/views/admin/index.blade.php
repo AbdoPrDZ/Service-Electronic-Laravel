@@ -231,6 +231,7 @@
         ['address', 'address'],
         ['number', 'number'],
       ];
+      window.currencies = [];
     </script>
 
   </body>
