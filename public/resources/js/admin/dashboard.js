@@ -828,6 +828,7 @@ $(document).ready(function() {
     } else {
       $('#body-loading .loading-message').css('display', 'block').html(`خطأ في الإتصال:<br> ${args.message ?? args.error}`)
       socket.disconnect();
+      window.location.href = "./admin/logout";
     };
   });
 
