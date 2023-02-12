@@ -150,7 +150,6 @@ class OfferController extends Controller {
   }
 
   public function delete(Request $request, $offer) {
-    // File::find($offer->image_id)->delete();
     $offer->preDelete();
     return $this->apiSuccessResponse('Successfully deleteing offer');
   }

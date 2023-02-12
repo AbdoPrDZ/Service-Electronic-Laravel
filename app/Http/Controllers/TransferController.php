@@ -59,6 +59,7 @@ class TransferController extends Controller {
     if(is_null($received_currency)) return $this->apiErrorResponse('Invalid received currency', [
       'errors' => ['received_currency_id' => 'Invalid received currency'],
     ]);
+    $received_currency->linking();
 
     $rules = [];
     foreach ($received_currency->data as $name => $item) {
@@ -88,6 +89,10 @@ class TransferController extends Controller {
       ]);
     }
 
+    if($received_balance > $received_currency->platform_wallet->balance) {
+      return $this->apiErrorResponse('Sorry we don\'t have credit required, you can try again later');
+    }
+
     $user = $request->user();
     $user->linking();
 
@@ -107,7 +112,7 @@ class TransferController extends Controller {
     ];
 
     $exchange = Exchange::create([
-      'name' => 'user-recharge',
+      'name' => 'user-transfer',
       'from_wallet_id' => $received_currency->platform_wallet_id,
       'sended_balance' => $received_balance,
       'received_balance' => $sended_balance,
@@ -147,7 +152,6 @@ class TransferController extends Controller {
 
     $validator = Validator::make($request->all(), [
       'sended_balance' => 'required|numeric',
-      'received_currency_id' => 'required|string',
       'sended_currency_id' => 'required|string',
       'proof' => 'file|mimes:jpg,png,jpeg',
     ]);
@@ -168,11 +172,6 @@ class TransferController extends Controller {
       'errors' => ['sended_currency_id' => 'Invalid sended currency']
     ]);
 
-    $received_currency = Currency::find($request->received_currency_id);
-    if(is_null($received_currency)) return $this->apiErrorResponse('Invalid received currency', [
-      'errors' => ['received_currency_id' => 'Invalid received currency']
-    ]);
-
     $platformCurrency = Setting::platformCurrency();
     $platformCurrency->linking();
 
@@ -182,8 +181,7 @@ class TransferController extends Controller {
       ]);
     }
 
-    if(!in_array($request->received_currency_id, array_keys($sended_currency->prices)) ||
-       $request->received_currency_id != $platformCurrency->id) {
+    if(!in_array($platformCurrency->id, array_keys($sended_currency->prices))) {
       return $this->apiErrorResponse('You can\'t transfer to this currency', [
         'errors' => ['received_currency_id' => 'You can\'t transfer to this currency']
       ]);
@@ -201,7 +199,7 @@ class TransferController extends Controller {
       'sended_balance' => $sended_balance,
       'received_balance' => $received_balance,
       'sended_currency_id' => $request->sended_currency_id,
-      'received_currency_id' => $request->received_currency_id,
+      'received_currency_id' => $platformCurrency->id,
       'data' => [],
       'for_what' => 'recharge',
       'unreades' => Admin::unreades()
@@ -254,7 +252,6 @@ class TransferController extends Controller {
     $validator = Validator::make($request->all(), [
       'received_balance' => 'required|numeric',
       'received_currency_id' => 'required|string',
-      'sended_currency_id' => 'required|string',
       'data' => 'required|array',
     ]);
     if ($validator->fails()) {
@@ -268,11 +265,9 @@ class TransferController extends Controller {
       return $this->apiErrorResponse('Received balance can\'t be zero');
     }
 
-    $sended_currency = Currency::find($request->sended_currency_id);
-    if(is_null($sended_currency)) return $this->apiErrorResponse('Invalid sended currency');
-
     $received_currency = Currency::find($request->received_currency_id);
     if(is_null($received_currency)) return $this->apiErrorResponse('Invalid received currency');
+    $received_currency->linking();
 
     $platformCurrency = Setting::platformCurrency();
     $platformCurrency->linking();
@@ -288,17 +283,20 @@ class TransferController extends Controller {
       ]);
     }
 
-    if(!in_array($request->sended_currency_id, array_keys($received_currency->prices)) ||
-       $request->sended_currency_id != $platformCurrency->id) {
+    if(!in_array($platformCurrency->id, array_keys($received_currency->prices))) {
       return $this->apiErrorResponse('You can\'t transfer to this currency');
     }
 
     $user = $request->user();
     $user->linking();
 
-    $sended_balance = $received_currency->prices[$request->sended_currency_id]['buy'] * $received_balance;
+    $sended_balance = $received_currency->prices[$platformCurrency->id]['buy'] * $received_balance;
     if($sended_balance > $user->balance) {
       return $this->apiErrorResponse('Your balance is not enough');
+    }
+
+    if($received_balance > $received_currency->platform_wallet->balance) {
+      return $this->apiErrorResponse('Sorry we don\'t have credit required, you can try again later');
     }
 
     $transferId = Transfer::getNextSequenceValue();
@@ -307,7 +305,7 @@ class TransferController extends Controller {
       'user_id' => $user->id,
       'sended_balance' => $sended_balance,
       'received_balance' => $received_balance,
-      'sended_currency_id' => $request->sended_currency_id,
+      'sended_currency_id' => $platformCurrency->id,
       'received_currency_id' => $request->received_currency_id,
       'data' => $request->data,
       'for_what' => 'withdraw',
@@ -322,7 +320,7 @@ class TransferController extends Controller {
     $user->wallet->unlinkingAndSave();
 
     $exchange = Exchange::create([
-      'name' => 'user-recharge',
+      'name' => 'user-withdraw',
       'from_wallet_id' => $received_currency->platform_wallet_id,
       'sended_balance' => $received_balance,
       'received_balance' => $sended_balance,

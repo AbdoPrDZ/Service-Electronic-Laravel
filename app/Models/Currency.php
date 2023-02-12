@@ -88,14 +88,17 @@ class Currency extends Model {
     }
   }
 
-  public function linking() {
+  public function linking($renderAvaliableCurrencies = true) {
     $this->platform_wallet = Wallet::find($this->platform_wallet_id);
-    // $this->platform_wallet->linking();
-    $avaliable_currencies = [];
-    foreach (array_keys($this->prices) as $currencyId) {
-      $avaliable_currencies[$currencyId] = Currency::find($currencyId);
+    if($renderAvaliableCurrencies) {
+      $avaliable_currencies = [];
+      foreach (array_keys($this->prices) as $currencyId) {
+        $currency = Currency::find($currencyId);
+        $currency->linking(false);
+        $avaliable_currencies[$currencyId] = $currency;
+      }
+      $this->avaliable_currencies = $avaliable_currencies;
     }
-    $this->avaliable_currencies = $avaliable_currencies;
   }
 
   public function unlinking() {

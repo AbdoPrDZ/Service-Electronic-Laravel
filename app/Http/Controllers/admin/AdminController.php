@@ -84,7 +84,6 @@ class AdminController extends Controller {
   public function logout(Request $request) {
     VerifyToken::find($request->session()->get('socketToken'))?->delete();
     session()->flush();
-    // auth()->guard('admins')->logout();
     auth()->logout();
     return redirect()->route('admin.login');
   }

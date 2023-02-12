@@ -271,7 +271,6 @@ class UserController extends Controller {
         ]);
       }
       $user->linking();
-      // send email
       $verifyCode = random_int(100000, 999999);
       $token = Str::random(64);
       VerifyToken::create([

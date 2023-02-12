@@ -14,6 +14,14 @@ class SettingSeeder extends Seeder {
    */
   public function run() {
     Setting::create([
+      'name' => 'platform_currency_id',
+      'value' => [1],
+    ]);
+    Setting::create([
+      'name' => 'display_currency_id',
+      'value' => [2],
+    ]);
+    Setting::create([
       'name' => 'commission',
       'value' => [0.05],
     ]);

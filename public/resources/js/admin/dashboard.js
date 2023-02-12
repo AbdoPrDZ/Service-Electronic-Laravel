@@ -853,7 +853,7 @@ $(document).ready(function() {
 
   socket.on('notifications', (notification) => {
     loadNotifications();
-    changeTab(window.currentTabName)
+    if(window.currenctTabName == notificationsNames[notification.name]) changeTab(window.currentTabName)
     socket.emit('news');
     alertMessage("new-notification", notification.title, notification.message, 'success', 30000);
   });
@@ -1066,7 +1066,7 @@ $on('#view-seller .modal-body button[name="change-status"]', 'click', async func
   hideLoadingDialog()
 });
 $on('#view-seller .modal-body .form-control[name="delivery_states"]', 'change', function() {
-  $('#view-seller .modal-body .form-control[name="delivery_state_price"]').html(`office: ${$(this).attr('office')} | home: ${$(this).attr('home')}`)
+  $('#view-seller .modal-body .form-control[name="delivery_state_price"]').html(`المكتب: ${$(this).attr('office')} | العنوان: ${$(this).attr('home')}`)
 });
 
 $on('#all-currencies .custom-table-header-actions button[action="create"]', 'click', function() {
@@ -1085,9 +1085,9 @@ $on('#all-currencies table tr td button[action="edit"]', 'click', function () {
   const rowId = getElementparent(this, 2).id.replace(`all-currencies-item-`, '');
   const currency = StorageDatabase.collection('currencies').doc(rowId).get();
 
-  $('#create-edit-currency .modal-title').html(`Edit Currency #${rowId}`);
+  $('#create-edit-currency .modal-title').html(`تعديل العملة #${rowId}`);
   var button = $($('#create-edit-currency .modal-footer button[action="edit"]')[0] ?? $('#create-edit-currency .modal-footer button[action="create"]')[0])
-  button.html('Edit');
+  button.html('تعديل');
   button.attr('action', 'edit');
   $('#create-edit-currency .btn-img-picker').html('<span class="material-symbols-sharp pick-icon">add_a_photo</span>');
   $('#create-edit-currency input').val('');
@@ -1712,7 +1712,6 @@ $on('#create-edit-template .modal-footer .btn[action="create"]', 'click', async 
   const formData = new FormData();
   formData.append('name', $('#create-edit-template input[name="template_name"]').val());
   formData.append('type', $('#create-edit-template select[name="template_type"]').val());
-  // formData.append('source_code', templateEditor.html.get());
   formData.append('source_code',$('#create-edit-template .modal-body #template-editor textarea[name="template-content"]').val());
   formData.append('args', JSON.stringify(getMultiInputValues('#template-args')));
   const data = await $.ajax({
@@ -1741,7 +1740,6 @@ $on('#create-edit-template .modal-footer .btn[action="edit"]', 'click', async fu
   const formData = new FormData();
   formData.append('name', $('#create-edit-template input[name="template_name"]').val());
   formData.append('type', $('#create-edit-template select[name="template_type"]').val());
-  // formData.append('source_code', templateEditor.html.get());
   formData.append('source_code',$('#create-edit-template .modal-body #template-editor textarea[name="template-content"]').val());
   formData.append('args', JSON.stringify(getMultiInputValues('#template-args')));
 

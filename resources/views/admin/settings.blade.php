@@ -185,47 +185,38 @@
           platform_currency: {
             title: 'تغيير عملة المنصة',
             message: 'هل أنت متأكد من تغيير عملة المنصة؟',
-            defualtValue: {{ $platformCurrencyId }}
           },
           display_currency: {
             title: 'تغيير عملة عرض قيمة الرصيد',
             message: 'هل أنت متأكد من تغيير عملة عرض قيمة الرصيد',
-            defualtValue: {{ $displayCurrencyId }}
           },
           email_verification_template: {
             title: 'تغيير قالب التحقق من البريد الإلكتروني',
             message: 'هل أنت متأكد من تغيير قالب التحقق من البريد الإلكتروني',
-            defualtValue: "{{ $emailVerificationTemplateId }}",
           },
           user_recharge_template: {
             title: 'تغيير قالب شحن الرصيد',
             message: 'هل أنت متأكد من تغيير قالب شحن الرصيد',
-            defualtValue: "{{ $userRechargeTemplateId }}",
           },
           user_withdraw_template: {
             title: 'تغيير قالب سحب الرصيد',
             message: 'هل أنت متأكد من تغيير قالب سحب الرصيد',
-            defualtValue: "{{ $userWithdrawTemplateId }}",
           },
           user_credit_receive_template: {
             title: 'تغيير قالب إستقبال الرصيد',
             message: 'هل أنت متأكد من تغيير قالب إستقبال الرصيد',
-            defualtValue: "{{ $userCreditReceiveTemplateId }}",
           },
           user_identity_confirm_template: {
             title: 'تغيير قالب التحقق من الهوية',
             message: 'هل أنت متأكد من تغيير قالب التحقق من الهوية',
-            defualtValue: "{{ $userIdentityConfirmTemplateId }}",
           },
           commission: {
             title: 'تغيير قيمة العمولة',
             message: 'هل أنت متأكد من تغيير قيمة العمولة',
-            defualtValue: {{ $commission }}
           },
           services_status: {
             title: 'تغيير حالة الخدمات',
             message: 'عل أنت متأكد من تغيير حالة الخدمات',
-            defualtValue: <?php echo json_encode($servicesStatus) ?>
           }
         }
         const value = name == 'services_status' ? JSON.stringify({
@@ -233,8 +224,6 @@
           offers: $('input[name="offers_servince_is_active"]').prop('checked') ? 'active' : 'deactivate',
           store: $('input[name="store_servince_is_active"]').prop('checked') ? 'active' : 'deactivate',
         }) : $(`.form-group[name="${name}"] .form-control`).val();
-        console.log(value);
-        if(value == actions[name].defualtValue) return;
         const btnHtml = $(button).html();
         $(button).html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>يرجى الإنتظار...`);
         $(button).attr('disabled', true);
@@ -255,7 +244,6 @@
                 processData: false,
                 data: formData,
               });
-              console.log(data);
               $('#message-dialog-modal').modal('hide');
               if(data.success) {
                 alertMessage('save-setting-message', actions[name].title, data.message, 'success');

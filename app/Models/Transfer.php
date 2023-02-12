@@ -141,9 +141,6 @@ class Transfer extends Model  {
       'refused' => 'Unfortunately your transfer request has been refused, for more information please contact support.'
     ];
     if($this->for_what == 'recharge') {
-      if($this->status == 'accepted') $exchangeRes = $exchange->accept();
-      else $exchangeRes = $exchange->refuse($answer_description);
-      if(!$exchangeRes['success']) return $exchangeRes;
       $answers = [
         'accepted' => 'Congratulations, your recharge request has been accepted',
         'refused' => 'Unfortunately your recharge request has been refused, for more information please contact support.'
@@ -156,15 +153,13 @@ class Transfer extends Model  {
       }
       $user->wallet->checking_withdraw_balance -= $this->sended_balance;
       $user->wallet->unlinkingAndSave();
-    } else {
-      if($exchange) {
-        if($this->status == 'accepted') $exchangeRes = $exchange->accept();
-        else $exchangeRes = $exchange->refuse($answer_description);
-        if(!$exchangeRes['success']) return $exchangeRes;
-      }
-      // $sended_currency->platform_wallet->balance += $this->sended_balance;
-      // $sended_currency->platform_wallet->unlinkingAndSave();
     }
+    if($exchange) {
+      if($this->status == 'accepted') $exchangeRes = $exchange->accept();
+      else $exchangeRes = $exchange->refuse($answer_description);
+      if(!$exchangeRes['success']) return $exchangeRes;
+    }
+
     Notification::create([
       'name' => 'transfer-answer',
       'title' => "Transfer (#$this->id) Status Changed",
