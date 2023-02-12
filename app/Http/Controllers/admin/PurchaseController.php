@@ -92,7 +92,7 @@ class PurchaseController extends Controller {
     }
     $steps['admin_answer'] = [$request->answer, now()];
     $purchase->delivery_steps = $steps;
-    $purchase->status = 'admin_ansowred';
+    $purchase->status = 'admin_answered';
     $purchase->unreades = Admin::unreades($request->user()->id);
     $purchase->unlinkingAndSave();
 

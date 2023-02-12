@@ -125,7 +125,7 @@ class Transfer extends Model  {
     ];
     if(!is_null($this->answered_at)) return [
       'success' => false,
-      'message' => 'This Transfer Already ansowred',
+      'message' => 'This Transfer Already answered',
     ];
     $this->status = $status;
     $this->answered_at = now();

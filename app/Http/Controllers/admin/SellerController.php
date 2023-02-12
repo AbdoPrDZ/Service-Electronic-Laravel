@@ -60,7 +60,7 @@ class SellerController extends Controller {
         return $this->apiErrorResponse('description required');
       }
       if($request->status == 'accepted' && $seller->answered_at != null) {
-        return $this->apiErrorResponse('This Seller already ansowred');
+        return $this->apiErrorResponse('This Seller already answered');
       }
       $seller->status = $request->status;
       $seller->anower_description = $request->description;

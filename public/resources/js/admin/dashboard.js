@@ -18,7 +18,7 @@ const statuses = {
   client_accept: '<span class="success">تم الموافقة من طرف العميل</span>',
   client_refuse: '<span class="danger">تم الرفض من طرف العميل</span>',
   received: '<span class="success">تم الاستلام</span>',
-  admin_ansowred: '<span class="success">تم الرد من طرف المدير</span>',
+  admin_answered: '<span class="success">تم الرد من طرف المدير</span>',
   waiting_admin_accept: '<span class="warning">في إنتظار موافقة المدير</span>',
   admin_accept: '<span class="success">تمت الموافقة من طرف المدير</span>',
   admin_refuse: '<span class="success">تم الرفض من طرف المدير</span>'
@@ -637,7 +637,7 @@ function viewPurchase(purchase) {
   }
   var status = statuses[purchase.status];
   const answers = {accept_all: 'قبول الكل', refuse_all: 'رفض الكل', accept_delivery_cost: 'اقتطاع الشحن'}
-  if(purchase.status == 'admin_ansowred' && purchase.delivery_steps.admin_answer) status += ` (${answers[purchase.delivery_steps.admin_answer[0]]})`
+  if(purchase.status == 'admin_answered' && purchase.delivery_steps.admin_answer) status += ` (${answers[purchase.delivery_steps.admin_answer[0]]})`
   $(`#view-purchase .modal-body .form-control[name="status"]`).html(status);
   $(`#view-purchase .modal-body .form-control[name="created_at"]`).html(purchase.created_at);
 

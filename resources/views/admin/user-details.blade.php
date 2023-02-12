@@ -111,9 +111,9 @@
             <span class="detail-item">
               <span>Store Name: </span>{{ $user->seller->store_name }}<br>
               <span>Store Address: </span>{{ $user->seller->store_address }}<br>
-              <span>Ansowred description: </span>{{ $user->seller->answer_description ?? '--'}}<br>
+              <span>Answered description: </span>{{ $user->seller->answer_description ?? '--'}}<br>
               <span>Status: </span><span class="<?php echo $statues[$user->seller->status]['class'] ?>"><?php echo $statues[$user->seller->status]['text'] ?></span><br>
-              <span>Ansowred at: </span>{{ $user->seller->answered_at }}<br>
+              <span>Answered at: </span>{{ $user->seller->answered_at }}<br>
               <span>Created at: </span>{{ $user->seller->created_at }}<br>
             </span>
             @endif

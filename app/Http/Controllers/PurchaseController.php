@@ -390,7 +390,7 @@ class PurchaseController extends Controller {
       'to_model' => User::class,
       'name' => 'purchase-client-answer',
       'title' => "Your delivery has been $answer",
-      'message' => "A client $answer your delivery, you can contact to support for more information",
+      'message' => "A client $answer your delivery",
       'data' => [
         'event_name' => 'purchase-client-answer',
         'data' => json_encode([

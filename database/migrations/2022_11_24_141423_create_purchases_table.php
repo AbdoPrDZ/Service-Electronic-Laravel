@@ -38,7 +38,7 @@ return new class extends Migration {
         ],
         'receive' => null,
       ]));
-      $table->enum('status', ['waiting', 'received', 'seller_accept', 'seller_refuse', 'waiting_client_answer', 'client_accept', 'client_refuse', 'seller_reported', 'admin_ansowred'])->default('waiting');
+      $table->enum('status', ['waiting', 'seller_accept', 'seller_refuse', 'waiting_client_answer', 'client_accept', 'client_refuse', 'seller_reported', 'admin_answered'])->default('waiting');
       $table->json('unreades')->default('[]');
       $table->timestamps();
     });

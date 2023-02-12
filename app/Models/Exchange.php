@@ -106,7 +106,7 @@ class Exchange extends Model {
     if(!is_null($this->answered_at)) {
       return [
         'success' => false,
-        'message' => 'You already ansowred',
+        'message' => 'You already answered',
       ];
     }
     if($this->from_wallet && $this->from_wallet->checking_withdraw_balance < $this->sended_balance) return [
@@ -135,7 +135,7 @@ class Exchange extends Model {
     if(!is_null($this->answered_at)) {
       return [
         'success' => false,
-        'message' => 'You already ansowred',
+        'message' => 'You already answered',
       ];
     }
     $this->anower_description = $message;

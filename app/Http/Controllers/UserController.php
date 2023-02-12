@@ -91,7 +91,7 @@ class UserController extends Controller {
       'email' => 'required|string|email|max:100',
       'phone' => 'required|string',
       'password' => 'required|string|min:6',
-      'messaging_token' => 'required|string',
+      'messaging_token' => $request->messaging_token? 'string' : '',
     ]);
     if($validator->fails()){
       return $this->apiErrorResponse(null, [
