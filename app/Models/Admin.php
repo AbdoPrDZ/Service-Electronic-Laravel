@@ -45,6 +45,7 @@ class Admin extends Authenticatable{
     'email',
     'phone',
     'profile_image_id',
+    'wallet_id',
     'password',
     'permissions',
   ];
@@ -61,7 +62,14 @@ class Admin extends Authenticatable{
   ];
 
   public function linking() {
-    $this->balance = $this->id == 1? Setting::platformCurrency()?->platform_wallet->balance ?? 0 : null;
+    // $this->balance = $this->id == 1? Setting::platformCurrency()?->platform_wallet->balance ?? 0 : null;
+    $this->wallet = Wallet::find($this->wallet_id);
+    $balance = 0;
+    if($this->wallet) {
+      $this->wallet->linking();
+      $balance = $this->wallet->balance;
+    }
+    $this->balance = $balance;
   }
 
   static function unreades($admin_id = null) {

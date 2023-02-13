@@ -120,7 +120,7 @@ class PurchaseController extends Controller {
     $commissionExchange = Exchange::create([
       'name' => 'new-purchase-commission',
       'from_wallet_id' => $user->wallet_id,
-      'to_wallet_id' => Setting::platformCurrency()->platform_wallet_id,
+      'to_wallet_id' => Admin::all()->first()->wallet_id,
       'sended_balance' => $cmmissionPrice,
       'received_balance' => $cmmissionPrice,
     ]);
