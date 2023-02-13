@@ -207,6 +207,8 @@ class TransferController extends Controller {
     if($user->wallet->status != 'active') {
       return $this->apiErrorResponse('Your wallet is not activeted');
     }
+    $platformCurrency->platform_wallet->checking_recharge_balance += $received_balance;
+    $platformCurrency->unlinkingAndSave();
     $values['received_balance'] = $received_balance;
     $exchange = Exchange::create([
       'name' => 'user-recharge',

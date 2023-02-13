@@ -140,11 +140,18 @@ class Transfer extends Model  {
       'accepted' => 'Congratulations, your transfer request has been accepted',
       'refused' => 'Unfortunately your transfer request has been refused, for more information please contact support.'
     ];
+    $platformCurrency = Setting::platformCurrency();
+    $platformCurrency->linking();
     if($this->for_what == 'recharge') {
       $answers = [
         'accepted' => 'Congratulations, your recharge request has been accepted',
         'refused' => 'Unfortunately your recharge request has been refused, for more information please contact support.'
       ];
+      $platformCurrency->platform_wallet->checking_withdraw_balance -= $this->received_balance;
+      if($status == 'accept') {
+        $platformCurrency->platform_wallet->balance += $this->received_balance;
+      }
+      $platformCurrency->unlinkingAndSave();
     } else if($this->for_what == 'withdraw') {
       $user = User::find($this->user_id);
       $user->linking();
