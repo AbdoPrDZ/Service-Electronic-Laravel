@@ -38,14 +38,13 @@ class TransferController extends Controller {
       'received_balance' => 'required|numeric',
       'received_currency_id' => 'required|string',
       'sended_currency_id' => 'required|string',
-      'data' => 'required|array',
       'proof' => 'file|mimes:jpg,png,jpeg',
     ]);
+    if (!$request->data && !is_array($request->data)) $validator['data'] = 'required|array';
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
         'errors' => $validator->errors(),
-        'data' => $request->data,
-        'data_is_array' => is_array($request->data),
+        'all' => $request->all(),
       ]);
     }
     $received_balance = floatVal($request->received_balance);
@@ -252,8 +251,8 @@ class TransferController extends Controller {
     $validator = Validator::make($request->all(), [
       'received_balance' => 'required|numeric',
       'received_currency_id' => 'required|string',
-      'data' => 'required|array',
     ]);
+    if (!$request->data && !is_array($request->data)) $validator['data'] = 'required|array';
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
         'errors' => $validator->errors(),
