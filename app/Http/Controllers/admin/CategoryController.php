@@ -60,7 +60,7 @@ class CategoryController extends Controller {
     $request->merge(['names' => $this->tryDecodeArray($request->names)]);
     $validator = Validator::make($request->all(), [
       'names' => 'array',
-      'image' =>  $request->file('image') ? 'file|mimes:jpg,png,jpeg' : null,
+      'image' =>  $request->file('image') ? 'file|mimes:jpg,png,jpeg' : '',
     ]);
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
