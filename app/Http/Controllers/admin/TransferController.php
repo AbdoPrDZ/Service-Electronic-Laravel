@@ -53,12 +53,13 @@ class TransferController extends Controller {
           'You recharged your account',
           Setting::userRechargeEmailTemplateId(),
           [
+            '<-request_id->' => $transfer->id,
             '<-sended_balance->' => "{$transfer->sended_balance} {$transfer->sended_currency->char}",
             '<-received_balance->' => "{$transfer->received_balance} {$transfer->received_currency->char}",
             '<-received_currency->' => $transfer->received_currency->name,
             '<-sended_currency->' => $transfer->sended_currency->name,
-            '<-wallet->' => $transfer->wallet,
-            '<-recharge_date->' => $transfer->exchange?->answered_at ?? '',
+            '<-wallet->' => $transfer->wallet ?? '--',
+            '<-recharge_date->' => $transfer->exchange?->answered_at ?? '--',
             '<-answer->' => $request->status,
             '<-answer_description->' => $request->description ?? $request->status,
           ]
@@ -67,12 +68,13 @@ class TransferController extends Controller {
           'You withdraw from your account',
           Setting::userWithdrawEmailTemplateId(),
           [
+            '<-request_id->' => $transfer->id,
             '<-sended_balance->' => "{$transfer->sended_balance} {$transfer->sended_currency->char}",
             '<-received_balance->' => "{$transfer->received_balance} {$transfer->received_currency->char}",
             '<-received_currency->' => $transfer->received_currency->name,
             '<-sended_currency->' => $transfer->sended_currency->name,
-            '<-to_wallet->' => $transfer->wallet,
-            '<-withdraw_date->' => $transfer->exchange?->answered_at ?? '',
+            '<-to_wallet->' => $transfer->wallet ?? '--',
+            '<-withdraw_date->' => $transfer->exchange?->answered_at ?? '--',
             '<-answer->' => $request->status,
             '<-answer_description->' => $request->description ?? $request->status,
           ]

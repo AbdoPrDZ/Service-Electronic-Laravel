@@ -130,8 +130,9 @@ class Transfer extends Model  {
     $this->status = $status;
     $this->answered_at = now();
     $this->answer_description = $answer_description;
-    $exchange = Exchange::find($this->exchange_id);
-    if(!is_null($exchange)) $exchange->linking();
+    $this->linking();
+    // $exchange = Exchange::find($this->exchange_id);
+    // if(!is_null($exchange)) $exchange->linking();
 
     $sended_currency = Currency::find($this->sended_currency_id);
     $sended_currency->linking();
@@ -161,9 +162,9 @@ class Transfer extends Model  {
       $user->wallet->checking_withdraw_balance -= $this->sended_balance;
       $user->wallet->unlinkingAndSave();
     }
-    if($exchange) {
-      if($this->status == 'accepted') $exchangeRes = $exchange->accept();
-      else $exchangeRes = $exchange->refuse($answer_description);
+    if($this->exchange) {
+      if($this->status == 'accepted') $exchangeRes = $this->exchange->accept();
+      else $exchangeRes = $this->exchange->refuse($answer_description);
       if(!$exchangeRes['success']) return $exchangeRes;
     }
 

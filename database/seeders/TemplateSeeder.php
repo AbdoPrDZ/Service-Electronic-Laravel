@@ -259,14 +259,14 @@ class TemplateSeeder extends Seeder {
           <div>
             <div style="height: 0.1px; width: 98%; background-color: #ccc; margin: auto;"> </div>
             <div style="margin: 10px 20px;">
-              You Request to withdraw from your account balance (<span style="color: rgb(204, 0, 0);"><-sended_balance-></span>) as (<span style="color: #0c0;"><-received_balance-></span>) at <span style="color: #06c;"><-withdraw_date->.</span> has been <-answer->
+              You Request to withdraw from your account balance (<span style="color: rgb(204, 0, 0);"><-sended_balance-></span>) as (<span style="color: #0c0;"><-received_balance-></span>) at <span style="color: #06c;"><-recharge_date->.</span> has been <-answer->
               <div style="font-weight: bold; font-size: 13px; margin: 10px 0 10px 10px;">
                 Request Id: <span style="font-weight: normal;">#<-request_id->.</span><br>
                 Sended Currency: <span style="font-weight: normal;"><-sended_currency->.</span><br>
                 Sended Balance: <span style="font-weight: normal;"><-sended_balance->.</span><br>
                 Received Currency: <span style="font-weight: normal;"><-received_currency->.</span><br>
                 Received Balance: <span style="font-weight: normal;"><-received_balance->.</span><br>
-                Withdrawed At: <span style="font-weight: normal;"><-withdraw_date->.</span><br>
+                Recharged At: <span style="font-weight: normal;"><-recharge_date->.</span><br>
                 To Wallet: <span style="font-weight: normal;"><-to_wallet->.</span><br>
                 Answer: <span style="font-weight: normal;"><-answer_description->.</span><br>
               </div>
@@ -370,7 +370,7 @@ class TemplateSeeder extends Seeder {
             <div style="height: 0.1px; width: 98%; background-color: #ccc; margin: auto;"> </div>
             <div style="margin: 10px 20px;">
               You have received credit from (<span style="color: rgb(204, 0, 0);"><-from-></span>)
-              with the value of (<span style="color: #0c0;"><-balance-></span>)
+              with the value of <span style="color: #0c0;"><-balance-></span>
               at <span style="color: #06c;"><-datetime->.</span>
               <div style="font-weight: bold; font-size: 13px; margin: 10px 0 10px 10px;">
                 Exchange Id: <span style="font-weight: normal;">#<-exchange_id->.</span><br>

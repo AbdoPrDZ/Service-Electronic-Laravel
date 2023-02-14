@@ -104,7 +104,7 @@ class ExchangeController extends Controller {
       'template_id' => Setting::userCreditReceiveEmailTemplateId(),
       'data' => [
         '<-from->' => $user->email,
-        '<-balance->' => $request->balance,
+        '<-balance->' => "$request->balance DZD",
         '<-exchange_id->' => $exchange->id,
         '<-datetime->' => $exchange->created_at,
       ],

@@ -72,7 +72,7 @@
         <div class="form-group">
           <h5>البيانات:</h5>
           <div id="template-args" class="multi-input"
-               inputs='[{"name": "name", "text": "الرمز في الكود المصدري", "type": "text"}, {"name": "type", "text": "انوع", "type": "select", "options": "inputTypes"}]'
+               inputs='[{"name": "name", "text": "الرمز في الكود المصدري", "type": "text"}, {"name": "type", "text": "انوع", "type": "select", "options": "$inputTypes"}]'
                add-btn-text="إضافة">
             <div class="multi-input-header"></div>
             <div class="multi-input-body"></div>
