@@ -1422,7 +1422,17 @@ $on('#create-edit-category .btn[action="edit"]', 'click', async function() {
 
 $on('#all-purchases table tr td button[action="view"]', 'click', function() {
   const rowId = getElementparent(this, 2).id.replace(`all-purchases-item-`, '');
-  const purchase = StorageDatabase.collection('purchases').doc(rowId).get();
+  const purchase = StorageDatabase.collection('purchases').doc('purchases').doc(rowId).get();
+  if(purchase) viewPurchase(purchase);
+});
+$on('#all-purchases-repports table tr td button[action="view"]', 'click', function() {
+  const rowId = getElementparent(this, 2).id.replace(`all-purchases-repports-item-`, '');
+  const purchase = StorageDatabase.collection('purchases').doc('purchases_repports').doc(rowId).get();
+  if(purchase) viewPurchase(purchase);
+});
+$on('#all-waiting-purchases table tr td button[action="view"]', 'click', function() {
+  const rowId = getElementparent(this, 2).id.replace(`all-waiting-purchases-item-`, '');
+  const purchase = StorageDatabase.collection('purchases').doc('waiting_purchases').doc(rowId).get();
   if(purchase) viewPurchase(purchase);
 });
 $on('#view-purchase .modal-body button[name="answer"]', 'click', async function() {
