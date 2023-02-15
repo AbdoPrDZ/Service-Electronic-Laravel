@@ -23,7 +23,14 @@ class PurchaseController extends Controller {
       $value->linking();
       $purchases[$value->id] = $value;
       if(in_array($value->status, ['client_refuse', 'seller_reported'])) $purchases_repports[$value->id] = $value;
-      if(!in_array($value->satatus, ['client_accept', 'admin_answered'])) $waiting_purchases[$value->id] = $value;
+      if(in_array($value->satatus, [
+        'waiting',
+        'seller_accept',
+        'waiting_client_answer',
+        'client_refuse',
+        'seller_reported',
+      ])) $waiting_purchases[$value->id] = $value;
+
     }
     return Controller::apiSuccessResponse('Success', [
       'data' => [
