@@ -17,12 +17,20 @@ class PurchaseController extends Controller {
   static function all(Request $request) {
     $items = Purchase::all();
     $purchases = [];
+    $purchases_repports = [];
+    $waiting_purchases = [];
     foreach ($items as $value) {
       $value->linking();
       $purchases[$value->id] = $value;
+      if(in_array($value->status, ['client_refuse','seller_reported'])) $purchases_repports[$value->id] = $value;
+      if($value->satatus == 'waiting') $waiting_purchases[$value->id] = $value;
     }
     return Controller::apiSuccessResponse('Success', [
-      'data' => $purchases,
+      'data' => [
+        'purchases' => $purchases,
+        'purchases_repports' => $purchases_repports,
+        'waiting_purchases' => $waiting_purchases,
+      ],
     ]);
   }
 

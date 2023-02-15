@@ -30,7 +30,7 @@ const tabsTables = {
   transfers: [['all-transfers', '*']],
   currencies: [['all-currencies', '*']],
   products: [['all-products', 'products'], ['all-categories', 'categories']],
-  purchases: [['all-purchases', '*']],
+  purchases: [['all-purchases', 'purchases'], ['all-purchases-repports', 'purchases_repports'], ['all-waiting-purchases', 'waiting_purchases']],
   offers: [['all-offers', 'offers'], ['all-offer-requests', 'offer_requests']],
   mails: [['all-mails', 'mails'], ['all-templates', 'templates']],
 }
@@ -347,7 +347,7 @@ function updateTable(values, tableId) {
               <span class="material-symbols-sharp">delete</span>
             </button>
           </td>`);
-      } else if(tableId == 'all-purchases') {
+      } else if(tableId == 'all-purchases' || tableId == 'all-purchases-repports' || tableId == 'all-waiting-purchases') {
         row.push(`<td>${values[id].id}</td>`);
         row.push(`<td>${values[id].fullname} <br> ${values[id].phone}</td>`);
         row.push(`<td>${values[id].product.seller.user.fullname} <br> ${values[id].product.seller.user.phone}</td>`);
