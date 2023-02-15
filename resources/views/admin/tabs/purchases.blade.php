@@ -44,7 +44,7 @@
             <div id="all-waiting-purchases" class="custom-table tab-view-tab-item" checkbox="true" for="purchases">
               <h3 class="table-refresh" table="all-waiting-purchases">تحديث</h3>
               <div class="custom-table-header">
-                <h2 class="custom-table-title">امبيعات المعلقة</h2>
+                <h2 class="custom-table-title">المبيعات المعلقة</h2>
               </div>
               <table class="table table-bordered table-condensed table-hover table-striped text-center">
                 <thead>
