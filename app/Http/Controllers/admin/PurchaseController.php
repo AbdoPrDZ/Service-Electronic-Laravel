@@ -23,7 +23,7 @@ class PurchaseController extends Controller {
       $value->linking();
       $purchases[$value->id] = $value;
       if(in_array($value->status, ['client_refuse', 'seller_reported'])) $purchases_repports[$value->id] = $value;
-      if(in_array($value->satatus, [
+      if(in_array($value->status, [
         'waiting',
         'seller_accept',
         'waiting_client_answer',
