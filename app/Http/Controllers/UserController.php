@@ -122,6 +122,7 @@ class UserController extends Controller {
       'settings' => [
         'theme' => 'Light',
         'languange' => 'En',
+        'policies_accepted' => false,
       ],
       'unreades' => Admin::unreades(),
     ]);
@@ -145,6 +146,15 @@ class UserController extends Controller {
       'token' => $token,
       'user_id' => $user->id,
     ]);
+  }
+
+  public function acceptPolicies(Request $request) {
+    $user = $request->user();
+    $settings = $user->settings;
+    $settings['policies_accepted'] = true;
+    $user->settings = $settings;
+    $user->save();
+    $this->apiSuccessResponse('Successfully accepting');
   }
 
   public function resendEmailVerifiy(Request $request) {

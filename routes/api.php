@@ -40,6 +40,7 @@ Route::group([
 
   Route::get('/logout', [UserController::class, 'logout']);
   Route::post('/refresh', [UserController::class, 'refresh']);
+  Route::get('/accept_policies', [UserController::class, 'acceptPolicies']);
   Route::get('/user', [UserController::class, 'index']);
   Route::post('/update_messaging_token', [UserController::class, 'updateMessagingToken']);
   Route::post('/edit', [UserController::class, 'editProfile']);
