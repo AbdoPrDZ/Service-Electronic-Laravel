@@ -35,6 +35,7 @@ Route::get('/load/{tabName}', [AdminController::class, 'loadTab']);
 
 Route::get('/notifications/all', [NotificationController::class, 'all']);
 Route::get('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->middleware('valid_id:' . Notification::class);
+Route::get('/notifications/clear', [NotificationController::class, 'markAsRead'])->middleware('valid_id:' . Notification::class);
 
 Route::group([
   'prefix' => 'user',
@@ -42,7 +43,8 @@ Route::group([
 ], function ($router) {
   Route::delete('/{id}/delete', [UserController::class, 'delete'])->middleware('valid_id:' . User::class);
   Route::post('/{id}/change_identity_status', [UserController::class, 'changeIdentityStatus'])->middleware('valid_id:' . User::class);
-  Route::post('/send_notification', [UserController::class, 'sendNotification']);
+  Route::post('/notification/send', [UserController::class, 'sendNotification']);
+  Route::post('/notification/clear', [UserController::class, 'clearNotification']);
   Route::get('/{id}/details', [UserController::class, 'details'])->middleware('valid_id:' . User::class);
 });
 

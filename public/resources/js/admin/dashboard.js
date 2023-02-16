@@ -904,6 +904,44 @@ $on('#all-users .custom-table-header-actions button[action="send-notification"]'
   $('#send-notification-modal').modal('show');
 
 });
+$on('#all-users .custom-table-header-actions button[action="clear-notification"]', 'click', function() {
+  const inputs = $('#all-users').find('table tbody tr input:checked');
+  var usersIds = [];
+  for (let i = 0; i < inputs.length; i++) {
+    usersIds.push(inputs[i].id.replace(`all-users-chb-`, ''));
+  }
+  const btnHtml = $(this).html();
+  $(this).html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>يرجى الإنتظار...`);
+  $(this).attr('disabled', true);
+
+  messageDialog('clear-notifications', 'Clear Messages', '<h4>Do sure you want to clear users messages?</h4>', async (action) => {
+    if(action == 'Yes') {
+    loadingDialog('حذف المستخدم', 'يرجى الإنتظار لحين حذف المستخدم...');
+    const data = await $.ajax({
+      url: `./admin/notification/clear`,
+      type: 'POST',
+      headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+      dataType: 'JSON',
+      data: targets,
+    });
+    $('#message-dialog-modal').modal('hide');
+    alertMessage('delete-user-response',
+      `حذف المستخدم`,
+      data.message ?? 'Some things bad',
+      data.success ? 'success': 'danger'
+    )
+    changeTab(window.currentTabName);
+    hideLoadingDialog()
+  } else {
+    $('#message-dialog-modal').modal('hide');
+  }
+  },
+  {نعم:'danger', لا: 'primary'},
+  () => {
+    $(this).html(btnHtml);
+    $(this).attr('disabled', false);
+  });
+});
 $on('#all-users table tr td button[action="view"] ', 'click', function () {
   const rowId = getElementparent(this, 2).id.replace(`all-users-item-`, '');
   const user = StorageDatabase.collection('users').doc('users').doc(rowId).get();

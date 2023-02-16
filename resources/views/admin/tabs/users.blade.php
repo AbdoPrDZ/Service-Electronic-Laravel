@@ -99,6 +99,9 @@
                   <button class="btn btn-success need-select" action="send-notification" disabled>
                     <span class="material-symbols-sharp">chat</span> إرسال رسالة
                   </button>
+                  <button class="btn btn-warning need-select" action="clear-notification" disabled>
+                    <span class="material-symbols-sharp">cached</span> حذف الرسائل
+                  </button>
                   <button class="btn btn-danger need-select" action="delete" disabled>
                     <span class="material-symbols-sharp">delete</span> حذف
                   </button>

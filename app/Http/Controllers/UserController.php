@@ -154,7 +154,7 @@ class UserController extends Controller {
     $settings['policies_accepted'] = true;
     $user->settings = $settings;
     $user->save();
-    $this->apiSuccessResponse('Successfully accepting');
+    return $this->apiSuccessResponse('Successfully accepting');
   }
 
   public function resendEmailVerifiy(Request $request) {
