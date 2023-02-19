@@ -53,9 +53,9 @@ class Offer extends Model {
     }
   }
 
-  public function preDelete() {
-    $this->is_deleted = true;
-    $this->save();
-  }
+  // public function preDelete() {
+  //   $this->is_deleted = true;
+  //   $this->save();
+  // }
 
 }

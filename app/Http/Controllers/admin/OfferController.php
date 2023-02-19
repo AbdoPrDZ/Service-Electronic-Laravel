@@ -150,7 +150,14 @@ class OfferController extends Controller {
   }
 
   public function delete(Request $request, $offer) {
-    $offer->preDelete();
+    // $offer->preDelete();
+    async(function () use ($offer) {
+      $requests = OfferRequest::where('offer_id', '=', $offer->id)->get();
+      foreach ($requests as $request) {
+        $request->delete();
+      }
+      $offer->delete();
+    })->start();
     return $this->apiSuccessResponse('Successfully deleteing offer');
   }
 
