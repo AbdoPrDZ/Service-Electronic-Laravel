@@ -154,6 +154,11 @@ class OfferController extends Controller {
     async(function () use ($offer) {
       $requests = OfferRequest::where('offer_id', '=', $offer->id)->get();
       foreach ($requests as $request) {
+        if($request->status == 'waiting') {
+          $request->linking();
+          $request->exchange->refuse('offer deleted');
+          $request->status = 'admin_refuse';
+        }
         $request->delete();
       }
       $offer->delete();
