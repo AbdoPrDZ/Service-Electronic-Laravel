@@ -34,13 +34,14 @@ class TransferController extends Controller {
     }
 
     $request->merge(['data' => $this->tryDecodeArray($request->data)]);
-    $validator = Validator::make($request->all(), [
+    $validates = [
       'received_balance' => 'required|numeric',
       'received_currency_id' => 'required|string',
       'sended_currency_id' => 'required|string',
       'proof' => 'file|mimes:jpg,png,jpeg',
-    ]);
-    if (!$request->data && !is_array($request->data)) $validator['data'] = 'required|array';
+    ];
+    if (!$request->data && !is_array($request->data)) $validates['data'] = 'required|array';
+    $validator = Validator::make($request->all(), $validates);
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
         'errors' => $validator->errors(),
@@ -48,6 +49,16 @@ class TransferController extends Controller {
       ]);
     }
     $received_balance = floatVal($request->received_balance);
+
+    if($received_balance == 0) {
+      return $this->apiErrorResponse('The received balance can\'t be zero', [
+        'errors' => ['received_balance' => 'The received balance can\'t be zero']
+      ]);
+    } else if($received_balance < 10) {
+      return $this->apiErrorResponse('The received balance must be > 10', [
+        'errors' => ['received_balance' => 'The received balance must be > 10']
+      ]);
+    }
 
     $sended_currency = Currency::find($request->sended_currency_id);
     if(is_null($sended_currency)) return $this->apiErrorResponse('Invalid sended currency', [
@@ -164,6 +175,10 @@ class TransferController extends Controller {
       return $this->apiErrorResponse('The sended balance can\'t be zero', [
         'errors' => ['sended_balance' => 'The sended balance can\'t be zero']
       ]);
+    } else if($sended_balance < 10) {
+      return $this->apiErrorResponse('The sended balance must be > 10', [
+        'errors' => ['sended_balance' => 'The sended balance must be > 10']
+      ]);
     }
 
     $sended_currency = Currency::find($request->sended_currency_id);
@@ -250,11 +265,12 @@ class TransferController extends Controller {
     }
 
     $request->merge(['data' => $this->tryDecodeArray($request->data)]);
-    $validator = Validator::make($request->all(), [
+    $validates = [
       'received_balance' => 'required|numeric',
       'received_currency_id' => 'required|string',
-    ]);
-    if (!$request->data && !is_array($request->data)) $validator['data'] = 'required|array';
+    ];
+    if (!$request->data && !is_array($request->data)) $validates['data'] = 'required|array';
+    $validator = Validator::make($request->all(), $validates);
     if ($validator->fails()) {
       return $this->apiErrorResponse(null, [
         'errors' => $validator->errors(),
