@@ -101,12 +101,11 @@ class UserController extends Controller {
 
     $email = User::where('email', '=', $request->email)->first();
     $phone = User::where('phone', '=', $request->phone)->first();
-    if(!is_null($email)) {
+    if(!is_null($email) && !is_null($email->email_verified_at)) {
       return $this->apiErrorResponse('You already registred please go to login', [
         'errors' => ['email' => 'You already registred please go to login']
       ]);
-    }
-    if(!is_null($phone)) {
+    } else if(!is_null($phone)) {
       return $this->apiErrorResponse('You already registred please go to login', [
         'errors' => ['phone' => 'You already registred please go to login']
       ]);
