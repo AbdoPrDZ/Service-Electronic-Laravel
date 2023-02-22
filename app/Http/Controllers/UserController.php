@@ -111,6 +111,8 @@ class UserController extends Controller {
       ]);
     }
 
+    if($email) $email->delete();
+
     $user = User::create([
       'firstname' => $request->firstname,
       'lastname' => $request->lastname,
