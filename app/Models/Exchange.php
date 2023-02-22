@@ -83,12 +83,15 @@ class Exchange extends Model {
     }
   }
 
-  public function linking($gettingTargetUser = false) {
+  public function linking($gettinUsers = false) {
     $this->from_wallet = Wallet::find($this->from_wallet_id);
     if($this->from_wallet) $this->from_wallet->linking();
     $this->to_wallet = Wallet::find($this->to_wallet_id);
     if($this->to_wallet) $this->to_wallet->linking();
-    if ($gettingTargetUser) $this->target_user = User::where('wallet_id', '=', $this->to_wallet_id)->first();
+    if ($gettinUsers) {
+      $this->from_user = User::where('wallet_id', '=', $this->from_wallet_id)->first();
+      $this->to_user = User::where('wallet_id', '=', $this->to_wallet_id)->first();
+    }
   }
 
   public function unlinking() {
