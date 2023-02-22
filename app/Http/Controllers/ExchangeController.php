@@ -26,7 +26,7 @@ class ExchangeController extends Controller {
     $items = Exchange::where([
       ['name', '=', 'users-transfer'],
       ['from_wallet_id', '=', $request->user()->wallet_id],
-    ])->get();
+    ])->orWhere('to_wallet_id', '=', $request->user()->wallet_id)->get();
     $exhcnages = [];
     foreach ($items as $item) {
       $item->linking(true);
