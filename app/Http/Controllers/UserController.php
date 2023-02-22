@@ -138,7 +138,8 @@ class UserController extends Controller {
       'title' => 'Email Verification',
       'template_id' => Setting::emailVerificationTemplateId(),
       'data' => ['<-user->' => $user->fullname, '<-code->' => $verifyCode],
-      'targets' => [$user->id]
+      'targets' => [$user->id],
+      'unreades' => Admin::unreades(),
     ]);
 
     return $this->apiSuccessResponse("Successfully registering", [
@@ -193,7 +194,8 @@ class UserController extends Controller {
       'title' => 'Email Verification',
       'template_id' => Setting::emailVerificationTemplateId(),
       'data' => ['<-user->' => $user->fullname, '<-code->' => $verifyCode],
-      'targets' => [$user->id]
+      'targets' => [$user->id],
+      'unreades' => Admin::unreades(),
     ]);
 
     return $this->apiSuccessResponse("User successfully resending verification email", [
@@ -291,7 +293,8 @@ class UserController extends Controller {
         'title' => 'Email Verification',
         'template_id' => Setting::emailVerificationTemplateId(),
         'data' => ['<-code->' => $verifyCode, '<-user->' => $user->fullname],
-        'targets' => [$user->id]
+        'targets' => [$user->id],
+        'unreades' => Admin::unreades(),
       ]);
       return $this->apiSuccessResponse("Successfully verifing email code", [
         'token' => $token,
@@ -536,7 +539,8 @@ class UserController extends Controller {
       'title' => 'Email Verification',
       'template_id' => Setting::emailVerificationTemplateId(),
       'data' => ['<-user->' => $user->fullname, '<-code->' => $verifyCode],
-      'targets' => [$user->id]
+      'targets' => [$user->id],
+      'unreades' => Admin::unreades(),
     ]);
     $user->tokens()->delete();
     return $this->apiSuccessResponse("Successfully changing email", [
