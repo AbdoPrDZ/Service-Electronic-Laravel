@@ -967,7 +967,7 @@ $on('#send-notification-modal .btn[action="send"]', 'click', async function() {
   formData.append('message', $('#send-notification-modal textarea[name="message"]').val());
   formData.append('image', window.ImagePicker['send-notification-image-picker']);
   const data = await $.ajax({
-    url: `./admin/user/send_notification`,
+    url: `./admin/user/notification/send`,
     type: 'POST',
     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
     contentType: false,
