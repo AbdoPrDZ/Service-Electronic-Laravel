@@ -602,6 +602,18 @@ class UserController extends Controller {
     ]);
   }
 
+  public function findUser(Request $request, $email) {
+    $user = User::where('email', '=', $email)->first();
+
+    if($user) {
+      return $this->apiSuccessResponse('Successfully geting user', [
+        'user' => $user,
+      ]);
+    } else {
+      return $this->apiErrorResponse('Invalid Email');
+    }
+  }
+
   public function updateMessagingToken(Request $request) {
     $validator = Validator::make($request->all(), [
       'token' => 'required|string',

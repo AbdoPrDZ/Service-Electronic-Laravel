@@ -42,6 +42,7 @@ Route::group([
   Route::post('/refresh', [UserController::class, 'refresh']);
   Route::get('/accept_policies', [UserController::class, 'acceptPolicies']);
   Route::get('/user', [UserController::class, 'index']);
+  Route::get('/find/{email}', [UserController::class, 'findUser']);
   Route::post('/update_messaging_token', [UserController::class, 'updateMessagingToken']);
   Route::post('/edit', [UserController::class, 'editProfile']);
   Route::post('/change_email', [UserController::class, 'changeEmail']);
