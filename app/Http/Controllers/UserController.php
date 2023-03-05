@@ -606,6 +606,7 @@ class UserController extends Controller {
     $user = User::where('email', '=', $email)->first();
 
     if($user) {
+      $user->linking();
       return $this->apiSuccessResponse('Successfully geting user', [
         'user' => $user,
       ]);
