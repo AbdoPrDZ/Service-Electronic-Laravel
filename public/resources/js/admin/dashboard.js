@@ -1495,6 +1495,7 @@ $on('#view-purchase .modal-body button[name="answer"]', 'click', async function(
 $on('#all-offers .custom-table-header-actions button[action="create"]', 'click', function() {
   $('#create-edit-offer .btn-img-picker').html('<span class="material-symbols-sharp pick-icon">add_a_photo</span>');
   $('#create-edit-offer .form-control').val('');
+  window.ImagePicker['offer-image-picker'] = null;
   initMultiInputWidget('#offer-sub-offers');
   initMultiInputWidget('#offer-fields');
   initMultiInputWidget('#offer-data');
@@ -1521,6 +1522,7 @@ $on('#all-offers table tr td button[action="edit"]', 'click', function () {
   $('#create-edit-offer .form-control[name="offer_description_en"]').val(offer.description.en);
   $('#create-edit-offer .form-control[name="offer_description_ar"]').val(offer.description.ar);
   $('#create-edit-offer .form-group .btn.btn-img-picker').html(`<img src="./file/admin/${offer.image_id}">`);
+  window.ImagePicker['offer-image-picker'] = null;
   initMultiInputWidget('#offer-sub-offers');
   clearMultiInputValues('#offer-sub-offers');
   for (const name in offer.sub_offers) {
@@ -1630,7 +1632,6 @@ $on('#create-edit-offer .modal-footer button[action="edit"]', 'click', async fun
   });
   if(data.success) {
     $('#create-edit-offer').modal('hide');
-    window.ImagePicker['offer-image-picker'] = undefined;
     alertMessage('create-offer-message', 'تعديل العرض', data.message, 'success');
     changeTab(window.currentTabName);
   } else {
