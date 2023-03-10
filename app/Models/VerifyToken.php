@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property int $token
  * @property string $code
- * @property int $user_id
+ * @property string $user_id
+ * @property string $model
  * @property \Illuminate\Support\Carbon|null $used_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -19,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|VerifyToken query()
  * @method static \Illuminate\Database\Eloquent\Builder|VerifyToken whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|VerifyToken whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VerifyToken whereModel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|VerifyToken whereToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|VerifyToken whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|VerifyToken whereUsedAt($value)

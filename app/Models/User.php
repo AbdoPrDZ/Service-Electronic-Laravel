@@ -24,17 +24,21 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string|null $wallet_id
  * @property array $verification_images_ids
  * @property \Illuminate\Support\Carbon|null $identity_verifited_at
+ * @property string $identity_status
+ * @property string|null $identity_answer_description
  * @property string $profile_image_id
  * @property string|null $messaging_token
  * @property string|null $remember_token
  * @property array $settings
+ * @property array $unreades
+ * @property bool $is_deleted
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Sanctum\PersonalAccessToken[] $tokens
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
- * @method static \Database\Factories\UserFactory factory(...$parameters)
+ * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User query()
@@ -43,7 +47,10 @@ use Laravel\Sanctum\HasApiTokens;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereEmailVerifiedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereFirstname($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereIdentityAnswerDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereIdentityStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereIdentityVerifitedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereLastname($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereMessagingToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword($value)
@@ -51,6 +58,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereProfileImageId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereSettings($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereUnreades($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereVerificationImagesIds($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereWalletId($value)
@@ -120,7 +128,7 @@ class User extends Authenticatable {
     $this->fullname = $this->firstname . ' ' . $this->lastname;
     $this->email_verified = !is_null($this->email_verified_at);
 
-    $this->seller = Seller::where('user_id', '=', $this->id)->first();
+    $this->seller = Seller::whereUserId($this->id)->first();
     if($this->seller && $linkSeller) $this->seller->linking(false);
 
     $this->wallet = Wallet::find($this->wallet_id);
@@ -170,9 +178,9 @@ class User extends Authenticatable {
   }
 
   public function purchases() {
-    $items = Purchase::where('user_id', '=', $this->id);
+    $items = Purchase::whereUserId($this->id)->get();
     $purchases = [];
-    foreach ($purchases as $purchase) {
+    foreach ($items as $purchase) {
       $purchase->linking();
       $purchases[$purchase->id] = $purchase;
     }

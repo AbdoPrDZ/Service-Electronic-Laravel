@@ -40,7 +40,7 @@ class SellerController extends Controller {
       return $this->apiErrorResponse('You identity not verifited');
     }
 
-    $seller = Seller::where('user_id', '=', $request->user()->id)->first();
+    $seller = Seller::whereUserId($request->user()->id)->first();
     if(!is_null($seller) && $seller->status != 'refused') {
       return $this->apiErrorResponse('You allready a seller');
     }
@@ -110,7 +110,7 @@ class SellerController extends Controller {
       return $this->apiErrorResponse('You identity not verifited');
     }
 
-    $seller = Seller::where('user_id', '=', $request->user()->id)->first();
+    $seller = Seller::whereUserId($request->user()->id)->first();
     if(is_null($seller)) {
       return $this->apiErrorResponse('You are not a seller');
     }

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Offer;
 
 use App\Models\Admin;
 use App\Models\Notification;
-use App\Models\OfferRequest;
+use App\Models\Offer;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -13,7 +13,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class OfferRequestCreatedEvent {
+class OfferCreatedEvent {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
   /**
@@ -21,20 +21,16 @@ class OfferRequestCreatedEvent {
    *
    * @return void
    */
-  public function __construct(OfferRequest $offerRequest) {
-    $offerRequest->linking();
-    foreach ($offerRequest->unreades ?? [] as $admin_id) {
+  public function __construct(Offer $offer) {
+    foreach ($offer->unreades ?? [] as $admin_id) {
       Notification::create([
         'to_id' => $admin_id,
         'to_model' => Admin::class,
-        'name' => 'new-offer-request-created',
-        'title' => 'A new offer request created',
-        'message' => 'Offer request created (title: ' .
-                    $offerRequest->offer->title['en'] . ', Offer: ' .
-                    $offerRequest->offer->sub_offers[$offerRequest->sub_offer]['title_en'] . ', Price: ' .
-                    $offerRequest->total_price . ' DZD)',
+        'name' => 'new-offer-created',
+        'title' => 'A new offer created',
+        'message' => 'Offer created (' . $offer->title['en'] . ', ' . $offer->description['en'] . ')',
         'data' => [
-          'offer_id' => $offerRequest->id,
+          'offer_id' => $offer->id,
         ],
         'image_id' => 'offers',
         'type' => 'emit',

@@ -20,7 +20,7 @@ class ProductController extends Controller {
     }
 
     $query = $request->query();
-    $items = Product::where('is_deleted', '=', 0)->get();
+    $items = Product::whereIsDeleted('0')->get();
     $from = key_exists('from', $query) && intVal($query['from']) < count($items) && intVal($query['from']) >= 0 ? intVal($query['from']) : 0;
     $to = key_exists('to', $query) && intVal($query['to']) <= count($items)&& intVal($query['to']) > $from ? intVal($query['to']) : count($items);
     $products = [];
@@ -53,14 +53,14 @@ class ProductController extends Controller {
 
     $user = $request->user();
 
-    $seller = Seller::where('user_id', '=', $user->id)->first();
+    $seller = Seller::whereUserId($user->id)->first();
     if(is_null($seller)) {
       return $this->apiErrorResponse('You are not seller');
     }
     if($user->identity_verifited_at == null) {
       return $this->apiErrorResponse('You identity not verifited');
     }
-    if(is_null(Category::where('id', '=', $request->category_id)->first())) {
+    if(is_null(Category::find($request->category_id))) {
       return $this->apiErrorResponse('Invalid category', [
         'errors' => ['category' => 'Invalid category']
       ]);
@@ -137,7 +137,7 @@ class ProductController extends Controller {
       ]);
     }
 
-    $seller = Seller::where('user_id', '=', $request->user()->id)->first();
+    $seller = Seller::whereUserId($request->user()->id)->first();
     if(is_null($seller)) {
       return $this->apiErrorResponse('You are not seller');
     }

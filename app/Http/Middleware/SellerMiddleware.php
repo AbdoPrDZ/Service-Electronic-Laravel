@@ -19,7 +19,7 @@ class SellerMiddleware {
     $user = $request->user();
     if($user) {
       $user->linking();
-      $seller = Seller::where('user_id', '=', $user->id)->first();
+      $seller = Seller::whereUserId($user->id)->first();
       if(is_null($seller)) {
         return Controller::apiErrorResponse('You are not seller');
       }

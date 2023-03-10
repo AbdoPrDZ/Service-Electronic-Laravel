@@ -1,11 +1,8 @@
 <?php
 
-namespace App\Events\Currency;
+namespace App\Events\Purchase;
 
-use App\Models\Currency;
-use App\Models\File;
-use App\Models\Notification;
-use App\Models\Transfer;
+use App\Models\Purchase;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -14,7 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class CurrencyDeletedEvent {
+class PurchaseDeletedEvent {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
   /**
@@ -22,14 +19,9 @@ class CurrencyDeletedEvent {
    *
    * @return void
    */
-  public function __construct(Currency $currency) {
-    $currency->linking();
-    $currency->platform_wallet->delete();
-    File::find($currency->image_id)->delete();
-    $transfers = Transfer::whereSendedCurrencyId($currency->id)->get();
-    foreach ($transfers as $transfer) {
-      $transfer->delete();
-    }
+  public function __construct(Purchase $purchase) {
+    $purchase->linking();
+    $purchase->exchange->delete();
   }
 
   /**

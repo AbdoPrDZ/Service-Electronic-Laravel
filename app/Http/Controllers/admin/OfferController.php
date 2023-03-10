@@ -14,7 +14,7 @@ use Validator;
 class OfferController extends Controller {
 
   static function all(Request $request) {
-    $items = Offer::where('is_deleted', '=', 0)->get();
+    $items = Offer::whereIsDeleted('0')->get();
     $offers = [];
     foreach ($items as $item) {
       $offers[$item->id] = $item;
@@ -152,7 +152,7 @@ class OfferController extends Controller {
   public function delete(Request $request, $offer) {
     // $offer->preDelete();
     async(function () use ($offer) {
-      $requests = OfferRequest::where('offer_id', '=', $offer->id)->get();
+      $requests = OfferRequest::whereOfferId($offer->id)->get();
       foreach ($requests as $request) {
         if($request->status == 'waiting') {
           $request->linking();

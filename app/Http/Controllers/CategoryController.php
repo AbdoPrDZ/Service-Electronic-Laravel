@@ -15,7 +15,7 @@ class CategoryController extends Controller {
       return $this->apiErrorResponse('This service has been deactivated');
     }
 
-    $data = Category::where('is_deleted', '=', 0)->get();
+    $data = Category::whereIsDeleted('0')->get();
     $items = [];
     foreach ($data as $item) {
       $items[$item->id] = $item;

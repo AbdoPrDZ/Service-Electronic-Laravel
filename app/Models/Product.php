@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use App\Events\ProductCreatedEvent;
+use App\Events\Product\ProductCreatedEvent;
+use App\Events\Product\ProductDeletedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -13,24 +14,36 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $seller_id
  * @property string $name
  * @property string $description
+ * @property bool $inside_country
  * @property float $price
+ * @property float $commission
  * @property int $count
+ * @property array $rates
+ * @property array $likes
  * @property int $category_id
  * @property array $images_ids
+ * @property array $unreades
+ * @property bool $is_deleted
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product query()
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereCommission($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereCount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereImagesIds($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereInsideCountry($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsDeleted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereLikes($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereRates($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereSellerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereUnreades($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereUpdatedAt($value)
  * @mixin \Eloquent
  */
@@ -66,6 +79,7 @@ class Product extends Model {
 
   protected $dispatchesEvents = [
     'created' => ProductCreatedEvent::class,
+    'deleted' => ProductDeletedEvent::class,
   ];
 
   static function news($admin_id) {

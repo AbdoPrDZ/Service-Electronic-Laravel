@@ -1,10 +1,8 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\OfferRequest;
 
-use App\Models\Admin;
-use App\Models\Notification;
-use App\Models\Offer;
+use App\Models\OfferRequest;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -13,7 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class OfferCreatedEvent {
+class OfferRequestDeletedEvent {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
   /**
@@ -21,21 +19,9 @@ class OfferCreatedEvent {
    *
    * @return void
    */
-  public function __construct(Offer $offer) {
-    foreach ($offer->unreades ?? [] as $admin_id) {
-      Notification::create([
-        'to_id' => $admin_id,
-        'to_model' => Admin::class,
-        'name' => 'new-offer-created',
-        'title' => 'A new offer created',
-        'message' => 'Offer created (' . $offer->title['en'] . ', ' . $offer->description['en'] . ')',
-        'data' => [
-          'offer_id' => $offer->id,
-        ],
-        'image_id' => 'offers',
-        'type' => 'emit',
-      ]);
-    }
+  public function __construct(OfferRequest $offerRequest) {
+    $offerRequest->linking();
+    $offerRequest->exchange->delete();
   }
 
   /**

@@ -2,10 +2,34 @@
 
 namespace App\Models;
 
-use App\Events\MailCreateEvent;
+use App\Events\MailCreatedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\Mail
+ *
+ * @property int $id
+ * @property string $title
+ * @property string $template_id
+ * @property array $data
+ * @property array $targets
+ * @property array $unreades
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|Mail newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Mail newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Mail query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Mail whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Mail whereData($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Mail whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Mail whereTargets($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Mail whereTemplateId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Mail whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Mail whereUnreades($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Mail whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Mail extends Model {
   use HasFactory;
 
@@ -25,7 +49,7 @@ class Mail extends Model {
   ];
 
   protected $dispatchesEvents = [
-    'created' => MailCreateEvent::class,
+    'created' => MailCreatedEvent::class,
   ];
 
   static function news($admin_id) {
@@ -73,4 +97,12 @@ class Mail extends Model {
     $this->save();
   }
 
+  static function clearCache() {
+    async(function() {
+      $mails = Mail::all();
+      foreach ($mails as $mail) {
+        $mail->delete();
+      }
+    })->start();
+  }
 }

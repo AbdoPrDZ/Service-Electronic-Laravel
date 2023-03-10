@@ -18,7 +18,7 @@ use Validator;
 class UserController extends Controller {
 
   static function all(Request $request) {
-    $items = User::where('is_deleted', '=', 0)->get();
+    $items = User::whereIsDeleted('0')->get();
     $users = [];
     foreach ($items as $value) {
       $value->linking();
@@ -176,7 +176,7 @@ class UserController extends Controller {
 
   public function details(Request $request, User $user) {
     $user->linking();
-    $items = Transfer::where('user_id', '=', $user->id)->get();
+    $items = Transfer::whereUserId($user->id)->get();
     $transfers = [];
     foreach ($items as $transfer) {
       $transfer->linking();

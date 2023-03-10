@@ -14,11 +14,15 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string $name
  * @property string $char
+ * @property string $image_id
  * @property bool $proof_is_required
+ * @property string $image_pick_type
+ * @property string|null $wallet
  * @property array $data
  * @property string $platform_wallet_id
- * @property Wallet $platform_wallet
  * @property array $prices
+ * @property array $unreades
+ * @property bool $is_deleted
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Currency newModelQuery()
@@ -26,12 +30,16 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Currency query()
  * @method static \Illuminate\Database\Eloquent\Builder|Currency whereChar($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Currency whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Currency whereData($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Currency whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Currency whereMaxReceive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Currency whereImageId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Currency whereImagePickType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Currency whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Currency whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Currency wherePlatformWalletId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Currency wherePrices($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Currency whereProofIsRequired($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Currency whereUnreades($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Currency whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Currency whereWallet($value)
  * @mixin \Eloquent

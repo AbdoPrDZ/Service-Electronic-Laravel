@@ -15,22 +15,28 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $store_name
  * @property string $store_address
  * @property string|null $store_image_id
+ * @property array $delivery_prices
  * @property string $status
  * @property string|null $anower_description
- * @property string|null $answered_at
+ * @property \Illuminate\Support\Carbon|null $answered_at
+ * @property array $unreades
+ * @property int $is_deleted
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Seller newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Seller newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Seller query()
- * @method static \Illuminate\Database\Eloquent\Builder|Seller whereAnowerAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Seller whereAnowerDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Seller whereAnsweredAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Seller whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Seller whereDeliveryPrices($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Seller whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Seller whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Seller whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Seller whereStoreAddress($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Seller whereStoreImageId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Seller whereStoreName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Seller whereUnreades($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Seller whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Seller whereUserId($value)
  * @mixin \Eloquent
@@ -107,7 +113,7 @@ class Seller extends Model {
    * @return array<Product>
    */
   public function products() {
-    $items = Product::where('seller_id', '=', $this->id)->get();
+    $items = Product::whereSellerId($this->id)->get();
     $products = [];
     foreach ($items as $product) {
       $product->linking(linkingSeller: false);
@@ -120,7 +126,7 @@ class Seller extends Model {
     $purchases = [];
     $sellerProducts = $this->products();
     foreach ($sellerProducts as $product) {
-      $items = Purchase::where('product_id', '=', $product->id)->get();
+      $items = Purchase::whereProductId($product->id)->get();
       foreach ($items as $purchase) {
         $purchase->linking();
         $purchases[$purchase->id] = $purchase;

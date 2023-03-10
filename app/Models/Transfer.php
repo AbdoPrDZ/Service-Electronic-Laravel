@@ -20,19 +20,24 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $received_currency_id
  * @property string|null $proof_id
  * @property string|null $wallet
- * @property int $exchange_id
+ * @property array $data
+ * @property int|null $exchange_id
+ * @property string $for_what
  * @property string $status
  * @property \Illuminate\Support\Carbon|null $answered_at
  * @property string|null $answer_description
+ * @property array $unreades
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer query()
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereAnswerDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereAnswerdAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereAnsweredAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereData($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereExchangeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereForWhat($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereProofId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereReceivedBalance($value)
@@ -40,6 +45,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereSendedBalance($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereSendedCurrencyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereUnreades($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Transfer whereWallet($value)
@@ -198,9 +204,7 @@ class Transfer extends Model  {
    * @return array
    */
   static function trnasfers() {
-    $transfers = Transfer::where([
-      ['for_what', '=', 'transfer'],
-    ])->get();
+    $transfers = Transfer::whereForWhat('transfer')->get();
     $fTransfers = [];
     foreach ($transfers as $transfer) {
       $transfer->linking();
@@ -246,4 +250,14 @@ class Transfer extends Model  {
     }
     return $fTransfers;
   }
+
+  static function clearCache() {
+    async(function(){
+      $transfers = Transfer::where('status', '!=', 'wiating')->get();
+      foreach ($transfers as $transfer) {
+        $transfer->delete();
+      }
+    })->start();
+  }
+
 }

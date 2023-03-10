@@ -24,7 +24,7 @@ class TemplateController extends Controller {
       ]);
     }
 
-    if(Template::where('name', '=', $request->name)->first()) {
+    if(Template::whereName($request->name)->first()) {
       return $this->apiErrorResponse('This Name already used', [
         'errors' => [
           'name' => 'This Name already used',

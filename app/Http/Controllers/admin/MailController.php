@@ -20,7 +20,7 @@ class MailController extends Controller {
       $item->linking();
       $mails[$item->id] = $item;
     }
-    $items = Template::where('is_deleted', '=', 0)->get();
+    $items = Template::whereIsDeleted('0')->get();
     $templates = [];
     foreach ($items as $item) {
       $templates[$item->name] = $item;

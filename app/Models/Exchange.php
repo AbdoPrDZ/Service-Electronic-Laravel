@@ -10,33 +10,31 @@ use Illuminate\Database\Eloquent\Model;
  * App\Models\Exchange
  *
  * @property int $id
- * @property int $from_id
- * @property string $from_model
- * @property int $to_id
- * @property string $to_model
+ * @property string $name
  * @property string|null $from_wallet_id
- * @property string $to_wallet_id
- * @property float $balance
+ * @property string|null $to_wallet_id
+ * @property float $sended_balance
+ * @property float $received_balance
  * @property string $status
  * @property string|null $anower_description
- * @property string|null $answered_at
+ * @property \Illuminate\Support\Carbon|null $answered_at
+ * @property array $unreades
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Exchange newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Exchange newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Exchange query()
- * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereAnowerAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereAnowerDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereBalance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereAnsweredAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereFromId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereFromModel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereFromWalletId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereReceivedBalance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereSendedBalance($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereToId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereToModel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereToWalletId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereUnreades($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereUpdatedAt($value)
  * @mixin \Eloquent
  */
@@ -89,8 +87,8 @@ class Exchange extends Model {
     $this->to_wallet = Wallet::find($this->to_wallet_id);
     if($this->to_wallet) $this->to_wallet->linking();
     if ($gettinUsers) {
-      $this->from_user = User::where('wallet_id', '=', $this->from_wallet_id)->first();
-      $this->to_user = User::where('wallet_id', '=', $this->to_wallet_id)->first();
+      $this->from_user = User::whereWalletId($this->from_wallet_id)->first();
+      $this->to_user = User::whereWalletId($this->to_wallet_id)->first();
     }
   }
 
@@ -158,4 +156,14 @@ class Exchange extends Model {
       'success' => true,
     ];
   }
+
+  static function clearUsersExchanges() {
+    async(function() {
+      $exchanges = Exchange::whereName('users-transfer')->get();
+      foreach ($exchanges as $exchange) {
+        $exchange->delete();
+      }
+    })->start();
+  }
+
 }

@@ -44,7 +44,7 @@ class UserController extends Controller {
       ]);
     }
 
-    $user = User::where('email', '=', $request->email)->first();
+    $user = User::whereEmail($request->email)->first();
     if(!is_null($user)) {
       if(is_null($user->email_verified_at)) {
         return $this->apiErrorResponse('Your email is not verifited.', [
@@ -99,8 +99,8 @@ class UserController extends Controller {
       ]);
     }
 
-    $email = User::where('email', '=', $request->email)->first();
-    $phone = User::where('phone', '=', $request->phone)->first();
+    $email = User::whereEmail($request->email)->first();
+    $phone = User::wherePhone($request->phone)->first();
     if(!is_null($email) && !is_null($email->email_verified_at)) {
       return $this->apiErrorResponse('You already registred please go to login', [
         'errors' => ['email' => 'You already registred please go to login']
@@ -276,7 +276,7 @@ class UserController extends Controller {
         'errors' => $validator->errors(),
       ]);
     }
-    $user = User::where('email', '=', $request->email)->first();
+    $user = User::whereEmail($request->email)->first();
     if(!is_null($user)) {
       if(is_null($user->email_verified_at)) {
         return $this->apiErrorResponse('Email not verfited, please verify your email', [
@@ -603,7 +603,7 @@ class UserController extends Controller {
   }
 
   public function findUser(Request $request, $email) {
-    $user = User::where('email', '=', $email)->first();
+    $user = User::whereEmail($email)->first();
 
     if($user) {
       $user->linking();

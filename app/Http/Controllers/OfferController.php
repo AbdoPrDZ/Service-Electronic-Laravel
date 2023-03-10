@@ -17,7 +17,7 @@ class OfferController extends Controller {
       return $this->apiErrorResponse('This service has been deactivated');
     }
 
-    $items = Offer::where('is_deleted', '=', 0)->get();
+    $items = Offer::whereIsDeleted('0')->get();
     $offers = [];
     foreach ($items as $offer) {
       $offers[$offer->id] = $offer;

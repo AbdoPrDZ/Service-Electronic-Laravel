@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * App\Models\Setting
  *
- * @property int $name
+ * @property string $name
  * @property array $value
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at

@@ -23,6 +23,7 @@ class TransferDeletedEvent {
   public function __construct(Transfer $transfer) {
     $transfer->linking();
     if ($transfer->proof_id) File::find($transfer->proof_id)?->delete();
+    if($transfer->exchange) $transfer->exchange->delete();
   }
 
   /**

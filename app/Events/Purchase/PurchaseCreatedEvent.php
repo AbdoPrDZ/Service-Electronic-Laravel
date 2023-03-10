@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Purchase;
 
 use App\Models\Admin;
 use App\Models\Notification;

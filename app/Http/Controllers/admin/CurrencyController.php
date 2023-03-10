@@ -14,7 +14,7 @@ use Validator;
 class CurrencyController extends Controller {
 
   static function all(Request $request) {
-    $items = Currency::where('is_deleted', '=', 0)->get();
+    $items = Currency::whereIsDeleted('0')->get();
     $currencies = [];
     foreach ($items as $value) {
       $currencies[$value->id] = $value;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Notification;
 
 use App\Http\SocketBridge\SocketClient;
 use App\Models\Admin;

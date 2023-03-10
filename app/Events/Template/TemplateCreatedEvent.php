@@ -1,17 +1,19 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Template;
 
 use App\Models\Admin;
-use App\Models\Mail;
 use App\Models\Notification;
+use App\Models\Template;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Mail\Message;
 use Illuminate\Queue\SerializesModels;
 
-class MailCreateEvent {
+class TemplateCreatedEvent {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
   /**
@@ -19,24 +21,16 @@ class MailCreateEvent {
    *
    * @return void
    */
-  public function __construct(Mail $mail) {
-    $mail->linking();
-    \Illuminate\Support\Facades\Mail::raw($mail->title, function (Message $message) use($mail) {
-      foreach ($mail->targetsMails as $email) {
-       $message->to($email)
-               ->subject($mail->title)
-               ->html($mail->rendredContent);
-      }
-    });
-    foreach ($mail->unreades ?? [] as $admin_id) {
+  public function __construct(Template $template) {
+    foreach ($template->unreades ?? [] as $admin_id) {
       Notification::create([
         'to_id' => $admin_id,
         'to_model' => Admin::class,
-        'name' => 'new-mail-created',
-        'title' => 'A new mail created',
-        'message' => 'Mail sended to (' . join(', ', $mail->targets) . ')',
+        'name' => 'new-template-created',
+        'title' => 'A new template created',
+        'message' => 'template created (Name: ' . $template->name . ')',
         'data' => [
-          'mail_id' => $mail->id,
+          'template_id' => $template->id,
         ],
         'image_id' => 'logo',
         'type' => 'emit',

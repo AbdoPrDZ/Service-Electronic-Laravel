@@ -14,13 +14,13 @@ class ProductController extends Controller {
   }
 
   static function all(Request $request) {
-    $items = Product::where('is_deleted', '=', 0)->get();
+    $items = Product::whereIsDeleted('0')->get();
     $products = [];
     foreach ($items as $value) {
       $value->linking();
       $products[$value->id] = $value;
     }
-    $items = Category::where('is_deleted', '=', 0)->get();
+    $items = Category::whereIsDeleted('0')->get();
     $categories = [];
     foreach ($items as $value) {
       $categories[$value->id] = $value;

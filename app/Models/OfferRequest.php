@@ -2,10 +2,43 @@
 
 namespace App\Models;
 
-use App\Events\OfferRequestCreatedEvent;
+use App\Events\OfferRequest\OfferRequestCreatedEvent;
+use App\Events\OfferRequest\OfferRequestDeletedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\OfferRequest
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property int $offer_id
+ * @property string|null $sub_offer
+ * @property array $fields
+ * @property array|null $data
+ * @property string $status
+ * @property float $total_price
+ * @property int $exchange_id
+ * @property array $unreades
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|OfferRequest newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|OfferRequest newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|OfferRequest query()
+ * @method static \Illuminate\Database\Eloquent\Builder|OfferRequest whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OfferRequest whereData($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OfferRequest whereExchangeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OfferRequest whereFields($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OfferRequest whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OfferRequest whereOfferId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OfferRequest whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OfferRequest whereSubOffer($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OfferRequest whereTotalPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OfferRequest whereUnreades($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OfferRequest whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OfferRequest whereUserId($value)
+ * @mixin \Eloquent
+ */
 class OfferRequest extends Model {
   use HasFactory;
 
@@ -30,6 +63,7 @@ class OfferRequest extends Model {
 
   protected $dispatchesEvents = [
     'created' => OfferRequestCreatedEvent::class,
+    'deleted' => OfferRequestDeletedEvent::class,
   ];
 
   static function news($admin_id) {
@@ -67,6 +101,15 @@ class OfferRequest extends Model {
   public function unlinkingAndSave() {
     $this->unlinking();
     $this->save();
+  }
+
+  static function clearCache() {
+    async(function() {
+      $offerRequests = OfferRequest::whereIn('status', ['admin_refuse', 'admin_accept'])->get();
+      foreach ($offerRequests as $offerRequest) {
+        $offerRequest->delete();
+      }
+    })->start();
   }
 
 }

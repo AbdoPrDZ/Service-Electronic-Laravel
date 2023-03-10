@@ -18,7 +18,7 @@ return new class extends Migration {
       $table->string('sub_offer')->nullable();
       $table->json('fields');
       $table->json('data')->nullable();
-      $table->enum('status', ['waiting_admin_accept', 'admin_accept', 'admin_refuse', 'client_report', 'delivering', 'received'])->default('waiting_admin_accept');
+      $table->enum('status', ['waiting_admin_accept', 'admin_accept', 'admin_refuse'])->default('waiting_admin_accept');
       $table->double('total_price');
       $table->integer('exchange_id');
       $table->json('unreades')->default('[]');

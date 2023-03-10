@@ -4,9 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Currency;
+use App\Models\Exchange;
+use App\Models\Mail;
 use App\Models\Notification;
+use App\Models\OfferRequest;
+use App\Models\Purchase;
 use App\Models\Setting;
 use App\Models\Template;
+use App\Models\Transfer;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Validator;
@@ -51,11 +56,12 @@ class SettingsController extends Controller {
                 'user_credit_receive_template,'.
                 'user_identity_confirm_template,'.
                 'commission,'.
-                'services_status',
+                'services_status,'.
+                'clear_data',
       'value' => 'required',
     ]);
     if ($validator->fails()) {
-      return $this->apiErrorResponse(null, ['errors' =>$validator->errors()]);
+      return $this->apiErrorResponse(null, ['errors' => $validator->errors()]);
     }
 
     switch ($request->name) {
@@ -144,6 +150,27 @@ class SettingsController extends Controller {
           'type' => 'emitOrNotify',
         ]);
         return $this->apiSuccessResponse('Successfully edditing services status');
+      case 'clear_data':
+        switch ($request->value) {
+          case 'transfers':
+            Transfer::clearCache();
+            Exchange::clearUsersExchanges();
+            break;
+          case 'messages':
+            Notification::clearCache();
+            break;
+          case 'mails':
+            Mail::clearCache();
+            break;
+          case 'purchases':
+            Purchase::clearCache();
+          case 'offers_requests':
+            OfferRequest::clearCache();
+            break;
+          default:
+            return $this->apiErrorResponse("Invalid target ($request->value)", ['value' => "Ivalid Target ($request->value)"]);
+        }
+        return $this->apiSuccessResponse('Successfully clearing data');
       default:
         return $this->apiErrorResponse('Some things worng', ['all' => $request->all()]);
     }

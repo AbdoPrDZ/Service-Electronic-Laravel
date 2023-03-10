@@ -20,8 +20,10 @@ use Laravel\Sanctum\HasApiTokens;
  * @property array $permissions
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
+ * @property-read int|null $tokens_count
  * @method static \Illuminate\Database\Eloquent\Builder|Admin newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Admin newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Admin query()
@@ -73,7 +75,7 @@ class Admin extends Authenticatable{
   }
 
   static function unreades($admin_id = null) {
-    $admins = is_null($admin_id) ? Admin::all() :Admin::where('id', '!=', $admin_id)->get();
+    $admins = is_null($admin_id) ? Admin::all() : Admin::where('id', '!=', $admin_id)->get();
     $ids = [];
     foreach ($admins as $admin) {
       $ids[] = $admin->id;

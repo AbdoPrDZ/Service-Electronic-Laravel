@@ -1,11 +1,9 @@
 <?php
 
-namespace App\Events\Currency;
+namespace App\Events\Template;
 
-use App\Models\Currency;
-use App\Models\File;
-use App\Models\Notification;
-use App\Models\Transfer;
+use App\Models\Mail;
+use App\Models\Template;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -14,7 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class CurrencyDeletedEvent {
+class TemplateDeletedEvent{
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
   /**
@@ -22,13 +20,10 @@ class CurrencyDeletedEvent {
    *
    * @return void
    */
-  public function __construct(Currency $currency) {
-    $currency->linking();
-    $currency->platform_wallet->delete();
-    File::find($currency->image_id)->delete();
-    $transfers = Transfer::whereSendedCurrencyId($currency->id)->get();
-    foreach ($transfers as $transfer) {
-      $transfer->delete();
+  public function __construct(Template $template) {
+    $mails = Mail::whereTemplateId($template->name)->get();
+    foreach ($mails as $mail) {
+      $mail->delete();
     }
   }
 

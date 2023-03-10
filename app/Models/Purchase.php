@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use App\Events\PurchaseCreatedEvent;
+use App\Events\Purchase\PurchaseCreatedEvent;
+use App\Events\Purchase\PurchaseDeletedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,34 +13,40 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property int $product_id
  * @property int $count
+ * @property int $user_id
  * @property string $fullname
  * @property string $phone
  * @property string|null $address
  * @property string $delivery_type
- * @property float $delivery_price
  * @property float $total_price
- * @property string|null $exchange_id
+ * @property int $delivery_cost_exchange_id
+ * @property int $product_price_exchange_id
+ * @property int $commission_exchange_id
+ * @property array $delivery_steps
+ * @property string $status
+ * @property array $unreades
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Purchase newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Purchase newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Purchase query()
  * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereAddress($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereChargingDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereCommissionExchangeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereCount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereDeliveryDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereDeliveryPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereDeliveryCostExchangeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereDeliverySteps($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereDeliveryType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereFullname($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Purchase wherePayExchangeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Purchase wherePhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereProductId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereReceivedDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereProductPriceExchangeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereTotalPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereUnreades($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Purchase whereUserId($value)
  * @mixin \Eloquent
  */
 class Purchase extends Model {
@@ -72,6 +79,7 @@ class Purchase extends Model {
 
   protected $dispatchesEvents = [
     'created' => PurchaseCreatedEvent::class,
+    'deleted' => PurchaseDeletedEvent::class,
   ];
 
   static function news($admin_id) {
@@ -116,5 +124,14 @@ class Purchase extends Model {
   public function unlinkingAndSave() {
     $this->unlinking();
     $this->save();
+  }
+
+  static function clearCache() {
+    async(function() {
+      $purchases = Purchase::whereIn('status', ['seller_refuse', 'client_accept', 'admin_answered'])->get();
+      foreach ($purchases as $purchase) {
+        $purchase->delete();
+      }
+    })->start();
   }
 }

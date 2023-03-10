@@ -9,6 +9,11 @@
     <link href="{{ asset('resources/css/admin/main.css') }}" rel="stylesheet">
     <link href="{{ asset('resources/css/admin/settings.css') }}" rel="stylesheet">
     <title>Service Electronic | Settings</title>
+    <style>
+      .btn {
+        width: 100%
+      }
+    </style>
   </head>
   <body>
     <div class="topbar">
@@ -56,7 +61,7 @@
             @endforeach
           </select>
           <br>
-          <button class="btn btn-success" action="save" onclick="saveSetting(this, 'platform_currency')" style="width: 100%;">حفظ</button>
+          <button class="btn btn-success" onclick="saveSetting(this, 'platform_currency')">حفظ</button>
         </div>
         <hr>
 
@@ -68,7 +73,7 @@
             @endforeach
           </select>
           <br>
-          <button class="btn btn-success" action="save" onclick="saveSetting(this, 'display_currency')" style="width: 100%;">حفظ</button>
+          <button class="btn btn-success" onclick="saveSetting(this, 'display_currency')">حفظ</button>
         </div>
         <hr>
 
@@ -80,7 +85,7 @@
             @endforeach
           </select>
           <br>
-          <button class="btn btn-success" action="save" onclick="saveSetting(this, 'email_verification_template')" style="width: 100%;">حفظ</button>
+          <button class="btn btn-success" onclick="saveSetting(this, 'email_verification_template')">حفظ</button>
         </div>
         <hr>
 
@@ -92,7 +97,7 @@
             @endforeach
           </select>
           <br>
-          <button class="btn btn-success" action="save" onclick="saveSetting(this, 'user_recharge_template')" style="width: 100%;">حفظ</button>
+          <button class="btn btn-success" onclick="saveSetting(this, 'user_recharge_template')">حفظ</button>
         </div>
         <hr>
 
@@ -104,7 +109,7 @@
             @endforeach
           </select>
           <br>
-          <button class="btn btn-success" action="save" onclick="saveSetting(this, 'user_withdraw_template')" style="width: 100%;">حفظ</button>
+          <button class="btn btn-success" onclick="saveSetting(this, 'user_withdraw_template')">حفظ</button>
         </div>
         <hr>
 
@@ -116,7 +121,7 @@
             @endforeach
           </select>
           <br>
-          <button class="btn btn-success" action="save" onclick="saveSetting(this, 'user_credit_receive_template')" style="width: 100%;">حفظ</button>
+          <button class="btn btn-success" onclick="saveSetting(this, 'user_credit_receive_template')">حفظ</button>
         </div>
         <hr>
 
@@ -128,7 +133,7 @@
             @endforeach
           </select>
           <br>
-          <button class="btn btn-success" action="save" onclick="saveSetting(this, 'user_credit_receive_template')" style="width: 100%;">حفظ</button>
+          <button class="btn btn-success" onclick="saveSetting(this, 'user_credit_receive_template')">حفظ</button>
         </div>
         <hr>
 
@@ -136,7 +141,7 @@
           <h5>عمولة المنتجات:</h5>
           <input type="number" class="form-control" value="{{ $commission }}">
           <br>
-          <button class="btn btn-success" action="save" onclick="saveSetting(this, 'commission')" style="width: 100%;">حفظ</button>
+          <button class="btn btn-success" onclick="saveSetting(this, 'commission')">حفظ</button>
         </div>
         <hr>
 
@@ -155,7 +160,32 @@
             <label class="custom-control-label" for="store-service">خدمة المتجر مفعلة</label>
           </div>
           <br>
-          <button class="btn btn-success" action="save" onclick="saveSetting(this, 'services_status')" style="width: 100%;">حفظ</button>
+          <button class="btn btn-success" onclick="saveSetting(this, 'services_status')">حفظ</button>
+        </div>
+
+        <div class="form-group">
+          <h5>حذف التحويلات:</h5>
+          <button class="btn btn-warning" target="transfers" onclick="saveSetting(this, 'clear_data')">حذف</button>
+        </div>
+        <hr>
+        <div class="form-group">
+          <h5>حذف الرسائل:</h5>
+          <button class="btn btn-warning" target="messages" onclick="saveSetting(this, 'clear_data')">حذف</button>
+        </div>
+        <hr>
+        <div class="form-group">
+          <h5>حذف رسائل البريد الإلكتروني:</h5>
+          <button class="btn btn-warning" target="mails" onclick="saveSetting(this, 'clear_data')">حذف</button>
+        </div>
+        <hr>
+        <div class="form-group">
+          <h5>حذف طلبات العروض:</h5>
+          <button class="btn btn-warning" target="offers_requests" onclick="saveSetting(this, 'clear_data')">حذف</button>
+        </div>
+        <hr>
+        <div class="form-group">
+          <h5>حذف طلبات الشراء:</h5>
+          <button class="btn btn-warning" target="purchases" onclick="saveSetting(this, 'clear_data')">حذف</button>
         </div>
 
       </div>
@@ -217,13 +247,17 @@
           services_status: {
             title: 'تغيير حالة الخدمات',
             message: 'عل أنت متأكد من تغيير حالة الخدمات',
-          }
+          },
+          clear_data: {
+            title: 'حذف البيانات',
+            message: 'عل أنت متأكد من حذف البيانات',
+          },
         }
         const value = name == 'services_status' ? JSON.stringify({
           transfers: $('input[name="transfers_servince_is_active"]').prop('checked') ? 'active' : 'deactivate',
           offers: $('input[name="offers_servince_is_active"]').prop('checked') ? 'active' : 'deactivate',
           store: $('input[name="store_servince_is_active"]').prop('checked') ? 'active' : 'deactivate',
-        }) : $(`.form-group[name="${name}"] .form-control`).val();
+        }) : name == 'clear_data' ? $(button).attr('target') : $(`.form-group[name="${name}"] .form-control`).val();
         const btnHtml = $(button).html();
         $(button).html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>يرجى الإنتظار...`);
         $(button).attr('disabled', true);

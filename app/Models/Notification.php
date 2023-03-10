@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use App\Events\NotificationCreatedEvent;
+use App\Events\Notification\NotificationCreatedEvent;
+use App\Events\Notification\NotificationDeletedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,8 +11,8 @@ use Illuminate\Database\Eloquent\Model;
  * App\Models\Notification
  *
  * @property int $id
- * @property string $from_id
- * @property string $from_model
+ * @property string|null $from_id
+ * @property string|null $from_model
  * @property string $to_id
  * @property string $to_model
  * @property string $name
@@ -19,7 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $message
  * @property array $data
  * @property string|null $image_id
- * @property int $is_readed
+ * @property bool $is_readed
  * @property string $type
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -67,6 +68,7 @@ class Notification extends Model {
 
   protected $dispatchesEvents = [
     'created' => NotificationCreatedEvent::class,
+    'deleted' => NotificationDeletedEvent::class,
   ];
 
   static function allUnreaded($user_id, $model = User::class) {
@@ -96,6 +98,15 @@ class Notification extends Model {
   public function unlinkingAndSave() {
     $this->unlinking();
     $this->save();
+  }
+
+  static function clearCache() {
+    async(function () {
+      $notifications = Notification::whereIsReaded('1')->get();
+      foreach ($notifications as $notification) {
+        $notification->delete();
+      }
+    })->start();
   }
 
 }

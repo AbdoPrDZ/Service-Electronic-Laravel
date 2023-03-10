@@ -16,7 +16,7 @@ class OfferRequestController extends Controller {
       return $this->apiErrorResponse('This service has been deactivated');
     }
 
-    $items = OfferRequest::where('user_id', '=', $request->user()->id)->get();
+    $items = OfferRequest::whereUserId($request->user()->id)->get();
     $offerRequests = [];
     foreach ($items as $offer) {
       $offer->linking();

@@ -16,7 +16,7 @@ class CurrencyController extends Controller {
       return $this->apiErrorResponse('This service has been deactivated');
     }
 
-    $data = Currency::where('is_deleted', '=', 0)->get();
+    $data = Currency::whereIsDeleted('0')->get();
     $items = [];
     foreach ($data as $item) {
       $items[$item->id] = $item;

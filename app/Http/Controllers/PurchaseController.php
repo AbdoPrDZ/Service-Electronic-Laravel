@@ -38,7 +38,7 @@ class PurchaseController extends Controller {
       return $this->apiErrorResponse('This service has been deactivated');
     }
 
-    $items = Purchase::where('user_id', '=',  $request->user()->id)->get();
+    $items = Purchase::whereUserId($request->user()->id)->get();
     $purchases = [];
     foreach ($items as $item) {
       $item->linking();
