@@ -1110,6 +1110,7 @@ $on('#view-seller .modal-body .form-control[name="delivery_states"]', 'change', 
 
 $on('#all-currencies .custom-table-header-actions button[action="create"]', 'click', function() {
   $('#create-edit-currency .btn-img-picker').html('<span class="material-symbols-sharp pick-icon">add_a_photo</span>');
+  window.ImagePicker['currency-image-picker'] = null;
   $('#create-edit-currency input').val('');
   initMultiInputWidget('#currency-prices');
   initMultiInputWidget('#currency-data');
@@ -1141,6 +1142,7 @@ $on('#all-currencies table tr td button[action="edit"]', 'click', function () {
   $('#create-edit-currency input[name="currency_balance"]').val(currency.platform_wallet.balance);
   $('#create-edit-currency input[name="currency_wallet"]').val(currency.wallet);
   $('#create-edit-currency .form-group .btn.btn-img-picker').html(`<img src="./file/public/${currency.image_id}">`);
+  window.ImagePicker['currency-image-picker'] = null;
   for (const currencyId in currency.prices) {
     const price = currency.prices[currencyId];
     addMultiInputItem('#currency-prices', {
